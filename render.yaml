@@ -7,4 +7,10 @@ services:
     envVars:
       - key: ANTHROPIC_API_KEY
         sync: false
+      - key: SESSIONS_DIR
+        value: /data/sessions
     healthCheckPath: /health
+    disk:
+      name: sessions-disk
+      mountPath: /data
+      sizeGB: 1

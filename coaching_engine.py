@@ -20,7 +20,8 @@ MODEL = "claude-sonnet-4-6"
 MAX_TOKENS = 1024
 MAX_HISTORY_TURNS = 20        # Keep last 20 turns in context
 SESSION_TTL_SECONDS = 3600   # 1 hour session expiry
-SESSIONS_DIR = Path("sessions")
+# Use SESSIONS_DIR env var if set (Render persistent disk), else local fallback
+SESSIONS_DIR = Path(os.environ.get("SESSIONS_DIR", "sessions"))
 
 
 # ── Session Management ───────────────────────────────────────────────────────
