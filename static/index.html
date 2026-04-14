@@ -11,20 +11,22 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --navy:       #0f1623;
-      --navy-mid:   #141e2e;
-      --navy-lt:    #1a2540;
-      --navy-hover: #1f2d4a;
-      --gold:       #C5A66B;
-      --gold-lt:    #d4bc8e;
-      --gold-dim:   rgba(197,166,107,0.15);
-      --border:     rgba(255,255,255,0.07);
-      --border-md:  rgba(255,255,255,0.12);
-      --text-wh:    #f0f2f8;
-      --text-lt:    #a8b4c8;
-      --text-mt:    #6b7a94;
-      --user-bg:    #1e2c4a;
-      --sidebar-w:  268px;
+      --navy:          #0f1623;
+      --navy-mid:      #141e2e;
+      --navy-lt:       #1a2540;
+      --navy-hover:    #1f2d4a;
+      --gold:          #C5A66B;
+      --gold-lt:       #d4bc8e;
+      --gold-dim:      rgba(197,166,107,0.15);
+      --green-accent:  #22c55e;
+      --purple-accent: #667eea;
+      --border:        rgba(255,255,255,0.07);
+      --border-md:     rgba(255,255,255,0.12);
+      --text-wh:       #f0f2f8;
+      --text-lt:       #a8b4c8;
+      --text-mt:       #6b7a94;
+      --user-bg:       #1e2c4a;
+      --sidebar-w:     268px;
     }
 
     html, body { height: 100%; overflow: hidden; }
@@ -57,13 +59,8 @@
       position: relative;
       z-index: 10;
     }
-    .sidebar.collapsed {
-      width: 0;
-      min-width: 0;
-      border-right: none;
-    }
+    .sidebar.collapsed { width: 0; min-width: 0; border-right: none; }
 
-    /* Logo */
     .sidebar-logo {
       padding: 20px 18px 16px;
       display: flex;
@@ -84,16 +81,11 @@
     .logo-text { font-size: 14px; font-weight: 600; letter-spacing: -0.2px; white-space: nowrap; }
     .logo-sub { font-size: 10px; color: var(--text-mt); margin-top: 1px; white-space: nowrap; }
 
-    /* New Session */
-    .new-session-wrap {
-      padding: 14px 14px 10px;
-      flex-shrink: 0;
-    }
+    .new-session-wrap { padding: 14px 14px 10px; flex-shrink: 0; }
     .new-session-btn {
       width: 100%;
       display: flex; align-items: center; gap: 8px;
-      background: var(--gold);
-      color: var(--navy);
+      background: var(--gold); color: var(--navy);
       border: none; border-radius: 10px;
       padding: 10px 14px;
       font-size: 13px; font-weight: 600;
@@ -103,28 +95,17 @@
     .new-session-btn:hover { background: var(--gold-lt); }
     .new-session-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
 
-    /* Sidebar scroll area */
-    .sidebar-scroll {
-      flex: 1;
-      overflow-y: auto;
-      padding: 0 0 20px;
-    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 0 0 20px; }
 
-    /* Section headers */
     .section-label {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-mt);
-      padding: 16px 18px 6px;
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-mt); padding: 16px 18px 6px;
     }
 
-    /* Session list */
     .session-item {
       display: flex; align-items: center; gap: 8px;
-      padding: 8px 14px;
-      border-radius: 8px; margin: 1px 6px;
+      padding: 8px 14px; border-radius: 8px; margin: 1px 6px;
       cursor: pointer; transition: background 0.15s;
       font-size: 13px; color: var(--text-lt);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -134,90 +115,75 @@
     .session-item svg { width: 13px; height: 13px; flex-shrink: 0; opacity: 0.5; }
     .session-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    /* Experiences */
     .experience-item {
       display: flex; align-items: center; gap: 12px;
-      padding: 9px 14px;
-      border-radius: 10px; margin: 2px 6px;
+      padding: 9px 14px; border-radius: 10px; margin: 2px 6px;
       cursor: pointer; transition: background 0.15s;
     }
     .experience-item:hover { background: var(--navy-hover); }
     .exp-orb {
-      width: 36px; height: 36px;
-      border-radius: 10px;
-      flex-shrink: 0;
-      position: relative;
-      overflow: hidden;
+      width: 36px; height: 36px; border-radius: 10px;
+      flex-shrink: 0; position: relative; overflow: hidden;
     }
     .exp-orb::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      opacity: 0.3;
-      background: radial-gradient(circle at 30% 30%, white, transparent 60%);
+      content: ''; position: absolute; inset: 0; border-radius: inherit;
+      opacity: 0.3; background: radial-gradient(circle at 30% 30%, white, transparent 60%);
     }
     .exp-orb.roleplay    { background: linear-gradient(135deg, #667eea, #764ba2); }
     .exp-orb.difficult   { background: linear-gradient(135deg, #f093fb, #f5576c); }
     .exp-orb.stakeholder { background: linear-gradient(135deg, #4facfe, #00f2fe); }
     .exp-orb.plan90      { background: linear-gradient(135deg, #43e97b, #38f9d7); }
     .exp-orb.decision    { background: linear-gradient(135deg, #fa709a, #fee140); }
-
     .exp-info { min-width: 0; }
     .exp-name { font-size: 13px; font-weight: 500; color: var(--text-wh); line-height: 1.3; }
     .exp-desc { font-size: 11px; color: var(--text-mt); margin-top: 1px; }
-
-    /* Sidebar toggle */
-    .sidebar-toggle {
-      position: absolute;
-      top: 20px; right: -14px;
-      width: 26px; height: 26px;
-      background: var(--navy-mid);
-      border: 1px solid var(--border-md);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; z-index: 20;
-      transition: background 0.15s;
-    }
-    .sidebar-toggle:hover { background: var(--navy-lt); }
-    .sidebar-toggle svg { width: 12px; height: 12px; color: var(--text-mt); transition: transform 0.25s; }
-    .sidebar.collapsed ~ .main .sidebar-toggle svg,
-    .sidebar-toggle.flipped svg { transform: rotate(180deg); }
 
     /* ═══════════════════════════════════════════════
        MAIN AREA
     ═══════════════════════════════════════════════ */
     .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      position: relative;
-      min-width: 0;
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; position: relative; min-width: 0;
     }
 
-    /* Top bar */
+    /* ── Top Navigation ── */
     .topbar {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 24px;
+      display: flex; align-items: center;
+      padding: 0 24px;
       border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
+      flex-shrink: 0; height: 54px; gap: 16px;
     }
     .topbar-left { display: flex; align-items: center; gap: 12px; }
     .toggle-sidebar-btn {
-      width: 30px; height: 30px;
-      background: none; border: 1px solid var(--border);
-      border-radius: 8px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--text-mt); transition: all 0.15s;
+      width: 30px; height: 30px; background: none;
+      border: 1px solid var(--border); border-radius: 8px;
+      cursor: pointer; display: flex; align-items: center;
+      justify-content: center; color: var(--text-mt); transition: all 0.15s;
     }
     .toggle-sidebar-btn:hover { border-color: var(--border-md); color: var(--text-lt); }
     .toggle-sidebar-btn svg { width: 14px; height: 14px; }
 
-    .session-title {
-      font-size: 14px; font-weight: 500;
-      color: var(--text-lt);
+    /* Top tab navigation */
+    .top-nav {
+      display: flex; align-items: center; gap: 2px;
+      flex: 1; justify-content: center;
     }
+    .top-nav-tab {
+      padding: 6px 18px; border-radius: 8px;
+      font-size: 13px; font-weight: 500;
+      color: var(--text-mt); cursor: pointer;
+      border: none; background: none;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.15s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .top-nav-tab:hover { color: var(--text-lt); background: rgba(255,255,255,0.04); }
+    .top-nav-tab.active {
+      color: var(--text-wh);
+      background: var(--navy-lt);
+      border: 1px solid var(--border-md);
+    }
+    .top-nav-tab svg { width: 13px; height: 13px; }
 
     .topbar-right { display: flex; align-items: center; gap: 8px; }
     .coach-pill {
@@ -226,7 +192,7 @@
       border-radius: 100px; padding: 4px 12px;
       font-size: 12px; color: var(--gold); font-weight: 500;
     }
-    .coach-dot { width: 5px; height: 5px; border-radius: 50%; background: #22c55e; flex-shrink: 0; }
+    .coach-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green-accent); flex-shrink: 0; }
     .coach-select {
       background: none; border: 1px solid var(--border);
       border-radius: 8px; padding: 6px 10px;
@@ -235,398 +201,499 @@
     }
     .coach-select:hover { border-color: var(--border-md); }
 
-    /* Messages */
-    .messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-    }
+    /* ═══════════════════════════════════════════════
+       PANEL SYSTEM
+    ═══════════════════════════════════════════════ */
+    .panel { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+    .panel.active { display: flex; }
 
-    /* ── Welcome State ── */
+    /* ═══════════════════════════════════════════════
+       COACH PANEL
+    ═══════════════════════════════════════════════ */
+    .messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+
     .welcome-state {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 24px 24px;
-      text-align: center;
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 40px 24px 24px; text-align: center;
     }
 
-    /* Animated orb */
     .coach-orb {
-      width: 80px; height: 80px;
-      border-radius: 50%;
-      position: relative;
-      margin-bottom: 28px;
+      width: 80px; height: 80px; border-radius: 50%;
+      position: relative; margin-bottom: 28px;
       animation: orb-float 6s ease-in-out infinite;
     }
     .coach-orb::before {
-      content: '';
-      position: absolute;
-      inset: -8px;
-      border-radius: 50%;
+      content: ''; position: absolute; inset: -8px; border-radius: 50%;
       background: radial-gradient(circle, rgba(197,166,107,0.2) 0%, transparent 70%);
       animation: orb-pulse 4s ease-in-out infinite;
     }
     .orb-inner {
-      width: 100%; height: 100%;
-      border-radius: 50%;
+      width: 100%; height: 100%; border-radius: 50%;
       background: conic-gradient(from 0deg, #C5A66B, #2a3f6e, #7c5cbf, #C5A66B);
       animation: orb-spin 8s linear infinite;
-      position: relative;
-      overflow: hidden;
+      position: relative; overflow: hidden;
     }
     .orb-inner::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
+      content: ''; position: absolute; inset: 0; border-radius: 50%;
       background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.35), transparent 55%);
     }
-    @keyframes orb-float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
-    @keyframes orb-pulse {
-      0%, 100% { transform: scale(1); opacity: 0.5; }
-      50% { transform: scale(1.1); opacity: 0.8; }
-    }
-    @keyframes orb-spin {
-      from { filter: hue-rotate(0deg); }
-      to { filter: hue-rotate(360deg); }
-    }
+    @keyframes orb-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    @keyframes orb-pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 0.8; } }
+    @keyframes orb-spin { from { filter: hue-rotate(0deg); } to { filter: hue-rotate(360deg); } }
 
     .welcome-title {
       font-family: 'Instrument Serif', Georgia, serif;
-      font-size: 32px;
-      font-weight: 400;
-      margin-bottom: 10px;
-      letter-spacing: -0.5px;
+      font-size: 32px; font-weight: 400; margin-bottom: 10px; letter-spacing: -0.5px;
     }
     .welcome-sub {
-      font-size: 15px;
-      color: var(--text-mt);
-      line-height: 1.6;
-      max-width: 400px;
-      margin-bottom: 32px;
+      font-size: 15px; color: var(--text-mt); line-height: 1.6;
+      max-width: 400px; margin-bottom: 32px;
     }
 
-    /* Quick starts */
     .quick-starts {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: center;
-      max-width: 560px;
+      display: flex; flex-wrap: wrap; gap: 8px;
+      justify-content: center; max-width: 620px;
     }
     .quick-chip {
-      padding: 8px 16px;
+      padding: 9px 18px;
       background: var(--navy-lt);
       border: 1px solid var(--border-md);
       border-radius: 100px;
-      font-size: 13px;
-      color: var(--text-lt);
-      cursor: pointer;
-      transition: all 0.15s;
-      white-space: nowrap;
+      font-size: 13px; color: var(--text-lt);
+      cursor: pointer; transition: all 0.15s; white-space: nowrap;
     }
-    .quick-chip:hover {
-      border-color: var(--gold);
-      color: var(--gold);
-      background: var(--gold-dim);
-    }
+    .quick-chip:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
 
-    /* ── Chat Messages ── */
+    /* Chat messages */
     .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 24px 24px 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
+      flex: 1; overflow-y: auto; padding: 24px 24px 8px;
+      display: flex; flex-direction: column; gap: 18px;
     }
 
-    .msg { display: flex; gap: 12px; }
+    .msg { display: flex; gap: 12px; position: relative; }
     .msg.user { flex-direction: row-reverse; align-self: flex-end; max-width: 72%; }
     .msg.assistant { align-self: flex-start; max-width: 78%; }
 
     .msg-avatar {
-      width: 28px; height: 28px;
-      border-radius: 8px;
-      flex-shrink: 0;
+      width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: 600;
-      margin-top: 2px;
+      font-size: 11px; font-weight: 600; margin-top: 2px;
     }
-    .msg.assistant .msg-avatar {
-      background: linear-gradient(135deg, var(--gold) 0%, #8a6d3b 100%);
-      color: var(--navy);
-    }
-    .msg.user .msg-avatar {
-      background: var(--navy-lt);
-      color: var(--text-mt);
-    }
+    .msg.assistant .msg-avatar { background: linear-gradient(135deg, var(--gold) 0%, #8a6d3b 100%); color: var(--navy); }
+    .msg.user .msg-avatar { background: var(--navy-lt); color: var(--text-mt); }
 
     .bubble {
-      padding: 12px 16px;
-      border-radius: 16px;
-      font-size: 14.5px;
-      line-height: 1.7;
+      padding: 12px 16px; border-radius: 16px;
+      font-size: 14.5px; line-height: 1.7;
     }
     .msg.assistant .bubble {
-      background: var(--navy-lt);
-      border: 1px solid var(--border);
-      color: var(--text-wh);
-      border-radius: 4px 16px 16px 16px;
+      background: var(--navy-lt); border: 1px solid var(--border);
+      color: var(--text-wh); border-radius: 4px 16px 16px 16px;
     }
     .msg.user .bubble {
-      background: var(--user-bg);
-      border: 1px solid rgba(255,255,255,0.06);
-      color: var(--text-wh);
-      border-radius: 16px 4px 16px 16px;
+      background: var(--user-bg); border: 1px solid rgba(255,255,255,0.06);
+      color: var(--text-wh); border-radius: 16px 4px 16px 16px;
     }
 
-    /* Role play indicator */
-    .roleplay-tag {
+    /* Inline annotation cards */
+    .annotation-card {
+      position: absolute;
+      right: -220px;
+      top: 0;
+      width: 200px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 11.5px;
+      line-height: 1.5;
+      animation: fadeSlideIn 0.3s ease;
+    }
+    @keyframes fadeSlideIn { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: translateX(0); } }
+    .annotation-card.praise {
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.25);
+      color: #86efac;
+    }
+    .annotation-card.tip {
+      background: rgba(245,158,11,0.12);
+      border: 1px solid rgba(245,158,11,0.25);
+      color: #fcd34d;
+    }
+    .annotation-label { font-weight: 700; margin-bottom: 2px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Character card during roleplay */
+    .character-card {
+      display: none;
+      margin: 0 24px 0;
+      padding: 14px 18px;
+      background: rgba(102,126,234,0.07);
+      border: 1px solid rgba(102,126,234,0.2);
+      border-radius: 14px;
+      flex-direction: row;
+      align-items: center;
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .character-card.visible { display: flex; }
+    .character-avatar {
+      width: 46px; height: 46px; border-radius: 12px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .character-info { flex: 1; min-width: 0; }
+    .character-name { font-size: 14px; font-weight: 600; color: var(--text-wh); }
+    .character-role { font-size: 12px; color: var(--text-lt); margin-top: 2px; }
+    .character-goal {
+      font-size: 12px; color: #a5b4fc;
+      background: rgba(102,126,234,0.1); border-radius: 8px;
+      padding: 8px 12px; margin-top: 8px; width: 100%;
+      line-height: 1.5;
+    }
+    .character-mode-badge {
       display: inline-flex; align-items: center; gap: 5px;
-      background: rgba(102,126,234,0.15);
-      border: 1px solid rgba(102,126,234,0.3);
-      border-radius: 100px; padding: 2px 10px;
-      font-size: 11px; color: #a5b4fc; font-weight: 500;
-      margin-bottom: 6px;
+      background: rgba(102,126,234,0.2); border: 1px solid rgba(102,126,234,0.35);
+      border-radius: 100px; padding: 3px 10px;
+      font-size: 10px; font-weight: 600; color: #a5b4fc;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .character-mode-dot { width: 5px; height: 5px; border-radius: 50%; background: #a5b4fc; animation: pulse 2s ease-in-out infinite; }
+
+    /* Roleplay banner */
+    .roleplay-banner {
+      display: none; padding: 10px 20px;
+      background: rgba(102,126,234,0.1);
+      border-bottom: 1px solid rgba(102,126,234,0.2);
+      font-size: 12px; color: #a5b4fc;
+      align-items: center; gap: 8px;
+    }
+    .roleplay-banner.visible { display: flex; }
+    .roleplay-banner-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #a5b4fc; animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+    .roleplay-timer {
+      margin-left: auto; font-size: 12px; font-weight: 700;
+      color: #a5b4fc; font-variant-numeric: tabular-nums; min-width: 36px;
+    }
+    .roleplay-timer.urgent { color: #f87171; }
+    .roleplay-end-btn {
+      margin-left: 12px; padding: 4px 10px;
+      background: rgba(102,126,234,0.2); border: 1px solid rgba(102,126,234,0.4);
+      border-radius: 6px; color: #a5b4fc; font-size: 11px; font-weight: 600;
+      cursor: pointer; font-family: 'Inter', sans-serif;
     }
 
     /* Typing dots */
     .typing-dots { display: flex; gap: 4px; padding: 4px 0; }
     .typing-dot {
-      width: 6px; height: 6px;
-      background: var(--text-mt);
-      border-radius: 50%;
-      animation: bounce 1.2s infinite;
+      width: 6px; height: 6px; background: var(--text-mt);
+      border-radius: 50%; animation: bounce 1.2s infinite;
     }
     .typing-dot:nth-child(2) { animation-delay: 0.15s; }
     .typing-dot:nth-child(3) { animation-delay: 0.3s; }
     @keyframes bounce { 0%, 80%, 100% { transform: translateY(0); opacity: 0.4; } 40% { transform: translateY(-5px); opacity: 1; } }
 
-    /* ── Input Area ── */
-    .input-area {
-      padding: 12px 24px 20px;
-      flex-shrink: 0;
-    }
-
+    /* Input Area */
+    .input-area { padding: 12px 24px 20px; flex-shrink: 0; }
     .input-card {
-      background: var(--navy-lt);
-      border: 1px solid var(--border-md);
-      border-radius: 16px;
-      overflow: hidden;
-      transition: border-color 0.2s;
+      background: var(--navy-lt); border: 1px solid var(--border-md);
+      border-radius: 16px; overflow: hidden; transition: border-color 0.2s;
     }
     .input-card:focus-within { border-color: rgba(197,166,107,0.4); }
-
     .input-top {
       display: flex; align-items: flex-end; gap: 10px;
       padding: 12px 12px 8px 16px;
     }
     #user-input {
-      flex: 1;
-      background: none; border: none; outline: none;
-      resize: none; overflow-y: auto;
-      color: var(--text-wh);
-      font-size: 14.5px; line-height: 1.55;
-      font-family: 'Inter', sans-serif;
+      flex: 1; background: none; border: none; outline: none;
+      resize: none; overflow-y: auto; color: var(--text-wh);
+      font-size: 14.5px; line-height: 1.55; font-family: 'Inter', sans-serif;
       max-height: 120px;
-      placeholder-color: var(--text-mt);
     }
     #user-input::placeholder { color: var(--text-mt); }
     #user-input:disabled::placeholder { color: var(--text-mt); opacity: 0.4; }
-
     .send-btn {
-      width: 34px; height: 34px;
-      border-radius: 10px; border: none;
+      width: 34px; height: 34px; border-radius: 10px; border: none;
       background: var(--gold); color: var(--navy);
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer; flex-shrink: 0;
-      transition: all 0.15s;
+      cursor: pointer; flex-shrink: 0; transition: all 0.15s;
     }
     .send-btn:hover { background: var(--gold-lt); }
     .send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
     .send-btn svg { width: 14px; height: 14px; }
-
     .input-bottom {
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 12px 10px 16px;
     }
     .mode-pills { display: flex; gap: 6px; }
     .mode-pill {
-      padding: 3px 10px;
-      border-radius: 100px;
-      font-size: 11px; font-weight: 500;
-      cursor: pointer; transition: all 0.15s;
-      border: 1px solid var(--border);
-      color: var(--text-mt);
-      background: none;
-      font-family: 'Inter', sans-serif;
+      padding: 3px 10px; border-radius: 100px;
+      font-size: 11px; font-weight: 500; cursor: pointer; transition: all 0.15s;
+      border: 1px solid var(--border); color: var(--text-mt);
+      background: none; font-family: 'Inter', sans-serif;
     }
     .mode-pill:hover { border-color: var(--border-md); color: var(--text-lt); }
     .mode-pill.active { background: var(--gold-dim); border-color: rgba(197,166,107,0.4); color: var(--gold); }
-
     .input-hint { font-size: 11px; color: var(--text-mt); }
-
+    .privacy-note { font-size: 11px; color: var(--text-mt); text-align: center; margin-top: 8px; }
     .error-msg { color: #f87171; font-style: italic; font-size: 13px; }
 
     /* ═══════════════════════════════════════════════
-       SCENARIO CHOOSER OVERLAY
+       SCENARIOS PANEL
     ═══════════════════════════════════════════════ */
-    .scenario-chooser {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: #0a0f1a;
-      z-index: 100;
-      overflow-y: auto;
-      padding: 48px 40px 64px;
+    .scenarios-panel {
+      flex: 1; overflow-y: auto; padding: 32px 40px;
     }
-    .scenario-chooser.visible { display: block; }
-
-    .scenario-chooser-header {
-      text-align: center;
-      margin-bottom: 48px;
+    .panel-header {
+      margin-bottom: 28px;
     }
-    .scenario-chooser-header h1 {
+    .panel-header h1 {
       font-family: 'Instrument Serif', Georgia, serif;
-      font-size: 42px;
-      font-weight: 400;
-      letter-spacing: -1px;
-      color: var(--text-wh);
-      line-height: 1.1;
+      font-size: 30px; font-weight: 400; color: var(--text-wh);
+      margin-bottom: 6px; letter-spacing: -0.5px;
     }
-    .scenario-chooser-header h1 em {
-      color: var(--gold);
-      font-style: italic;
+    .panel-header p { font-size: 14px; color: var(--text-mt); }
+
+    .filter-pills {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px;
     }
-    .scenario-chooser-sub {
-      margin-top: 10px;
-      font-size: 15px;
-      color: var(--text-lt);
-    }
-    .scenario-chooser-close {
-      position: fixed;
-      top: 20px; right: 24px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid var(--border-md);
-      border-radius: 8px;
-      width: 36px; height: 36px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: var(--text-lt);
+    .filter-pill {
+      padding: 6px 16px; border-radius: 100px;
+      font-size: 12px; font-weight: 500; cursor: pointer;
+      border: 1px solid var(--border); color: var(--text-lt);
+      background: none; font-family: 'Inter', sans-serif;
       transition: all 0.15s;
     }
-    .scenario-chooser-close:hover { background: rgba(255,255,255,0.14); }
+    .filter-pill:hover { border-color: var(--border-md); color: var(--text-wh); }
+    .filter-pill.active { background: var(--gold-dim); border-color: rgba(197,166,107,0.4); color: var(--gold); }
 
-    .scenario-grid {
+    .scenario-grid-new {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 20px;
-      max-width: 1100px;
-      margin: 0 auto;
     }
 
-    .scenario-card {
-      border-radius: 16px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    .scenario-card-new {
+      border-radius: 16px; overflow: hidden;
+      cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;
       border: 1px solid rgba(255,255,255,0.08);
       background: var(--navy-mid);
     }
-    .scenario-card:hover {
+    .scenario-card-new:hover {
       transform: translateY(-4px);
       box-shadow: 0 16px 40px rgba(0,0,0,0.5);
       border-color: rgba(255,255,255,0.16);
     }
-    .scenario-card-art {
-      height: 180px;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
+    .scenario-card-image {
+      height: 160px; background: var(--navy-lt);
+      position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
     }
-    .scenario-card-art svg {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
+    .scenario-card-image-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 48px;
     }
-    .scenario-card-title {
-      padding: 16px 18px 18px;
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-wh);
-      line-height: 1.3;
+    .scenario-card-badges {
+      position: absolute; top: 12px; left: 12px;
+      display: flex; gap: 6px;
     }
-    .scenario-card-subtitle {
-      padding: 0 18px 16px;
-      font-size: 12px;
+    .badge {
+      padding: 3px 9px; border-radius: 100px;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.3px;
+    }
+    .badge-category { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: var(--text-lt); }
+    .badge-medium   { background: rgba(59,130,246,0.25); border: 1px solid rgba(59,130,246,0.4); color: #93c5fd; }
+    .badge-hard     { background: rgba(234,88,12,0.25);  border: 1px solid rgba(234,88,12,0.4);  color: #fdba74; }
+    .badge-expert   { background: rgba(220,38,38,0.25);  border: 1px solid rgba(220,38,38,0.4);  color: #fca5a5; }
+    .scenario-card-body { padding: 16px 18px 18px; }
+    .scenario-card-title { font-size: 15px; font-weight: 600; color: var(--text-wh); margin-bottom: 4px; }
+    .scenario-card-char { font-size: 12px; color: var(--text-mt); margin-bottom: 12px; }
+    .scenario-card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .scenario-attempts { font-size: 11px; color: var(--text-mt); }
+    .scenario-start-btn-sm {
+      padding: 6px 16px; background: var(--gold); color: var(--navy);
+      border: none; border-radius: 8px; font-size: 12px; font-weight: 600;
+      cursor: pointer; font-family: 'Inter', sans-serif; transition: background 0.15s;
+    }
+    .scenario-start-btn-sm:hover { background: var(--gold-lt); }
+
+    /* ═══════════════════════════════════════════════
+       PROGRESS PANEL
+    ═══════════════════════════════════════════════ */
+    .progress-panel {
+      flex: 1; overflow-y: auto; padding: 32px 40px;
+    }
+    .progress-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 32px;
+    }
+    .progress-header h1 {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 30px; font-weight: 400; letter-spacing: -0.5px;
+    }
+    .generate-btn {
+      padding: 10px 22px; background: var(--gold); color: var(--navy);
+      border: none; border-radius: 10px; font-size: 13px; font-weight: 600;
+      cursor: pointer; font-family: 'Inter', sans-serif; transition: background 0.15s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .generate-btn:hover { background: var(--gold-lt); }
+    .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .progress-empty {
+      text-align: center; padding: 80px 40px;
       color: var(--text-mt);
     }
+    .progress-empty-icon { font-size: 48px; margin-bottom: 16px; }
+    .progress-empty h2 { font-size: 20px; font-weight: 600; color: var(--text-lt); margin-bottom: 8px; }
+    .progress-empty p { font-size: 14px; line-height: 1.6; }
+
+    .progress-loading { text-align: center; padding: 80px 40px; color: var(--text-lt); }
+
+    .progress-results {
+      display: grid; grid-template-columns: 340px 1fr; gap: 24px;
+    }
+
+    /* Leader score card */
+    .score-card {
+      background: var(--navy-mid); border: 1px solid var(--border);
+      border-radius: 18px; padding: 28px;
+    }
+    .score-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-mt); margin-bottom: 20px; }
+    .score-ring-wrap { display: flex; justify-content: center; margin-bottom: 24px; }
+    .score-ring { position: relative; width: 140px; height: 140px; }
+    .score-ring svg { transform: rotate(-90deg); }
+    .score-ring-text {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .score-number { font-size: 40px; font-weight: 700; color: var(--gold); line-height: 1; }
+    .score-out-of { font-size: 12px; color: var(--text-mt); margin-top: 4px; }
+
+    .skill-bars { display: flex; flex-direction: column; gap: 12px; }
+    .skill-row { display: flex; flex-direction: column; gap: 4px; }
+    .skill-row-header { display: flex; justify-content: space-between; align-items: center; }
+    .skill-name { font-size: 12px; color: var(--text-lt); font-weight: 500; }
+    .skill-score { font-size: 12px; color: var(--text-wh); font-weight: 600; }
+    .skill-bar-track {
+      height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden;
+    }
+    .skill-bar-fill {
+      height: 100%; background: var(--green-accent); border-radius: 3px;
+      transition: width 0.8s ease;
+    }
+    .sessions-counter {
+      margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);
+      font-size: 13px; color: var(--text-lt); display: flex; align-items: center; gap: 8px;
+    }
+    .sessions-counter span { font-weight: 700; color: var(--text-wh); }
+
+    /* Right column */
+    .progress-right { display: flex; flex-direction: column; gap: 20px; }
+
+    .radar-card {
+      background: var(--navy-mid); border: 1px solid var(--border);
+      border-radius: 18px; padding: 24px;
+    }
+    .radar-card-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-mt); margin-bottom: 16px; }
+    .radar-wrap { display: flex; justify-content: center; }
+
+    .growth-card {
+      background: var(--navy-mid); border: 1px solid var(--border);
+      border-radius: 18px; padding: 24px;
+    }
+    .growth-card-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-mt); margin-bottom: 12px; }
+    .growth-text { font-size: 14px; color: var(--text-lt); line-height: 1.7; }
+
+    .tip-card {
+      background: rgba(197,166,107,0.07); border: 1px solid rgba(197,166,107,0.2);
+      border-radius: 18px; padding: 20px 24px;
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .tip-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+    .tip-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--gold); margin-bottom: 6px; }
+    .tip-text { font-size: 13px; color: var(--text-lt); line-height: 1.6; }
+
+    /* ═══════════════════════════════════════════════
+       SCENARIO CHOOSER OVERLAY (legacy)
+    ═══════════════════════════════════════════════ */
+    .scenario-chooser {
+      display: none; position: fixed; inset: 0;
+      background: #0a0f1a; z-index: 100; overflow-y: auto;
+      padding: 48px 40px 64px;
+    }
+    .scenario-chooser.visible { display: block; }
+    .scenario-chooser-header { text-align: center; margin-bottom: 48px; }
+    .scenario-chooser-header h1 {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 42px; font-weight: 400; letter-spacing: -1px;
+      color: var(--text-wh); line-height: 1.1;
+    }
+    .scenario-chooser-header h1 em { color: var(--gold); font-style: italic; }
+    .scenario-chooser-sub { margin-top: 10px; font-size: 15px; color: var(--text-lt); }
+    .scenario-chooser-close {
+      position: fixed; top: 20px; right: 24px;
+      background: rgba(255,255,255,0.08); border: 1px solid var(--border-md);
+      border-radius: 8px; width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-lt); transition: all 0.15s;
+    }
+    .scenario-chooser-close:hover { background: rgba(255,255,255,0.14); }
+
+    .scenario-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px; max-width: 1100px; margin: 0 auto;
+    }
+    .scenario-card {
+      border-radius: 16px; overflow: hidden; cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border: 1px solid rgba(255,255,255,0.08); background: var(--navy-mid);
+    }
+    .scenario-card:hover {
+      transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+      border-color: rgba(255,255,255,0.16);
+    }
+    .scenario-card-art {
+      height: 180px; position: relative; overflow: hidden;
+      display: flex; align-items: flex-end; justify-content: center;
+    }
+    .scenario-card-art svg { position: absolute; bottom: 0; width: 100%; }
+    .scenario-card-title { padding: 16px 18px 18px; font-size: 15px; font-weight: 600; color: var(--text-wh); line-height: 1.3; }
+    .scenario-card-subtitle { padding: 0 18px 16px; font-size: 12px; color: var(--text-mt); }
 
     /* Scenario Detail Modal */
     .scenario-modal-bg {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      z-index: 200;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7); z-index: 200;
+      align-items: center; justify-content: center; padding: 20px;
     }
     .scenario-modal-bg.visible { display: flex; }
-
     .scenario-modal {
-      background: #1a2540;
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 20px;
-      padding: 32px;
-      max-width: 520px;
-      width: 100%;
-      position: relative;
+      background: #1a2540; border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px; padding: 32px; max-width: 520px; width: 100%; position: relative;
     }
     .scenario-modal-close {
-      position: absolute;
-      top: 16px; right: 16px;
-      background: rgba(255,255,255,0.08);
-      border: none;
-      border-radius: 6px;
-      width: 28px; height: 28px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: var(--text-lt);
+      position: absolute; top: 16px; right: 16px;
+      background: rgba(255,255,255,0.08); border: none; border-radius: 6px;
+      width: 28px; height: 28px; display: flex; align-items: center;
+      justify-content: center; cursor: pointer; color: var(--text-lt);
     }
-    .scenario-modal-title {
-      font-size: 20px; font-weight: 700; color: var(--text-wh);
-      margin-bottom: 16px;
-    }
-    .scenario-modal-char {
-      display: flex; gap: 14px;
-      margin-bottom: 16px;
-    }
+    .scenario-modal-title { font-size: 20px; font-weight: 700; color: var(--text-wh); margin-bottom: 16px; }
+    .scenario-modal-char { display: flex; gap: 14px; margin-bottom: 16px; }
     .scenario-modal-avatar {
-      width: 56px; height: 56px; border-radius: 12px;
-      flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px;
+      width: 56px; height: 56px; border-radius: 12px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 22px;
     }
     .scenario-modal-char-info h3 { font-size: 15px; font-weight: 600; color: var(--text-wh); }
     .scenario-modal-char-info p { font-size: 13px; color: var(--text-lt); margin-top: 4px; line-height: 1.5; }
-
     .scenario-modal-goal {
-      background: rgba(197,166,107,0.08);
-      border: 1px solid rgba(197,166,107,0.2);
-      border-radius: 10px;
-      padding: 14px 16px;
-      margin-bottom: 24px;
+      background: rgba(197,166,107,0.08); border: 1px solid rgba(197,166,107,0.2);
+      border-radius: 10px; padding: 14px 16px; margin-bottom: 24px;
     }
     .scenario-modal-goal-label {
       font-size: 11px; font-weight: 700; text-transform: uppercase;
@@ -634,121 +701,83 @@
       display: flex; align-items: center; gap: 6px;
     }
     .scenario-modal-goal p { font-size: 13px; color: var(--text-lt); line-height: 1.5; }
-
     .scenario-start-btn {
-      width: 100%;
-      padding: 14px;
-      background: var(--gold);
-      color: var(--navy);
-      border: none; border-radius: 12px;
-      font-size: 14px; font-weight: 700;
-      cursor: pointer; transition: background 0.15s;
-      font-family: 'Inter', sans-serif;
+      width: 100%; padding: 14px; background: var(--gold); color: var(--navy);
+      border: none; border-radius: 12px; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: background 0.15s; font-family: 'Inter', sans-serif;
     }
     .scenario-start-btn:hover { background: var(--gold-lt); }
-
-    /* Roleplay banner shown during active roleplay */
-    .roleplay-banner {
-      display: none;
-      padding: 10px 20px;
-      background: rgba(102,126,234,0.1);
-      border-bottom: 1px solid rgba(102,126,234,0.2);
-      font-size: 12px;
-      color: #a5b4fc;
-      align-items: center;
-      gap: 8px;
-    }
-    .roleplay-banner.visible { display: flex; }
-    .roleplay-banner-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: #a5b4fc;
-      animation: pulse 2s ease-in-out infinite;
-    }
-    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
-    .roleplay-timer {
-      margin-left: auto;
-      font-size: 12px; font-weight: 700;
-      color: #a5b4fc;
-      font-variant-numeric: tabular-nums;
-      min-width: 36px;
-    }
-    .roleplay-timer.urgent { color: #f87171; }
-    .roleplay-end-btn {
-      margin-left: 12px;
-      padding: 4px 10px;
-      background: rgba(102,126,234,0.2);
-      border: 1px solid rgba(102,126,234,0.4);
-      border-radius: 6px;
-      color: #a5b4fc; font-size: 11px; font-weight: 600;
-      cursor: pointer; font-family: 'Inter', sans-serif;
+    .scenario-eval-notice {
+      background: rgba(197,166,107,0.07); border: 1px solid rgba(197,166,107,0.18);
+      border-radius: 8px; padding: 10px 14px; margin-bottom: 20px;
+      font-size: 12px; color: var(--gold); display: flex; align-items: center; gap: 8px;
     }
 
     /* Feedback modal */
     .feedback-modal-bg {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.8);
-      z-index: 300;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8); z-index: 300;
+      align-items: center; justify-content: center; padding: 20px;
     }
     .feedback-modal-bg.visible { display: flex; }
     .feedback-modal {
-      background: #1a2540;
-      border: 1px solid rgba(197,166,107,0.3);
-      border-radius: 20px;
-      padding: 32px;
-      max-width: 560px;
-      width: 100%;
-      max-height: 80vh;
-      overflow-y: auto;
-      position: relative;
+      background: #1a2540; border: 1px solid rgba(197,166,107,0.3);
+      border-radius: 20px; padding: 32px;
+      max-width: 560px; width: 100%; max-height: 80vh; overflow-y: auto; position: relative;
     }
     .feedback-modal-header {
-      display: flex; align-items: center; gap: 10px;
-      margin-bottom: 20px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
+      padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.08);
     }
-    .feedback-modal-header h2 {
-      font-size: 18px; font-weight: 700; color: var(--text-wh);
-    }
-    .feedback-modal-header p {
-      font-size: 12px; color: var(--text-lt); margin-top: 2px;
-    }
-    .feedback-body {
-      font-size: 14px; color: var(--text-lt); line-height: 1.7;
-      white-space: pre-wrap;
-    }
+    .feedback-modal-header h2 { font-size: 18px; font-weight: 700; color: var(--text-wh); }
+    .feedback-modal-header p { font-size: 12px; color: var(--text-lt); margin-top: 2px; }
+    .feedback-body { font-size: 14px; color: var(--text-lt); line-height: 1.7; white-space: pre-wrap; }
     .feedback-body strong { color: var(--gold); display: block; margin-top: 16px; margin-bottom: 4px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
     .feedback-body strong:first-child { margin-top: 0; }
     .feedback-close-btn {
-      width: 100%;
-      margin-top: 24px;
-      padding: 12px;
-      background: var(--gold);
-      color: var(--navy);
-      border: none; border-radius: 10px;
-      font-size: 14px; font-weight: 700;
+      width: 100%; margin-top: 24px; padding: 12px; background: var(--gold);
+      color: var(--navy); border: none; border-radius: 10px;
+      font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif;
+    }
+    .feedback-loading { text-align: center; padding: 40px 20px; color: var(--text-lt); }
+
+    /* Welcome modal */
+    .welcome-modal-bg {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75); z-index: 400;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .welcome-modal-bg.visible { display: flex; }
+    .welcome-modal {
+      background: var(--navy-mid); border: 1px solid var(--border-md);
+      border-radius: 24px; padding: 40px; max-width: 460px; width: 100%;
+      text-align: center;
+    }
+    .welcome-modal-icon { font-size: 44px; margin-bottom: 20px; }
+    .welcome-modal h2 {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 26px; font-weight: 400; margin-bottom: 12px;
+    }
+    .welcome-modal p { font-size: 14px; color: var(--text-lt); line-height: 1.7; margin-bottom: 28px; }
+    .welcome-modal-footer { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+    .welcome-get-started-btn {
+      width: 100%; padding: 14px; background: var(--gold); color: var(--navy);
+      border: none; border-radius: 12px; font-size: 14px; font-weight: 700;
       cursor: pointer; font-family: 'Inter', sans-serif;
     }
-    .feedback-loading {
-      text-align: center; padding: 40px 20px; color: var(--text-lt);
+    .welcome-modal-check {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--text-mt); cursor: pointer;
     }
-    .scenario-eval-notice {
-      background: rgba(197,166,107,0.07);
-      border: 1px solid rgba(197,166,107,0.18);
-      border-radius: 8px;
-      padding: 10px 14px;
-      margin-bottom: 20px;
-      font-size: 12px;
-      color: var(--gold);
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .welcome-modal-check input { cursor: pointer; }
+
+    /* Spinner */
+    .spinner {
+      width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.1);
+      border-top-color: var(--gold); border-radius: 50%;
+      animation: spin 0.7s linear infinite; margin: 0 auto;
     }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -757,7 +786,6 @@
      SIDEBAR
 ════════════════════════════════ -->
 <aside class="sidebar" id="sidebar">
-
   <div class="sidebar-logo">
     <div class="logo-mark">S</div>
     <div>
@@ -769,24 +797,19 @@
   <div class="new-session-wrap">
     <button class="new-session-btn" onclick="newSession()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-        <circle cx="12" cy="12" r="10"/>
-        <path d="M12 8v8M8 12h8"/>
+        <circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/>
       </svg>
       Start a new session
     </button>
   </div>
 
   <div class="sidebar-scroll">
-
-    <!-- Session history -->
     <div class="section-label">Your Sessions</div>
     <div id="session-list">
-      <div style="padding: 8px 18px; font-size: 12px; color: var(--text-mt);">No sessions yet</div>
+      <div style="padding:8px 18px;font-size:12px;color:var(--text-mt)">No sessions yet</div>
     </div>
 
-    <!-- AI Experiences -->
-    <div class="section-label" style="margin-top: 8px;">AI Experiences</div>
-
+    <div class="section-label" style="margin-top:8px">AI Experiences</div>
     <div class="experience-item" onclick="startExperience('roleplay')">
       <div class="exp-orb roleplay"></div>
       <div class="exp-info">
@@ -794,7 +817,6 @@
         <div class="exp-desc">Simulate a real conversation</div>
       </div>
     </div>
-
     <div class="experience-item" onclick="startExperience('difficult')">
       <div class="exp-orb difficult"></div>
       <div class="exp-info">
@@ -802,7 +824,6 @@
         <div class="exp-desc">Map it before you have it</div>
       </div>
     </div>
-
     <div class="experience-item" onclick="startExperience('stakeholder')">
       <div class="exp-orb stakeholder"></div>
       <div class="exp-info">
@@ -810,7 +831,6 @@
         <div class="exp-desc">Who's on board, who isn't</div>
       </div>
     </div>
-
     <div class="experience-item" onclick="startExperience('plan90')">
       <div class="exp-orb plan90"></div>
       <div class="exp-info">
@@ -818,7 +838,6 @@
         <div class="exp-desc">Build your first 90 days</div>
       </div>
     </div>
-
     <div class="experience-item" onclick="startExperience('decision')">
       <div class="exp-orb decision"></div>
       <div class="exp-info">
@@ -826,7 +845,6 @@
         <div class="exp-desc">Structure a hard choice</div>
       </div>
     </div>
-
   </div>
 </aside>
 
@@ -835,17 +853,39 @@
 ════════════════════════════════ -->
 <div class="main" id="main">
 
-  <!-- Top bar -->
+  <!-- Top navigation bar -->
   <div class="topbar">
     <div class="topbar-left">
       <button class="toggle-sidebar-btn" onclick="toggleSidebar()" title="Toggle sidebar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <rect x="3" y="3" width="18" height="18" rx="2"/>
-          <path d="M9 3v18"/>
+          <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/>
         </svg>
       </button>
-      <span class="session-title" id="session-title">Choose a session or start new</span>
     </div>
+
+    <nav class="top-nav">
+      <button class="top-nav-tab active" data-tab="coach" onclick="switchTab('coach')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        Coach
+      </button>
+      <button class="top-nav-tab" data-tab="scenarios" onclick="switchTab('scenarios')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        Scenarios
+      </button>
+      <button class="top-nav-tab" data-tab="progress" onclick="switchTab('progress')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+        Progress
+      </button>
+    </nav>
+
     <div class="topbar-right">
       <div class="coach-pill" id="coach-pill" style="display:none">
         <span class="coach-dot"></span>
@@ -858,431 +898,125 @@
     </div>
   </div>
 
-  <!-- Messages area -->
-  <div class="messages" id="messages-wrap">
+  <!-- ══ COACH PANEL ══ -->
+  <div class="panel active" id="panel-coach">
+    <div class="messages" id="messages-wrap">
 
-    <!-- Welcome state -->
-    <div class="welcome-state" id="welcome-state">
-      <div class="coach-orb">
-        <div class="orb-inner"></div>
+      <!-- Welcome state -->
+      <div class="welcome-state" id="welcome-state">
+        <div class="coach-orb"><div class="orb-inner"></div></div>
+        <div class="welcome-title">Your coaching session starts here.</div>
+        <div class="welcome-sub">No judgment. No generic advice. Just the questions that surface what's actually going on.</div>
+        <div class="quick-starts">
+          <div class="quick-chip" onclick="quickStart('I need to navigate a difficult conversation with someone on my team.')">Navigate a difficult conversation</div>
+          <div class="quick-chip" onclick="quickStart('I need to prepare for an upcoming board presentation and sharpen my narrative.')">Prepare for a board presentation</div>
+          <div class="quick-chip" onclick="quickStart('I need to give feedback to someone who is underperforming.')">Give feedback to an underperformer</div>
+          <div class="quick-chip" onclick="quickStart('I have a resistant stakeholder I need to bring on board.')">Manage a resistant stakeholder</div>
+          <div class="quick-chip" onclick="quickStart('I want to think through how to negotiate a promotion.')">Negotiate a promotion</div>
+          <div class="quick-chip" onclick="quickStart('There is growing conflict between two people on my team that I need to address.')">Handle team conflict</div>
+          <div class="quick-chip" onclick="quickStart('I want to work on my executive presence and how I show up in senior rooms.')">Build executive presence</div>
+          <div class="quick-chip" onclick="quickStart('I need to communicate a major organizational change to my team.')">Communicate a major change</div>
+        </div>
       </div>
-      <div class="welcome-title">Your coaching session starts here.</div>
-      <div class="welcome-sub">No judgment. No generic advice. Just the kind of questions that surface what's actually going on.</div>
 
-      <div class="quick-starts">
-        <div class="quick-chip" onclick="quickStart('I\'m struggling with stakeholder alignment on a key initiative.')">Stakeholder alignment</div>
-        <div class="quick-chip" onclick="quickStart('I need to have a difficult conversation with someone on my team.')">Difficult conversation</div>
-        <div class="quick-chip" onclick="quickStart('I\'m preparing for a board presentation and want to sharpen my narrative.')">Board prep</div>
-        <div class="quick-chip" onclick="quickStart('I\'m trying to navigate a conflict between two senior leaders.')">Political conflict</div>
-        <div class="quick-chip" onclick="quickStart('I need to think through whether to take this promotion.')">Promotion decision</div>
+      <!-- Character card during roleplay -->
+      <div class="character-card" id="character-card">
+        <div class="character-avatar" id="character-avatar">🎭</div>
+        <div class="character-info">
+          <div class="character-name" id="character-name"></div>
+          <div class="character-role" id="character-role-text"></div>
+          <div class="character-goal" id="character-goal-text"></div>
+        </div>
+        <div class="character-mode-badge">
+          <span class="character-mode-dot"></span>
+          Practice Mode
+        </div>
       </div>
+
+      <!-- Chat messages -->
+      <div class="chat-messages" id="chat-messages" style="display:none"></div>
     </div>
 
-    <!-- Chat messages (hidden until session starts) -->
-    <div class="chat-messages" id="chat-messages" style="display:none"></div>
+    <!-- Roleplay banner -->
+    <div class="roleplay-banner" id="roleplay-banner">
+      <div class="roleplay-banner-dot"></div>
+      <span id="roleplay-banner-text">Role Play Active</span>
+      <span class="roleplay-timer" id="roleplay-timer">5:00</span>
+      <button class="roleplay-end-btn" onclick="endRoleplay()">End &amp; Get Feedback</button>
+    </div>
 
+    <!-- Input area -->
+    <div class="input-area">
+      <div class="input-card">
+        <div class="input-top">
+          <textarea id="user-input" placeholder="What's on your mind?" rows="1"
+            onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+          <button class="send-btn" id="send-btn" onclick="sendMessage()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+        <div class="input-bottom">
+          <div class="mode-pills">
+            <button class="mode-pill active" data-mode="direct" onclick="setMode('direct')">Direct</button>
+            <button class="mode-pill" data-mode="empathetic" onclick="setMode('empathetic')">Empathetic</button>
+            <button class="mode-pill" data-mode="socratic" onclick="setMode('socratic')">Socratic</button>
+          </div>
+          <span class="input-hint">Enter to send · Shift+Enter for new line</span>
+        </div>
+      </div>
+      <div class="privacy-note">🔒 All conversations are private and confidential</div>
+    </div>
   </div>
 
-  <!-- Roleplay active banner -->
-  <div class="roleplay-banner" id="roleplay-banner">
-    <div class="roleplay-banner-dot"></div>
-    <span id="roleplay-banner-text">Role Play Active</span>
-    <span class="roleplay-timer" id="roleplay-timer">5:00</span>
-    <button class="roleplay-end-btn" onclick="endRoleplay()">End & Get Feedback</button>
+  <!-- ══ SCENARIOS PANEL ══ -->
+  <div class="panel" id="panel-scenarios">
+    <div class="scenarios-panel">
+      <div class="panel-header">
+        <h1>Scenario Library</h1>
+        <p>Practice real executive conversations with AI characters</p>
+      </div>
+      <div class="filter-pills" id="filter-pills">
+        <button class="filter-pill active" data-cat="All" onclick="filterScenarios('All', this)">All</button>
+        <button class="filter-pill" data-cat="Difficult Conversations" onclick="filterScenarios('Difficult Conversations', this)">Difficult Conversations</button>
+        <button class="filter-pill" data-cat="Performance" onclick="filterScenarios('Performance', this)">Performance</button>
+        <button class="filter-pill" data-cat="Managing Up" onclick="filterScenarios('Managing Up', this)">Managing Up</button>
+        <button class="filter-pill" data-cat="Peer Dynamics" onclick="filterScenarios('Peer Dynamics', this)">Peer Dynamics</button>
+        <button class="filter-pill" data-cat="Executive Presence" onclick="filterScenarios('Executive Presence', this)">Executive Presence</button>
+        <button class="filter-pill" data-cat="Change Management" onclick="filterScenarios('Change Management', this)">Change Management</button>
+        <button class="filter-pill" data-cat="Stakeholder Management" onclick="filterScenarios('Stakeholder Management', this)">Stakeholder Management</button>
+        <button class="filter-pill" data-cat="Career Development" onclick="filterScenarios('Career Development', this)">Career Development</button>
+        <button class="filter-pill" data-cat="Conflict Resolution" onclick="filterScenarios('Conflict Resolution', this)">Conflict Resolution</button>
+      </div>
+      <div class="scenario-grid-new" id="scenario-grid-new"></div>
+    </div>
   </div>
 
-  <!-- Input area -->
-  <div class="input-area">
-    <div class="input-card">
-      <div class="input-top">
-        <textarea
-          id="user-input"
-          placeholder="What's on your mind?"
-          rows="1"
-          onkeydown="handleKey(event)"
-          oninput="autoResize(this)"
-        ></textarea>
-        <button class="send-btn" id="send-btn" onclick="sendMessage()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
+  <!-- ══ PROGRESS PANEL ══ -->
+  <div class="panel" id="panel-progress">
+    <div class="progress-panel">
+      <div class="progress-header">
+        <h1>My Progress</h1>
+        <button class="generate-btn" id="generate-btn" onclick="generateProgress()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Generate Report
         </button>
       </div>
-      <div class="input-bottom">
-        <div class="mode-pills">
-          <button class="mode-pill active" data-mode="direct" onclick="setMode('direct')">Direct</button>
-          <button class="mode-pill" data-mode="empathetic" onclick="setMode('empathetic')">Empathetic</button>
-          <button class="mode-pill" data-mode="socratic" onclick="setMode('socratic')">Socratic</button>
+      <div id="progress-content">
+        <div class="progress-empty">
+          <div class="progress-empty-icon">📊</div>
+          <h2>Build your progress profile</h2>
+          <p>Complete a few coaching sessions or scenario practices, then generate your report to see your leadership skill profile, growth areas, and personalized recommendations.</p>
         </div>
-        <span class="input-hint">Enter to send · Shift+Enter for new line</span>
       </div>
     </div>
   </div>
 
 </div>
 
-<script>
-// ── State ───────────────────────────────────────────────────────────────────
-let sessionId     = null;
-let selectedCoach = 'James';
-let currentMode   = 'direct';
-let isStreaming   = false;
-let isRoleplay    = false;
-let sessionName   = null;
-let pendingExperience = null;
-
-// ── Init ────────────────────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  loadSessionList();
-});
-
-// ── Sidebar ─────────────────────────────────────────────────────────────────
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('collapsed');
-}
-
-// ── Coach & Mode ─────────────────────────────────────────────────────────────
-function setCoach(name) {
-  selectedCoach = name;
-}
-
-function setMode(mode) {
-  currentMode = mode;
-  document.querySelectorAll('.mode-pill').forEach(p => {
-    p.classList.toggle('active', p.dataset.mode === mode);
-  });
-}
-
-// ── Session List ─────────────────────────────────────────────────────────────
-async function loadSessionList() {
-  try {
-    const res = await fetch('/sessions');
-    if (!res.ok) return;
-    const data = await res.json();
-    renderSessionList(data.sessions || []);
-  } catch (_) {}
-}
-
-function renderSessionList(sessions) {
-  const list = document.getElementById('session-list');
-  if (!sessions.length) {
-    list.innerHTML = '<div style="padding: 8px 18px; font-size: 12px; color: var(--text-mt);">No sessions yet</div>';
-    return;
-  }
-  list.innerHTML = sessions.map(s => {
-    const name = s.session_name || truncate(s.session_id, 22);
-    const isActive = s.session_id === sessionId;
-    return `<div class="session-item ${isActive ? 'active' : ''}" onclick="loadSession('${s.session_id}', '${escHtml(name)}')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      <span class="session-name">${escHtml(name)}</span>
-    </div>`;
-  }).join('');
-}
-
-function truncate(str, n) {
-  return str && str.length > n ? str.slice(0, n) + '…' : str;
-}
-function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// ── Load existing session ────────────────────────────────────────────────────
-async function loadSession(id, name) {
-  try {
-    const res = await fetch(`/sessions/${id}`);
-    if (!res.ok) return;
-    const data = await res.json();
-
-    sessionId   = id;
-    sessionName = name;
-    selectedCoach = data.coach_name || 'James';
-    document.getElementById('coach-select').value = selectedCoach;
-
-    showChatState();
-    document.getElementById('session-title').textContent = name;
-    document.getElementById('coach-pill').style.display = 'flex';
-    document.getElementById('coach-pill-name').textContent = selectedCoach;
-
-    const chatEl = document.getElementById('chat-messages');
-    chatEl.innerHTML = '';
-    for (const msg of data.messages || []) {
-      appendMessage(msg.role, msg.content, msg.role === 'assistant' ? selectedCoach : 'You');
-    }
-    enableInput();
-    loadSessionList();
-  } catch (_) {}
-}
-
-// ── New Session ───────────────────────────────────────────────────────────────
-function newSession() {
-  sessionId   = null;
-  sessionName = null;
-  isRoleplay  = false;
-  isStreaming  = false;
-  showWelcomeState();
-  document.getElementById('session-title').textContent = 'Choose a session or start new';
-  document.getElementById('coach-pill').style.display = 'none';
-  document.getElementById('roleplay-setup').classList.remove('visible');
-  enableInput();
-  loadSessionList();
-}
-
-// ── Quick start ───────────────────────────────────────────────────────────────
-async function quickStart(message) {
-  await startSessionThen(message);
-}
-
-// ── Experiences ───────────────────────────────────────────────────────────────
-const EXPERIENCE_PROMPTS = {
-  roleplay:    null, // handled via setup panel
-  difficult:   "I need to prepare for a difficult conversation. Let's map it out together before I have it.",
-  stakeholder: "I want to do a stakeholder analysis for a challenge I'm navigating. Help me map who's involved and what they care about.",
-  plan90:      "I want to build out a 90-day leadership plan. Help me structure what I should focus on and accomplish.",
-  decision:    "I have a hard decision to make and I want to use a structured framework to think it through."
-};
-
-function startExperience(type) {
-  if (type === 'roleplay') {
-    renderScenarioGrid();
-    document.getElementById('scenario-chooser').classList.add('visible');
-    return;
-  }
-  const prompt = EXPERIENCE_PROMPTS[type];
-  if (prompt) quickStart(prompt);
-}
-
-// ── Session Start ─────────────────────────────────────────────────────────────
-async function startSessionThen(firstMessage) {
-  showChatState();
-  const typingEl = showTyping();
-
-  try {
-    const res = await fetch('/sessions/new', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ coach_name: selectedCoach, mode: currentMode })
-    });
-    if (!res.ok) throw new Error();
-    const data = await res.json();
-    sessionId = data.session_id;
-
-    // Use first message as session name
-    sessionName = firstMessage.length > 40 ? firstMessage.slice(0, 40) + '…' : firstMessage;
-    document.getElementById('session-title').textContent = sessionName;
-    document.getElementById('coach-pill').style.display = 'flex';
-    document.getElementById('coach-pill-name').textContent = selectedCoach;
-
-    removeTyping(typingEl);
-    appendMessage('assistant', data.opening_message, selectedCoach);
-    enableInput();
-
-    // Send first message
-    await sendMessageText(firstMessage);
-    loadSessionList();
-  } catch (err) {
-    removeTyping(typingEl);
-    appendError('Could not start session. Check server status.');
-  }
-}
-
-// ── Messaging ─────────────────────────────────────────────────────────────────
-async function sendMessage() {
-  const input = document.getElementById('user-input');
-  const text  = input.value.trim();
-  if (!text || isStreaming) return;
-  input.value = '';
-  input.style.height = 'auto';
-  // No session yet → create one with this as the first message
-  if (!sessionId) {
-    await startSessionThen(text);
-    return;
-  }
-  await sendMessageText(text);
-}
-
-async function sendMessageText(text) {
-  if (isStreaming || !sessionId) return;
-  isStreaming = true;
-  document.getElementById('send-btn').disabled = true;
-
-  appendMessage('user', text, 'You');
-  const bubbleEl = appendStreamingBubble();
-
-  try {
-    const res = await fetch('/chat/stream', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        session_id: sessionId,
-        message: text,
-        mode: currentMode
-      })
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-    const reader  = res.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer    = '';
-    let fullText  = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop();
-
-      for (const line of lines) {
-        if (!line.startsWith('data: ')) continue;
-        const payload = line.slice(6).trim();
-        if (payload === '[DONE]') break;
-        try {
-          const parsed = JSON.parse(payload);
-          if (parsed.error) {
-            bubbleEl.innerHTML = `<span class="error-msg">${parsed.error}</span>`;
-            break;
-          }
-          if (parsed.text) {
-            fullText += parsed.text;
-            bubbleEl.textContent = fullText;
-            scrollBottom();
-          }
-        } catch (_) {}
-      }
-    }
-  } catch (err) {
-    bubbleEl.innerHTML = `<span class="error-msg">Connection error — please try again.</span>`;
-  } finally {
-    isStreaming = false;
-    document.getElementById('send-btn').disabled = false;
-    document.getElementById('user-input').focus();
-    scrollBottom();
-  }
-}
-
-// ── DOM helpers ───────────────────────────────────────────────────────────────
-function showWelcomeState() {
-  document.getElementById('welcome-state').style.display = 'flex';
-  document.getElementById('chat-messages').style.display = 'none';
-  document.getElementById('chat-messages').innerHTML = '';
-}
-
-function showChatState() {
-  document.getElementById('welcome-state').style.display = 'none';
-  const chatEl = document.getElementById('chat-messages');
-  chatEl.style.display = 'flex';
-  chatEl.innerHTML = '';
-}
-
-function enableInput() {
-  const inp = document.getElementById('user-input');
-  inp.disabled = false;
-  inp.focus();
-  inp.placeholder = isRoleplay ? 'Your line...' : 'What\'s on your mind?';
-  document.getElementById('send-btn').disabled = false;
-}
-
-function disableInput() {
-  document.getElementById('user-input').disabled = true;
-  document.getElementById('send-btn').disabled = true;
-}
-
-function appendMessage(role, text, label) {
-  const chatEl = document.getElementById('chat-messages');
-  const msg = document.createElement('div');
-  msg.className = `msg ${role}`;
-
-  const avatar = document.createElement('div');
-  avatar.className = 'msg-avatar';
-  avatar.textContent = role === 'assistant' ? label[0].toUpperCase() : 'Y';
-
-  const bubble = document.createElement('div');
-  bubble.className = 'bubble';
-  bubble.textContent = text;
-
-  msg.appendChild(avatar);
-  msg.appendChild(bubble);
-  chatEl.appendChild(msg);
-  scrollBottom();
-  return bubble;
-}
-
-function appendStreamingBubble() {
-  const chatEl = document.getElementById('chat-messages');
-  const msg = document.createElement('div');
-  msg.className = 'msg assistant';
-  msg.id = 'streaming-msg';
-
-  const avatar = document.createElement('div');
-  avatar.className = 'msg-avatar';
-  avatar.textContent = selectedCoach[0].toUpperCase();
-
-  const bubble = document.createElement('div');
-  bubble.className = 'bubble';
-  bubble.innerHTML = '<div class="typing-dots"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>';
-
-  msg.appendChild(avatar);
-  msg.appendChild(bubble);
-  chatEl.appendChild(msg);
-  scrollBottom();
-  return bubble;
-}
-
-function showTyping() {
-  const chatEl = document.getElementById('chat-messages');
-  const msg = document.createElement('div');
-  msg.className = 'msg assistant';
-  msg.id = 'typing-indicator';
-
-  const avatar = document.createElement('div');
-  avatar.className = 'msg-avatar';
-  avatar.textContent = selectedCoach[0].toUpperCase();
-
-  const bubble = document.createElement('div');
-  bubble.className = 'bubble';
-  bubble.innerHTML = '<div class="typing-dots"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>';
-
-  msg.appendChild(avatar);
-  msg.appendChild(bubble);
-  chatEl.appendChild(msg);
-  scrollBottom();
-  return msg;
-}
-
-function removeTyping(el) {
-  if (el) el.remove();
-  const existing = document.getElementById('typing-indicator');
-  if (existing) existing.remove();
-}
-
-function appendError(msg) {
-  const chatEl = document.getElementById('chat-messages');
-  const div = document.createElement('div');
-  div.style.cssText = 'text-align:center;padding:16px;color:#f87171;font-size:13px;';
-  div.textContent = msg;
-  chatEl.appendChild(div);
-}
-
-function scrollBottom() {
-  const chatEl = document.getElementById('chat-messages');
-  chatEl.scrollTop = chatEl.scrollHeight;
-}
-
-function handleKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
-}
-
-function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-}
-</script>
-
 <!-- ════════════════════════════════
-     SCENARIO CHOOSER OVERLAY
+     SCENARIO CHOOSER OVERLAY (for sidebar roleplay click)
 ════════════════════════════════ -->
 <div class="scenario-chooser" id="scenario-chooser">
   <button class="scenario-chooser-close" onclick="closeScenarioChooser()">
@@ -1296,24 +1030,6 @@ function autoResize(el) {
 </div>
 
 <!-- Scenario Detail Modal -->
-<div class="feedback-modal-bg" id="feedback-modal-bg">
-  <div class="feedback-modal" id="feedback-modal">
-    <div class="feedback-modal-header">
-      <div>
-        <h2>📊 Session Feedback</h2>
-        <p id="feedback-scenario-label">Role Play Evaluation</p>
-      </div>
-    </div>
-    <div class="feedback-body" id="feedback-body">
-      <div class="feedback-loading">
-        <div class="typing-dots" style="justify-content:center"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>
-        <p style="margin-top:12px;font-size:13px;">Analyzing your conversation…</p>
-      </div>
-    </div>
-    <button class="feedback-close-btn" onclick="closeFeedbackModal()">Start New Session</button>
-  </div>
-</div>
-
 <div class="scenario-modal-bg" id="scenario-modal-bg">
   <div class="scenario-modal" id="scenario-modal">
     <button class="scenario-modal-close" onclick="closeScenarioModal()">
@@ -1342,88 +1058,609 @@ function autoResize(el) {
   </div>
 </div>
 
+<!-- Feedback modal -->
+<div class="feedback-modal-bg" id="feedback-modal-bg">
+  <div class="feedback-modal" id="feedback-modal">
+    <div class="feedback-modal-header">
+      <div>
+        <h2>📊 Session Feedback</h2>
+        <p id="feedback-scenario-label">Role Play Evaluation</p>
+      </div>
+    </div>
+    <div class="feedback-body" id="feedback-body">
+      <div class="feedback-loading">
+        <div class="typing-dots" style="justify-content:center"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>
+        <p style="margin-top:12px;font-size:13px;">Analyzing your conversation…</p>
+      </div>
+    </div>
+    <button class="feedback-close-btn" onclick="closeFeedbackModal()">Start New Session</button>
+  </div>
+</div>
+
+<!-- First-time welcome modal -->
+<div class="welcome-modal-bg" id="welcome-modal-bg">
+  <div class="welcome-modal">
+    <div class="welcome-modal-icon">✦</div>
+    <h2>Welcome to Stratos AI</h2>
+    <p>Your private executive coaching companion. Practice high-stakes conversations, get real-time coaching insights, and track your leadership development — all in a confidential space designed for senior leaders.</p>
+    <div class="welcome-modal-footer">
+      <button class="welcome-get-started-btn" onclick="closeWelcomeModal()">Get Started</button>
+      <label class="welcome-modal-check">
+        <input type="checkbox" id="dont-show-again"> Don't show again
+      </label>
+    </div>
+  </div>
+</div>
+
 <script>
-// ── Scenario Data ────────────────────────────────────────────────────────────
-const SCENARIOS = [
+// ════════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════════
+let sessionId        = null;
+let selectedCoach    = 'James';
+let currentMode      = 'direct';
+let isStreaming      = false;
+let isRoleplay       = false;
+let sessionName      = null;
+let selectedScenario = null;
+let roleplayTimer    = null;
+let roleplaySecondsLeft = 300;
+let scenariosCache   = [];
+let sessionAnnotated = false; // track if we annotated this session
+
+// ════════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  loadSessionList();
+  loadScenarios();
+  maybeShowWelcomeModal();
+});
+
+// ════════════════════════════════════════════════════════════════
+// WELCOME MODAL
+// ════════════════════════════════════════════════════════════════
+function maybeShowWelcomeModal() {
+  if (!localStorage.getItem('stratos_welcome_seen')) {
+    document.getElementById('welcome-modal-bg').classList.add('visible');
+  }
+}
+function closeWelcomeModal() {
+  if (document.getElementById('dont-show-again').checked) {
+    localStorage.setItem('stratos_welcome_seen', '1');
+  }
+  document.getElementById('welcome-modal-bg').classList.remove('visible');
+}
+
+// ════════════════════════════════════════════════════════════════
+// TAB NAVIGATION
+// ════════════════════════════════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.top-nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === `panel-${tab}`));
+  if (tab === 'scenarios') renderScenariosPanel();
+}
+
+// ════════════════════════════════════════════════════════════════
+// SIDEBAR
+// ════════════════════════════════════════════════════════════════
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('collapsed');
+}
+
+// ════════════════════════════════════════════════════════════════
+// COACH & MODE
+// ════════════════════════════════════════════════════════════════
+function setCoach(name) { selectedCoach = name; }
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-pill').forEach(p => p.classList.toggle('active', p.dataset.mode === mode));
+}
+
+// ════════════════════════════════════════════════════════════════
+// SESSION LIST
+// ════════════════════════════════════════════════════════════════
+async function loadSessionList() {
+  try {
+    const res = await fetch('/sessions');
+    if (!res.ok) return;
+    const data = await res.json();
+    renderSessionList(data.sessions || []);
+  } catch (_) {}
+}
+
+function renderSessionList(sessions) {
+  const list = document.getElementById('session-list');
+  if (!sessions.length) {
+    list.innerHTML = '<div style="padding:8px 18px;font-size:12px;color:var(--text-mt)">No sessions yet</div>';
+    return;
+  }
+  list.innerHTML = sessions.map(s => {
+    const name = s.session_name || truncate(s.session_id, 22);
+    const isActive = s.session_id === sessionId;
+    return `<div class="session-item ${isActive ? 'active' : ''}" onclick="loadSession('${s.session_id}', '${escHtml(name)}')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span class="session-name">${escHtml(name)}</span>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════════════
+// LOAD EXISTING SESSION
+// ════════════════════════════════════════════════════════════════
+async function loadSession(id, name) {
+  try {
+    const res = await fetch(`/sessions/${id}`);
+    if (!res.ok) return;
+    const data = await res.json();
+
+    sessionId    = id;
+    sessionName  = name;
+    selectedCoach = data.coach_name || 'James';
+    document.getElementById('coach-select').value = selectedCoach;
+
+    switchTab('coach');
+    showChatState();
+    document.getElementById('session-title-text') && (document.getElementById('session-title-text').textContent = name);
+    document.getElementById('coach-pill').style.display = 'flex';
+    document.getElementById('coach-pill-name').textContent = selectedCoach;
+
+    const chatEl = document.getElementById('chat-messages');
+    chatEl.innerHTML = '';
+    for (const msg of data.messages || []) {
+      appendMessage(msg.role, msg.content, msg.role === 'assistant' ? selectedCoach : 'You');
+    }
+    enableInput();
+    loadSessionList();
+    sessionAnnotated = true; // already annotated in past
+  } catch (_) {}
+}
+
+// ════════════════════════════════════════════════════════════════
+// NEW SESSION
+// ════════════════════════════════════════════════════════════════
+function newSession() {
+  sessionId    = null;
+  sessionName  = null;
+  isRoleplay   = false;
+  isStreaming   = false;
+  sessionAnnotated = false;
+  switchTab('coach');
+  showWelcomeState();
+  document.getElementById('coach-pill').style.display = 'none';
+  hideCharacterCard();
+  enableInput();
+  loadSessionList();
+}
+
+// ════════════════════════════════════════════════════════════════
+// QUICK START
+// ════════════════════════════════════════════════════════════════
+async function quickStart(message) { await startSessionThen(message); }
+
+// ════════════════════════════════════════════════════════════════
+// EXPERIENCES (sidebar)
+// ════════════════════════════════════════════════════════════════
+const EXPERIENCE_PROMPTS = {
+  difficult:   "I need to prepare for a difficult conversation. Let's map it out together before I have it.",
+  stakeholder: "I want to do a stakeholder analysis for a challenge I'm navigating. Help me map who's involved and what they care about.",
+  plan90:      "I want to build out a 90-day leadership plan. Help me structure what I should focus on and accomplish.",
+  decision:    "I have a hard decision to make and I want to use a structured framework to think it through."
+};
+
+function startExperience(type) {
+  if (type === 'roleplay') {
+    renderScenarioGridLegacy();
+    document.getElementById('scenario-chooser').classList.add('visible');
+    return;
+  }
+  const prompt = EXPERIENCE_PROMPTS[type];
+  if (prompt) quickStart(prompt);
+}
+
+// ════════════════════════════════════════════════════════════════
+// SESSION START
+// ════════════════════════════════════════════════════════════════
+async function startSessionThen(firstMessage) {
+  switchTab('coach');
+  showChatState();
+  const typingEl = showTyping();
+
+  try {
+    const res = await fetch('/sessions/new', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ coach_name: selectedCoach, mode: currentMode })
+    });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    sessionId = data.session_id;
+    sessionAnnotated = false;
+
+    sessionName = firstMessage.length > 40 ? firstMessage.slice(0, 40) + '…' : firstMessage;
+    document.getElementById('coach-pill').style.display = 'flex';
+    document.getElementById('coach-pill-name').textContent = selectedCoach;
+
+    removeTyping(typingEl);
+    appendMessage('assistant', data.opening_message, selectedCoach);
+    enableInput();
+    await sendMessageText(firstMessage);
+    loadSessionList();
+  } catch (err) {
+    removeTyping(typingEl);
+    appendError('Could not start session. Check server status.');
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// MESSAGING
+// ════════════════════════════════════════════════════════════════
+async function sendMessage() {
+  const input = document.getElementById('user-input');
+  const text  = input.value.trim();
+  if (!text || isStreaming) return;
+  input.value = '';
+  input.style.height = 'auto';
+  if (!sessionId) { await startSessionThen(text); return; }
+  await sendMessageText(text);
+}
+
+async function sendMessageText(text) {
+  if (isStreaming || !sessionId) return;
+  isStreaming = true;
+  document.getElementById('send-btn').disabled = true;
+
+  const userMsgEl = appendMessage('user', text, 'You');
+  const bubbleEl  = appendStreamingBubble();
+
+  try {
+    const res = await fetch('/chat/stream', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ session_id: sessionId, message: text, mode: currentMode })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const reader  = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '', fullText = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const payload = line.slice(6).trim();
+        if (payload === '[DONE]') break;
+        try {
+          const parsed = JSON.parse(payload);
+          if (parsed.error) { bubbleEl.innerHTML = `<span class="error-msg">${parsed.error}</span>`; break; }
+          if (parsed.text) { fullText += parsed.text; bubbleEl.textContent = fullText; scrollBottom(); }
+        } catch (_) {}
+      }
+    }
+
+    // Annotation after first user message in a new non-roleplay session
+    if (!isRoleplay && !sessionAnnotated) {
+      sessionAnnotated = true;
+      fetchAndShowAnnotation(userMsgEl);
+    }
+  } catch (err) {
+    bubbleEl.innerHTML = `<span class="error-msg">Connection error — please try again.</span>`;
+  } finally {
+    isStreaming = false;
+    document.getElementById('send-btn').disabled = false;
+    document.getElementById('user-input').focus();
+    scrollBottom();
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// ANNOTATION
+// ════════════════════════════════════════════════════════════════
+async function fetchAndShowAnnotation(userMsgEl) {
+  if (!sessionId || !userMsgEl) return;
+  try {
+    const res = await fetch(`/sessions/${sessionId}/annotate`, { method: 'POST' });
+    if (!res.ok) return;
+    const data = await res.json();
+    const annotations = data.annotations || {};
+    const keys = Object.keys(annotations);
+    if (!keys.length) return;
+    // Show annotation for the first annotated message
+    const key = keys[0];
+    const ann = annotations[key];
+    const card = document.createElement('div');
+    card.className = `annotation-card ${ann.type}`;
+    card.innerHTML = `<div class="annotation-label">${ann.type === 'praise' ? '👍 Praise' : '💡 Tip'}</div>${escHtml(ann.text)}`;
+    userMsgEl.style.position = 'relative';
+    userMsgEl.appendChild(card);
+  } catch (_) {}
+}
+
+// ════════════════════════════════════════════════════════════════
+// DOM HELPERS
+// ════════════════════════════════════════════════════════════════
+function showWelcomeState() {
+  document.getElementById('welcome-state').style.display = 'flex';
+  document.getElementById('chat-messages').style.display = 'none';
+  document.getElementById('chat-messages').innerHTML = '';
+  hideCharacterCard();
+}
+
+function showChatState() {
+  document.getElementById('welcome-state').style.display = 'none';
+  const chatEl = document.getElementById('chat-messages');
+  chatEl.style.display = 'flex';
+  chatEl.innerHTML = '';
+}
+
+function hideCharacterCard() {
+  document.getElementById('character-card').classList.remove('visible');
+}
+
+function showCharacterCard(scenario) {
+  if (!scenario) return;
+  document.getElementById('character-avatar').textContent = getScenarioEmoji(scenario.id);
+  document.getElementById('character-name').textContent = scenario.character || scenario.title;
+  document.getElementById('character-role-text').textContent = scenario.character_role || scenario.characterTitle || '';
+  document.getElementById('character-goal-text').textContent = 'Goal: ' + (scenario.goal || '');
+  document.getElementById('character-card').classList.add('visible');
+}
+
+function enableInput() {
+  const inp = document.getElementById('user-input');
+  inp.disabled = false; inp.focus();
+  inp.placeholder = isRoleplay ? 'Your line...' : "What's on your mind?";
+  document.getElementById('send-btn').disabled = false;
+}
+function disableInput() {
+  document.getElementById('user-input').disabled = true;
+  document.getElementById('send-btn').disabled = true;
+}
+
+function appendMessage(role, text, label) {
+  const chatEl = document.getElementById('chat-messages');
+  const msg = document.createElement('div');
+  msg.className = `msg ${role}`;
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = role === 'assistant' ? label[0].toUpperCase() : 'Y';
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.textContent = text;
+  msg.appendChild(avatar);
+  msg.appendChild(bubble);
+  chatEl.appendChild(msg);
+  scrollBottom();
+  return msg;
+}
+
+function appendStreamingBubble() {
+  const chatEl = document.getElementById('chat-messages');
+  const msg = document.createElement('div');
+  msg.className = 'msg assistant'; msg.id = 'streaming-msg';
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = selectedCoach[0].toUpperCase();
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.innerHTML = '<div class="typing-dots"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>';
+  msg.appendChild(avatar); msg.appendChild(bubble);
+  chatEl.appendChild(msg); scrollBottom();
+  return bubble;
+}
+
+function showTyping() {
+  const chatEl = document.getElementById('chat-messages');
+  const msg = document.createElement('div');
+  msg.className = 'msg assistant'; msg.id = 'typing-indicator';
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar'; avatar.textContent = selectedCoach[0].toUpperCase();
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.innerHTML = '<div class="typing-dots"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>';
+  msg.appendChild(avatar); msg.appendChild(bubble);
+  chatEl.appendChild(msg); scrollBottom();
+  return msg;
+}
+
+function removeTyping(el) {
+  if (el) el.remove();
+  const ex = document.getElementById('typing-indicator');
+  if (ex) ex.remove();
+}
+
+function appendError(msg) {
+  const chatEl = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.style.cssText = 'text-align:center;padding:16px;color:#f87171;font-size:13px;';
+  div.textContent = msg;
+  chatEl.appendChild(div);
+}
+
+function scrollBottom() {
+  const chatEl = document.getElementById('chat-messages');
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function truncate(str, n) { return str && str.length > n ? str.slice(0, n) + '…' : str; }
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ════════════════════════════════════════════════════════════════
+// SCENARIOS — FETCH & PANEL
+// ════════════════════════════════════════════════════════════════
+async function loadScenarios() {
+  try {
+    const res = await fetch('/scenarios');
+    if (!res.ok) return;
+    const data = await res.json();
+    scenariosCache = data.scenarios || [];
+  } catch (_) {}
+}
+
+function getAttemptsForScenario(id) {
+  const key = 'stratos_attempts';
+  const stored = JSON.parse(localStorage.getItem(key) || '{}');
+  return stored[id] || 0;
+}
+
+function incrementAttempts(id) {
+  const key = 'stratos_attempts';
+  const stored = JSON.parse(localStorage.getItem(key) || '{}');
+  stored[id] = (stored[id] || 0) + 1;
+  localStorage.setItem(key, JSON.stringify(stored));
+}
+
+function getDifficultyBadgeClass(difficulty) {
+  const map = { 'Medium': 'badge-medium', 'Hard': 'badge-hard', 'Expert': 'badge-expert' };
+  return map[difficulty] || 'badge-medium';
+}
+
+function getScenarioEmoji(id) {
+  const map = {
+    'difficult-feedback': '💬', 'performance-review': '📋', 'micromanager-boss': '🔍',
+    'peer-conflict': '🤝', 'board-communication': '📊', 'change-resistance': '🔄',
+    'stakeholder-alignment': '🗺️', 'promotion-conversation': '🎯', 'team-conflict': '⚡',
+    'executive-vision': '🏔️'
+  };
+  return map[id] || '💼';
+}
+
+function getScenarioGradient(id) {
+  const map = {
+    'difficult-feedback':    'linear-gradient(135deg, #1a2040, #0f1625)',
+    'performance-review':    'linear-gradient(135deg, #1f1a10, #2a2010)',
+    'micromanager-boss':     'linear-gradient(135deg, #0d1f2a, #101825)',
+    'peer-conflict':         'linear-gradient(135deg, #0d1f1a, #0a1a14)',
+    'board-communication':   'linear-gradient(135deg, #1f102a, #18082a)',
+    'change-resistance':     'linear-gradient(135deg, #1a1020, #140c1a)',
+    'stakeholder-alignment': 'linear-gradient(135deg, #0d2028, #0a1820)',
+    'promotion-conversation':'linear-gradient(135deg, #1a2010, #141a0a)',
+    'team-conflict':         'linear-gradient(135deg, #2a1010, #200c0c)',
+    'executive-vision':      'linear-gradient(135deg, #101a2a, #0c1420)'
+  };
+  return map[id] || 'linear-gradient(135deg, #1a2040, #0f1625)';
+}
+
+let activeFilter = 'All';
+
+function filterScenarios(cat, btn) {
+  activeFilter = cat;
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.toggle('active', p.dataset.cat === cat));
+  renderScenariosPanel();
+}
+
+function renderScenariosPanel() {
+  const grid = document.getElementById('scenario-grid-new');
+  if (!grid) return;
+  const scenarios = activeFilter === 'All'
+    ? scenariosCache
+    : scenariosCache.filter(s => s.category === activeFilter);
+
+  if (!scenarios.length) {
+    grid.innerHTML = '<div style="color:var(--text-mt);font-size:14px;padding:40px 0">No scenarios in this category yet.</div>';
+    return;
+  }
+
+  grid.innerHTML = scenarios.map(s => {
+    const attempts = getAttemptsForScenario(s.id);
+    const diffClass = getDifficultyBadgeClass(s.difficulty);
+    const emoji = getScenarioEmoji(s.id);
+    const gradient = getScenarioGradient(s.id);
+    return `
+      <div class="scenario-card-new">
+        <div class="scenario-card-image" style="background:${gradient}">
+          <div class="scenario-card-image-placeholder">${emoji}</div>
+          <div class="scenario-card-badges">
+            <span class="badge badge-category">${escHtml(s.category)}</span>
+            <span class="badge ${diffClass}">${escHtml(s.difficulty)}</span>
+          </div>
+        </div>
+        <div class="scenario-card-body">
+          <div class="scenario-card-title">${escHtml(s.title)}</div>
+          <div class="scenario-card-char">${escHtml(s.character)} · ${escHtml(s.character_role)}</div>
+          <div class="scenario-card-footer">
+            <span class="scenario-attempts">${attempts > 0 ? attempts + ' attempt' + (attempts !== 1 ? 's' : '') : 'Not tried yet'}</span>
+            <button class="scenario-start-btn-sm" onclick="openNewScenarioModal('${s.id}')">Start Practice</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openNewScenarioModal(id) {
+  const s = scenariosCache.find(sc => sc.id === id);
+  if (!s) return;
+  openScenarioModal_fromNew(s);
+}
+
+// ════════════════════════════════════════════════════════════════
+// LEGACY SCENARIO CHOOSER (sidebar roleplay)
+// ════════════════════════════════════════════════════════════════
+const LEGACY_SCENARIOS = [
   {
-    id: 'career-bottleneck',
-    title: 'The Frozen Ladder',
-    subtitle: 'Promotion denied, no timeline',
-    emoji: '📈',
-    gradient: 'linear-gradient(135deg, #1a2a4a 0%, #0d1f3c 50%, #162040 100%)',
-    accentColor: '#4a9eff',
-    character: 'Marcus Chen',
-    characterTitle: 'Senior Engineer — 6 years, top performer',
+    id: 'career-bottleneck', title: 'The Frozen Ladder', subtitle: 'Promotion denied, no timeline', emoji: '📈',
+    gradient: 'linear-gradient(135deg, #1a2a4a 0%, #0d1f3c 50%, #162040 100%)', accentColor: '#4a9eff',
+    character: 'Marcus Chen', characterTitle: 'Senior Engineer — 6 years, top performer',
     situation: 'Marcus is a 6-year top performer who has been verbally promised a Staff Engineer promotion for two cycles running. Both times it was pulled at the last minute — first due to headcount freeze, then because his manager changed. He now has a competing offer from a competitor paying 40% more. He has scheduled this meeting himself. He is not venting. He wants answers, and he has already made up his mind to leave unless you give him a concrete reason to stay. You cannot match the salary. The promotion timeline is genuinely uncertain.',
     goal: 'Retain Marcus without lying to him. Navigate between honesty about the uncertainty and giving him a real reason to believe in the path here. If you overpromise, he will call it out.',
     avatarBg: 'linear-gradient(135deg, #1a3a6a, #0d2540)',
   },
   {
-    id: 'performance-rating',
-    title: 'The Blindside Review',
-    subtitle: 'Rating she never saw coming',
-    emoji: '📋',
-    gradient: 'linear-gradient(135deg, #2d1a0e 0%, #3d2010 50%, #2a1808 100%)',
-    accentColor: '#f59e0b',
-    character: 'Alicia Torres',
-    characterTitle: 'Marketing Manager — 3 years',
+    id: 'performance-rating', title: 'The Blindside Review', subtitle: 'Rating she never saw coming', emoji: '📋',
+    gradient: 'linear-gradient(135deg, #2d1a0e 0%, #3d2010 50%, #2a1808 100%)', accentColor: '#f59e0b',
+    character: 'Alicia Torres', characterTitle: 'Marketing Manager — 3 years',
     situation: "It's Alicia's annual review. You are giving her a \"Needs Improvement\" — one level below what she expected, and a rating that will freeze her bonus and flag her for a PIP if repeated. She did not see this coming. She has documented evidence of her contributions, her peer feedback was positive, and she worked 60-hour weeks on the Q3 launch. She believes you have been inconsistent in your feedback and will say so directly. She may mention consulting HR. The rating is justified — but your feedback delivery this year has been poor, and she knows it.",
     goal: 'Hold the rating under significant emotional and factual pushback. Acknowledge where your feedback process failed without undermining the outcome. End with a documented improvement plan.',
     avatarBg: 'linear-gradient(135deg, #5a3010, #3d2010)',
   },
   {
-    id: 'resistant-report',
-    title: 'The Untouchable',
-    subtitle: 'Star performer, zero accountability',
-    emoji: '🧱',
-    gradient: 'linear-gradient(135deg, #0d2a1f 0%, #0a2218 50%, #0d2a1a 100%)',
-    accentColor: '#10b981',
-    character: 'Derek Walsh',
-    characterTitle: 'Sales Lead — top revenue generator',
+    id: 'resistant-report', title: 'The Untouchable', subtitle: 'Star performer, zero accountability', emoji: '🧱',
+    gradient: 'linear-gradient(135deg, #0d2a1f 0%, #0a2218 50%, #0d2a1a 100%)', accentColor: '#10b981',
+    character: 'Derek Walsh', characterTitle: 'Sales Lead — top revenue generator',
     situation: "Derek is your highest-revenue salesperson — he brought in 40% of team quota last quarter. He also systematically ignores CRM documentation, undermines junior reps in team meetings, and has been the subject of two informal HR complaints (both dropped). You have mentioned these issues twice in 1:1s; both times he smiled, agreed, and changed nothing. He knows his numbers make him fireproof and he acts like it. This is a formal conversation. He will remind you of his numbers within the first two minutes. He will be charming and completely unmoved.",
     goal: "Make consequences real for someone who believes they are above them. Document specific behavioral commitments. Don't let him turn this into a negotiation about his value.",
     avatarBg: 'linear-gradient(135deg, #0a3020, #0d2518)',
   },
   {
-    id: 'executive-pushback',
-    title: 'The Kill Shot',
-    subtitle: 'C-suite about to cancel your project',
-    emoji: '🏛️',
-    gradient: 'linear-gradient(135deg, #1f0d3a 0%, #180a2d 50%, #1a0d38 100%)',
-    accentColor: '#8b5cf6',
-    character: 'Diana Park',
-    characterTitle: 'Chief Revenue Officer',
+    id: 'executive-pushback', title: 'The Kill Shot', subtitle: 'C-suite about to cancel your project', emoji: '🏛️',
+    gradient: 'linear-gradient(135deg, #1f0d3a 0%, #180a2d 50%, #1a0d38 100%)', accentColor: '#8b5cf6',
+    character: 'Diana Park', characterTitle: 'Chief Revenue Officer',
     situation: "Diana has called this meeting — you didn't initiate it. She has already spoken to Finance and believes your team's 18-month AI platform initiative should be cancelled and the budget reallocated to a competitor acquisition. She has numbers from her own analysis that contradict yours. She is not asking for your input — she is informing you of the direction unless you can change her mind in the next 20 minutes. She respects directness and has no patience for caveats. She has cancelled three projects this year that had more support than yours.",
     goal: "Change her mind or at minimum buy 60 days. Don't be defensive. Attack her assumptions with data she hasn't seen. Getting emotional or over-explaining will end the conversation.",
     avatarBg: 'linear-gradient(135deg, #2d1058, #1f0a3d)',
   },
   {
-    id: 'skip-level',
-    title: 'The Ambush',
-    subtitle: 'Your boss\'s boss has questions',
-    emoji: '⚡',
-    gradient: 'linear-gradient(135deg, #2d0a1a 0%, #250818 50%, #2a0a1c 100%)',
-    accentColor: '#f43f5e',
-    character: 'Robert Hale',
-    characterTitle: 'VP of Engineering — your boss\'s boss',
+    id: 'skip-level', title: 'The Ambush', subtitle: "Your boss's boss has questions", emoji: '⚡',
+    gradient: 'linear-gradient(135deg, #2d0a1a 0%, #250818 50%, #2a0a1c 100%)', accentColor: '#f43f5e',
+    character: 'Robert Hale', characterTitle: "VP of Engineering — your boss's boss",
     situation: "Robert requested this 1:1 at 4pm yesterday with no agenda. He opens by telling you he has been hearing — from multiple peer directors — that your team is a bottleneck, that decisions take too long, and that engineers on your team are interviewing elsewhere because of morale issues. He has specifics: two engineers he knows by name who have complained about you directly to him. Your manager is traveling and is unreachable. Robert is not angry. He is measured and fair — but he wants to know what is actually happening on your team, and he will probe any answer that sounds like deflection.",
     goal: "Answer honestly without panicking, throwing your team under the bus, or making promises you can't keep. The engineers he named are real people you manage. How you handle this shapes his view of you permanently.",
     avatarBg: 'linear-gradient(135deg, #4d1028, #320818)',
   },
 ];
 
-let selectedScenario = null;
-let roleplayTimer = null;
-let roleplaySecondsLeft = 300; // 5 minutes
-
-function renderScenarioGrid() {
+function renderScenarioGridLegacy() {
   const grid = document.getElementById('scenario-grid');
-  grid.innerHTML = SCENARIOS.map(s => `
-    <div class="scenario-card" onclick="openScenarioModal('${s.id}')">
+  // Merge: show legacy first, then new scenarios
+  const allLegacy = LEGACY_SCENARIOS;
+  grid.innerHTML = allLegacy.map(s => `
+    <div class="scenario-card" onclick="openScenarioModal_legacy('${s.id}')">
       <div class="scenario-card-art" style="background:${s.gradient}">
-        <svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg" style="opacity:0.35">
-          ${getSceneIllustration(s.id, s.accentColor)}
-        </svg>
         <div style="position:absolute;top:16px;left:16px;font-size:28px;">${s.emoji}</div>
       </div>
       <div class="scenario-card-title">${s.title}</div>
@@ -1432,61 +1669,31 @@ function renderScenarioGrid() {
   `).join('');
 }
 
-function getSceneIllustration(id, color) {
-  // Simple geometric SVG illustrations per scenario
-  const scenes = {
-    'career-bottleneck': `
-      <rect x="60" y="80" width="40" height="60" rx="4" fill="${color}" opacity="0.6"/>
-      <circle cx="80" cy="65" r="15" fill="${color}" opacity="0.7"/>
-      <rect x="130" y="95" width="40" height="45" rx="4" fill="${color}" opacity="0.4"/>
-      <circle cx="150" cy="80" r="13" fill="${color}" opacity="0.5"/>
-      <rect x="40" y="140" width="160" height="4" rx="2" fill="${color}" opacity="0.3"/>
-      <rect x="20" y="50" width="80" height="3" rx="2" fill="${color}" opacity="0.2"/>
-      <rect x="20" y="58" width="60" height="3" rx="2" fill="${color}" opacity="0.2"/>`,
-    'performance-rating': `
-      <rect x="50" y="60" width="140" height="100" rx="8" fill="${color}" opacity="0.15"/>
-      <rect x="65" y="75" width="80" height="6" rx="3" fill="${color}" opacity="0.5"/>
-      <rect x="65" y="88" width="110" height="4" rx="2" fill="${color}" opacity="0.3"/>
-      <rect x="65" y="98" width="90" height="4" rx="2" fill="${color}" opacity="0.3"/>
-      <rect x="65" y="115" width="60" height="20" rx="4" fill="${color}" opacity="0.4"/>
-      <circle cx="170" cy="100" r="20" fill="${color}" opacity="0.2"/>
-      <path d="M162 100 L168 106 L178 94" stroke="${color}" stroke-width="3" fill="none" opacity="0.6"/>`,
-    'resistant-report': `
-      <circle cx="90" cy="70" r="16" fill="${color}" opacity="0.6"/>
-      <rect x="74" y="86" width="32" height="55" rx="4" fill="${color}" opacity="0.5"/>
-      <circle cx="155" cy="70" r="16" fill="${color}" opacity="0.4"/>
-      <rect x="139" y="86" width="32" height="55" rx="4" fill="${color}" opacity="0.3"/>
-      <path d="M106 75 L138 75" stroke="${color}" stroke-width="3" opacity="0.5"/>
-      <rect x="60" y="140" width="120" height="3" rx="2" fill="${color}" opacity="0.25"/>`,
-    'executive-pushback': `
-      <rect x="20" y="60" width="200" height="4" rx="2" fill="${color}" opacity="0.2"/>
-      <rect x="30" y="70" width="180" height="80" rx="4" fill="${color}" opacity="0.08"/>
-      <circle cx="75" cy="100" r="18" fill="${color}" opacity="0.5"/>
-      <rect x="57" y="118" width="36" height="22" rx="3" fill="${color}" opacity="0.4"/>
-      <circle cx="130" cy="95" r="14" fill="${color}" opacity="0.35"/>
-      <rect x="116" y="109" width="28" height="31" rx="3" fill="${color}" opacity="0.3"/>
-      <circle cx="175" cy="98" r="14" fill="${color}" opacity="0.35"/>
-      <rect x="161" y="112" width="28" height="28" rx="3" fill="${color}" opacity="0.3"/>`,
-    'skip-level': `
-      <rect x="90" y="30" width="60" height="45" rx="6" fill="${color}" opacity="0.5"/>
-      <circle cx="120" cy="20" r="14" fill="${color}" opacity="0.6"/>
-      <path d="M120 75 L80 105 M120 75 L160 105" stroke="${color}" stroke-width="3" opacity="0.4"/>
-      <rect x="55" y="105" width="50" height="40" rx="5" fill="${color}" opacity="0.35"/>
-      <circle cx="80" cy="97" r="11" fill="${color}" opacity="0.4"/>
-      <rect x="130" y="105" width="50" height="40" rx="5" fill="${color}" opacity="0.35"/>
-      <circle cx="155" cy="97" r="11" fill="${color}" opacity="0.4"/>`,
-  };
-  return scenes[id] || '';
-}
-
-function openScenarioModal(id) {
-  const s = SCENARIOS.find(sc => sc.id === id);
+function openScenarioModal_legacy(id) {
+  const s = LEGACY_SCENARIOS.find(sc => sc.id === id);
   if (!s) return;
-  selectedScenario = s;
+  const adapted = {
+    id: s.id, title: s.title, character: s.character,
+    character_role: s.characterTitle, situation: s.situation, goal: s.goal,
+    avatarBg: s.avatarBg, emoji: s.emoji
+  };
+  selectedScenario = adapted;
   document.getElementById('modal-title').textContent = s.title;
   document.getElementById('modal-avatar').style.background = s.avatarBg;
   document.getElementById('modal-avatar').textContent = s.emoji;
   document.getElementById('modal-char-name').textContent = s.character + ' — ' + s.characterTitle;
+  document.getElementById('modal-situation').textContent = s.situation;
+  document.getElementById('modal-goal').textContent = s.goal;
+  document.getElementById('scenario-modal-bg').classList.add('visible');
+}
+
+function openScenarioModal_fromNew(s) {
+  // Adapt new scenario format to legacy modal
+  selectedScenario = s;
+  document.getElementById('modal-title').textContent = s.title;
+  document.getElementById('modal-avatar').style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+  document.getElementById('modal-avatar').textContent = getScenarioEmoji(s.id);
+  document.getElementById('modal-char-name').textContent = s.character + ' · ' + s.character_role;
   document.getElementById('modal-situation').textContent = s.situation;
   document.getElementById('modal-goal').textContent = s.goal;
   document.getElementById('scenario-modal-bg').classList.add('visible');
@@ -1506,17 +1713,21 @@ function closeScenarioChooser() {
 async function startSelectedScenario() {
   if (!selectedScenario) return;
   const s = selectedScenario;
+
+  // Increment attempts
+  incrementAttempts(s.id);
+
   closeScenarioChooser();
+  closeScenarioModal();
+  switchTab('coach');
   showChatState();
   const typingEl = showTyping();
 
   try {
     const res = await fetch('/sessions/new', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-        coach_name: selectedCoach,
-        is_roleplay: true,
+        coach_name: selectedCoach, is_roleplay: true,
         roleplay_character: s.character,
         roleplay_situation: s.situation,
       })
@@ -1524,29 +1735,32 @@ async function startSelectedScenario() {
     if (!res.ok) throw new Error();
     const data = await res.json();
     sessionId = data.session_id;
+    isRoleplay = true;
+    sessionAnnotated = true;
     sessionName = `Role Play: ${s.title}`;
-    document.getElementById('session-title').textContent = sessionName;
+
     document.getElementById('coach-pill').style.display = 'flex';
-    document.getElementById('coach-pill-name').textContent = s.character;
+    document.getElementById('coach-pill-name').textContent = s.character || s.title;
 
     removeTyping(typingEl);
 
-    // Show compact scenario context strip
+    // Show character card
+    showCharacterCard(s);
+
+    // Show compact context strip
     const contextMsg = `<div style="padding:10px 16px;background:rgba(102,126,234,0.07);border:1px solid rgba(102,126,234,0.18);border-radius:10px;margin-bottom:12px;font-size:12px;color:var(--text-lt);">
-      <span style="color:#a5b4fc;font-weight:700;">🎭 ${s.title}</span> &nbsp;·&nbsp; Goal: ${s.goal}
+      <span style="color:#a5b4fc;font-weight:700;">🎭 ${escHtml(s.title)}</span> &nbsp;·&nbsp; Goal: ${escHtml(s.goal)}
     </div>`;
     document.getElementById('chat-messages').insertAdjacentHTML('beforeend', contextMsg);
 
-    // Character speaks first — display their opening message
-    appendMessage('assistant', data.opening_message, s.character);
+    appendMessage('assistant', data.opening_message, s.character || s.title);
 
-    // Show roleplay banner with timer
-    document.getElementById('roleplay-banner-text').textContent = `Role Play — ${s.character}`;
+    document.getElementById('roleplay-banner-text').textContent = `Role Play — ${s.character || s.title}`;
     document.getElementById('roleplay-banner').classList.add('visible');
     startRoleplayTimer();
 
     enableInput();
-    document.getElementById('user-input').placeholder = `Respond to ${s.character}...`;
+    document.getElementById('user-input').placeholder = `Respond to ${s.character || s.title}...`;
     loadSessionList();
   } catch (err) {
     removeTyping(typingEl);
@@ -1554,6 +1768,9 @@ async function startSelectedScenario() {
   }
 }
 
+// ════════════════════════════════════════════════════════════════
+// ROLEPLAY TIMER
+// ════════════════════════════════════════════════════════════════
 function startRoleplayTimer() {
   roleplaySecondsLeft = 300;
   clearInterval(roleplayTimer);
@@ -1561,11 +1778,7 @@ function startRoleplayTimer() {
   roleplayTimer = setInterval(() => {
     roleplaySecondsLeft--;
     updateTimerDisplay();
-    if (roleplaySecondsLeft <= 0) {
-      clearInterval(roleplayTimer);
-      // Auto-trigger evaluation
-      endRoleplay();
-    }
+    if (roleplaySecondsLeft <= 0) { clearInterval(roleplayTimer); endRoleplay(); }
   }, 1000);
 }
 
@@ -1581,11 +1794,12 @@ function updateTimerDisplay() {
 async function endRoleplay() {
   clearInterval(roleplayTimer);
   document.getElementById('roleplay-banner').classList.remove('visible');
+  hideCharacterCard();
+  isRoleplay = false;
   document.getElementById('user-input').placeholder = "What's on your mind?";
 
   if (!sessionId) return;
 
-  // Show feedback modal immediately with loading state
   document.getElementById('feedback-scenario-label').textContent = selectedScenario ? `${selectedScenario.title} — ${selectedScenario.character}` : 'Role Play Evaluation';
   document.getElementById('feedback-body').innerHTML = `<div class="feedback-loading">
     <div class="typing-dots" style="justify-content:center"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>
@@ -1604,25 +1818,202 @@ async function endRoleplay() {
 }
 
 function renderFeedback(text) {
-  // Convert **Bold** headers to styled blocks
-  const html = text
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\n\n/g, '\n');
+  const html = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n\n/g, '\n');
   document.getElementById('feedback-body').innerHTML = `<div class="feedback-body">${html}</div>`;
 }
 
 function closeFeedbackModal() {
   document.getElementById('feedback-modal-bg').classList.remove('visible');
-  // Reset to fresh state
   sessionId = null;
   document.getElementById('chat-messages').innerHTML = '';
-  document.getElementById('session-title').textContent = 'New Session';
   showWelcomeState();
 }
 
-function sendMessageWithText(text) {
-  if (isStreaming || !sessionId) return;
-  sendMessageText(text);
+// ════════════════════════════════════════════════════════════════
+// PROGRESS REPORT
+// ════════════════════════════════════════════════════════════════
+async function generateProgress() {
+  const btn = document.getElementById('generate-btn');
+  btn.disabled = true;
+  btn.textContent = 'Generating…';
+
+  document.getElementById('progress-content').innerHTML = `
+    <div class="progress-loading">
+      <div class="spinner"></div>
+      <p style="margin-top:16px;font-size:13px;color:var(--text-lt)">Analyzing your sessions…</p>
+    </div>`;
+
+  try {
+    const res = await fetch('/progress/generate', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ session_ids: [] })
+    });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+
+    if (data.error && !data.leader_score) {
+      document.getElementById('progress-content').innerHTML = `
+        <div class="progress-empty">
+          <div class="progress-empty-icon">💬</div>
+          <h2>Not enough data yet</h2>
+          <p>${data.error || 'Complete a few coaching sessions first, then generate your report.'}</p>
+        </div>`;
+    } else {
+      renderProgressResults(data);
+    }
+  } catch (err) {
+    document.getElementById('progress-content').innerHTML = `
+      <div class="progress-empty">
+        <div class="progress-empty-icon">⚠️</div>
+        <h2>Could not generate report</h2>
+        <p>Please try again. Make sure you have completed at least one coaching session.</p>
+      </div>`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Generate Report`;
+  }
+}
+
+function renderProgressResults(data) {
+  const skills = data.skills || {};
+  const score  = data.leader_score || 0;
+  const skillNames = Object.keys(skills);
+
+  // Build skill bars HTML
+  const skillBarsHtml = skillNames.map(name => {
+    const val = skills[name] || 0;
+    const pct = (val / 10) * 100;
+    return `
+      <div class="skill-row">
+        <div class="skill-row-header">
+          <span class="skill-name">${escHtml(name)}</span>
+          <span class="skill-score">${val}/10</span>
+        </div>
+        <div class="skill-bar-track">
+          <div class="skill-bar-fill" style="width:${pct}%"></div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Build SVG radar chart
+  const radarSvg = buildRadarChart(skills);
+
+  // Score ring
+  const circumference = 2 * Math.PI * 52;
+  const dashOffset = circumference - (score / 100) * circumference;
+
+  document.getElementById('progress-content').innerHTML = `
+    <div class="progress-results">
+      <div>
+        <div class="score-card">
+          <div class="score-label">Leader Score</div>
+          <div class="score-ring-wrap">
+            <div class="score-ring">
+              <svg width="140" height="140" viewBox="0 0 140 140">
+                <circle cx="70" cy="70" r="52" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+                <circle cx="70" cy="70" r="52" fill="none" stroke="${score >= 70 ? '#22c55e' : score >= 50 ? '#C5A66B' : '#f87171'}"
+                  stroke-width="10" stroke-linecap="round"
+                  stroke-dasharray="${circumference.toFixed(1)}"
+                  stroke-dashoffset="${dashOffset.toFixed(1)}"/>
+              </svg>
+              <div class="score-ring-text">
+                <div class="score-number">${score}</div>
+                <div class="score-out-of">out of 100</div>
+              </div>
+            </div>
+          </div>
+          <div class="skill-bars">${skillBarsHtml}</div>
+          <div class="sessions-counter">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Completed sessions: <span>${data.completed_sessions || 0}</span>
+          </div>
+        </div>
+      </div>
+      <div class="progress-right">
+        <div class="radar-card">
+          <div class="radar-card-label">Skill Radar</div>
+          <div class="radar-wrap">${radarSvg}</div>
+        </div>
+        <div class="growth-card">
+          <div class="growth-card-label">Growth Plan</div>
+          <div class="growth-text">${escHtml(data.growth_plan || '')}</div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">💡</div>
+          <div>
+            <div class="tip-label">Improvement Tip</div>
+            <div class="tip-text">${escHtml(data.improvement_tip || '')}</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function buildRadarChart(skills) {
+  const names   = Object.keys(skills);
+  const values  = Object.values(skills);
+  const n       = names.length;
+  if (n === 0) return '';
+
+  const cx = 140, cy = 140, r = 100;
+  const angleStep = (2 * Math.PI) / n;
+
+  function polarToXY(angle, radius) {
+    return {
+      x: cx + radius * Math.cos(angle - Math.PI / 2),
+      y: cy + radius * Math.sin(angle - Math.PI / 2)
+    };
+  }
+
+  // Grid rings
+  let gridHtml = '';
+  for (let ring = 2; ring <= 10; ring += 2) {
+    const ringR = (ring / 10) * r;
+    const pts = names.map((_, i) => {
+      const p = polarToXY(i * angleStep, ringR);
+      return `${p.x},${p.y}`;
+    }).join(' ');
+    gridHtml += `<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+  }
+
+  // Axes
+  let axesHtml = '';
+  names.forEach((_, i) => {
+    const p = polarToXY(i * angleStep, r);
+    axesHtml += `<line x1="${cx}" y1="${cy}" x2="${p.x}" y2="${p.y}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`;
+  });
+
+  // Data polygon
+  const dataPts = values.map((v, i) => {
+    const scaledR = (Math.min(v, 10) / 10) * r;
+    const p = polarToXY(i * angleStep, scaledR);
+    return `${p.x},${p.y}`;
+  }).join(' ');
+
+  // Labels
+  let labelsHtml = '';
+  names.forEach((name, i) => {
+    const p = polarToXY(i * angleStep, r + 20);
+    const anchor = p.x < cx - 5 ? 'end' : p.x > cx + 5 ? 'start' : 'middle';
+    // Abbreviate
+    const short = name.split(' ').map(w => w[0]).join('');
+    labelsHtml += `<text x="${p.x}" y="${p.y}" text-anchor="${anchor}" dominant-baseline="middle" fill="#a8b4c8" font-size="11" font-family="Inter, sans-serif">${short}</text>`;
+    // Full label tooltip approximation
+    labelsHtml += `<title>${name}</title>`;
+  });
+
+  return `
+    <svg width="280" height="280" viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+      ${gridHtml}
+      ${axesHtml}
+      <polygon points="${dataPts}" fill="rgba(197,166,107,0.15)" stroke="#C5A66B" stroke-width="2"/>
+      ${labelsHtml}
+      ${values.map((v, i) => {
+        const scaledR = (Math.min(v, 10) / 10) * r;
+        const p = polarToXY(i * angleStep, scaledR);
+        return `<circle cx="${p.x}" cy="${p.y}" r="4" fill="#C5A66B"/>`;
+      }).join('')}
+    </svg>`;
 }
 </script>
 </body>

@@ -4,6 +4,7 @@ Run: uvicorn main:app --reload --port 8000
 """
 
 import os
+import re
 import json
 from pathlib import Path
 from fastapi import FastAPI, HTTPException
@@ -39,8 +40,138 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Init coaching engine
 engine = CoachingEngine()
 
+MODEL = "claude-sonnet-4-6"
+
+# ── Scenario Data ─────────────────────────────────────────────────────────────
+SCENARIOS = [
+    {
+        "id": "difficult-feedback",
+        "title": "Delivering Difficult Feedback",
+        "character": "Alex Chen",
+        "character_role": "Senior Engineer, 5 years at company",
+        "situation": "Alex is a high-performing senior engineer who has become increasingly dismissive in team meetings, interrupting colleagues and taking credit for others' work. You're his manager and need to address this behavior directly. Alex is defensive and highly valued by leadership, making this conversation high-stakes.",
+        "goal": "Address the dismissive behavior and credit-taking directly while preserving the relationship and Alex's motivation.",
+        "image": "/static/images/scenario-feedback.jpg",
+        "category": "Difficult Conversations",
+        "difficulty": "Hard",
+        "attempts": 0
+    },
+    {
+        "id": "performance-review",
+        "title": "The Underperformer",
+        "character": "Jordan Mills",
+        "character_role": "Marketing Manager, 2 years at company",
+        "situation": "Jordan was a top performer who has been significantly underperforming for 3 months. Quality of work has dropped, deadlines are being missed, and attitude in meetings has changed. You've tried casual check-ins but nothing has changed. This is a formal performance conversation.",
+        "goal": "Get to the real reason behind the performance drop and create a shared action plan with clear accountability.",
+        "image": "/static/images/scenario-performance.jpg",
+        "category": "Performance",
+        "difficulty": "Hard",
+        "attempts": 0
+    },
+    {
+        "id": "micromanager-boss",
+        "title": "The Micromanager",
+        "character": "Dawn Patel",
+        "character_role": "VP of Engineering, your direct manager",
+        "situation": "Dawn insists on approving every decision, reviews every PR, and schedules daily check-ins even for routine work. She's risk-averse and doesn't seem to trust your judgment despite 3 years of strong performance. You need to renegotiate your working relationship.",
+        "goal": "Help Dawn feel confident enough to give you more autonomy without making her feel criticized or undermined.",
+        "image": "/static/images/scenario-micromanager.jpg",
+        "category": "Managing Up",
+        "difficulty": "Medium",
+        "attempts": 0
+    },
+    {
+        "id": "peer-conflict",
+        "title": "The Credit Taker",
+        "character": "Marcus Webb",
+        "character_role": "Peer Director, cross-functional partner",
+        "situation": "Marcus presented work from your team to the executive leadership team last week without mentioning your team's contribution — framing it entirely as his initiative. This is the second time this has happened. You need to address it directly before the next board presentation.",
+        "goal": "Establish clear norms around attribution and collaboration without creating a hostile peer relationship.",
+        "image": "/static/images/scenario-peer.jpg",
+        "category": "Peer Dynamics",
+        "difficulty": "Medium",
+        "attempts": 0
+    },
+    {
+        "id": "board-communication",
+        "title": "The Board Skeptic",
+        "character": "Richard Stanton",
+        "character_role": "Board Member, former CFO",
+        "situation": "Richard has been consistently skeptical of your division's roadmap in board meetings, asking pointed questions about ROI and timeline. He has significant influence with the CEO. You've requested a 1:1 before the next board meeting to address his concerns directly.",
+        "goal": "Turn a skeptic into a supporter by addressing his real concerns, not just the surface objections.",
+        "image": "/static/images/scenario-boardroom.jpg",
+        "category": "Executive Presence",
+        "difficulty": "Expert",
+        "attempts": 0
+    },
+    {
+        "id": "change-resistance",
+        "title": "Resistance to Change",
+        "character": "Sharon Torres",
+        "character_role": "Senior Director, 12 years at company",
+        "situation": "Sharon is openly resistant to the organizational restructuring you're leading. She's been with the company longer than anyone and has significant informal authority. She's been lobbying peers against the changes. You need to bring her on board or neutralize her opposition.",
+        "goal": "Understand her real objections and find a path where she becomes an advocate, not an obstacle.",
+        "image": "/static/images/scenario-change.jpg",
+        "category": "Change Management",
+        "difficulty": "Expert",
+        "attempts": 0
+    },
+    {
+        "id": "stakeholder-alignment",
+        "title": "The Misaligned Stakeholder",
+        "character": "Priya Sharma",
+        "character_role": "Chief Marketing Officer",
+        "situation": "Priya has different expectations about the product roadmap than what your engineering team has been building toward. The disconnect only became apparent in a cross-functional meeting where she revealed she had been telling customers features would ship that are 6 months out on your roadmap.",
+        "goal": "Get to shared understanding of the roadmap without blame, and establish a process to prevent future misalignment.",
+        "image": "/static/images/scenario-stakeholder.jpg",
+        "category": "Stakeholder Management",
+        "difficulty": "Hard",
+        "attempts": 0
+    },
+    {
+        "id": "promotion-conversation",
+        "title": "The Promotion Ask",
+        "character": "Catherine Lowe",
+        "character_role": "SVP of Product, your skip-level manager",
+        "situation": "You've been performing at the next level for 18 months and your direct manager has been non-committal about your promotion timeline. You've requested this meeting with Catherine to advocate for yourself directly. She respects directness but has high standards for executive-level communication.",
+        "goal": "Make a compelling case for your promotion using evidence and strategic framing — not just tenure or effort.",
+        "image": "/static/images/scenario-promotion.jpg",
+        "category": "Career Development",
+        "difficulty": "Medium",
+        "attempts": 0
+    },
+    {
+        "id": "team-conflict",
+        "title": "The Team Conflict",
+        "character": "Both: Lena K. & David R.",
+        "character_role": "Two senior engineers with escalating conflict",
+        "situation": "Two of your best engineers have a growing interpersonal conflict that's affecting team morale. They disagree on technical architecture and the tension has spilled into meetings. You're meeting with David first — he's convinced Lena is trying to undermine his work.",
+        "goal": "De-escalate David's narrative and get to the shared interests underneath the conflict.",
+        "image": "/static/images/scenario-conflict.jpg",
+        "category": "Conflict Resolution",
+        "difficulty": "Hard",
+        "attempts": 0
+    },
+    {
+        "id": "executive-vision",
+        "title": "Setting Vision as a New Leader",
+        "character": "Your new leadership team (played by AI)",
+        "character_role": "5-person team you inherited 90 days ago",
+        "situation": "You joined as VP 90 days ago and inherited a team that was loyal to your predecessor. You've been observing, learning, and building trust. Now it's time to share your vision for where you're taking the team over the next 12 months. The team is skeptical but open.",
+        "goal": "Present your vision in a way that inspires, invites collaboration, and addresses the uncertainty the team feels.",
+        "image": "/static/images/scenario-feedback.jpg",
+        "category": "Executive Presence",
+        "difficulty": "Hard",
+        "attempts": 0
+    }
+]
+
 
 # ── Request Models ────────────────────────────────────────────────────────────
+class ProgressRequest(BaseModel):
+    session_ids: list[str] = []
+
+
 class NewSessionRequest(BaseModel):
     coach_name: str = "James"  # "James" or "Alexandra"
     is_roleplay: bool = False
@@ -163,6 +294,116 @@ async def evaluate_session(session_id: str):
         return {"feedback": feedback, "session_id": session_id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/scenarios")
+async def get_scenarios():
+    """Return all scenario metadata."""
+    return {"scenarios": SCENARIOS}
+
+
+@app.post("/progress/generate")
+async def generate_progress(req: ProgressRequest):
+    """Analyze last N sessions and generate a progress report using Claude."""
+    if req.session_ids:
+        sessions = [engine.store.get(sid) for sid in req.session_ids if engine.store.get(sid)]
+    else:
+        recent = engine.store.list_recent(limit=5)
+        sessions = [engine.store.get(s["session_id"]) for s in recent if engine.store.get(s["session_id"])]
+
+    if not sessions:
+        return {"error": "No sessions found", "skills": {}, "leader_score": 0, "growth_plan": ""}
+
+    all_user_messages = []
+    for s in sessions:
+        for msg in s.messages:
+            if msg["role"] == "user":
+                all_user_messages.append(msg["content"])
+
+    if not all_user_messages:
+        return {"error": "No messages found", "skills": {}, "leader_score": 0, "growth_plan": ""}
+
+    transcript = "\n".join(f"- {m}" for m in all_user_messages[-30:])
+
+    prompt = f"""You are an executive coaching analyst. Based on these user messages from coaching sessions, evaluate the leader's communication and leadership skills.
+
+User messages from coaching sessions:
+{transcript}
+
+Provide a JSON response with exactly this structure:
+{{
+  "leader_score": <number 0-100>,
+  "skills": {{
+    "Goal Clarity": <number 1-10>,
+    "Self Awareness": <number 1-10>,
+    "Stakeholder Thinking": <number 1-10>,
+    "Communication": <number 1-10>,
+    "Accountability": <number 1-10>,
+    "Strategic Thinking": <number 1-10>
+  }},
+  "growth_plan": "<2-3 sentence personalized growth narrative>",
+  "improvement_tip": "<one specific actionable tip>",
+  "completed_sessions": {len(sessions)}
+}}
+
+Return ONLY valid JSON, no other text."""
+
+    response = engine.client.messages.create(
+        model=MODEL,
+        max_tokens=600,
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    text = response.content[0].text.strip()
+    json_match = re.search(r'\{.*\}', text, re.DOTALL)
+    if json_match:
+        data = json.loads(json_match.group())
+        return data
+    return {"error": "Could not generate progress", "skills": {}, "leader_score": 50, "growth_plan": "Keep coaching to build your progress profile."}
+
+
+@app.post("/sessions/{session_id}/annotate")
+async def annotate_session(session_id: str):
+    """Generate inline praise/tip annotations for a session transcript."""
+    session = engine.store.get(session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    user_messages = [(i, msg["content"]) for i, msg in enumerate(session.messages) if msg["role"] == "user"]
+
+    if len(user_messages) < 1:
+        return {"annotations": {}}
+
+    transcript = "\n".join(f"[Message {i}]: {content}" for i, content in user_messages[:10])
+
+    prompt = f"""You are an executive coaching observer. Review these user messages from a coaching conversation and provide brief inline annotations.
+
+{transcript}
+
+For each message, provide either a "praise" (something they did well) or a "tip" (something to improve). Be specific and brief (under 15 words each).
+
+Return JSON:
+{{
+  "annotations": {{
+    "<message_index>": {{"type": "praise"|"tip", "text": "<annotation text>"}},
+    ...
+  }}
+}}
+
+Only annotate messages that have something noteworthy — skip generic or very short messages.
+Return ONLY valid JSON."""
+
+    response = engine.client.messages.create(
+        model=MODEL,
+        max_tokens=400,
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    text = response.content[0].text.strip()
+    json_match = re.search(r'\{.*\}', text, re.DOTALL)
+    if json_match:
+        return json.loads(json_match.group())
+    return {"annotations": {}}
 
 
 @app.get("/health")
