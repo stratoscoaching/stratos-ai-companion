@@ -1405,9 +1405,8 @@ function closeScenarioChooser() {
 
 async function startSelectedScenario() {
   if (!selectedScenario) return;
-  closeScenarioChooser();
-
   const s = selectedScenario;
+  closeScenarioChooser();
   showChatState();
   const typingEl = showTyping();
 
