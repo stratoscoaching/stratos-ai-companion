@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stratos AI — Executive Coaching</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #0f1623;
+      --navy-mid:   #141e2e;
+      --navy-lt:    #1a2540;
+      --navy-hover: #1f2d4a;
+      --gold:       #C5A66B;
+      --gold-lt:    #d4bc8e;
+      --gold-dim:   rgba(197,166,107,0.15);
+      --border:     rgba(255,255,255,0.07);
+      --border-md:  rgba(255,255,255,0.12);
+      --text-wh:    #f0f2f8;
+      --text-lt:    #a8b4c8;
+      --text-mt:    #6b7a94;
+      --user-bg:    #1e2c4a;
+      --sidebar-w:  268px;
+    }
+
+    html, body { height: 100%; overflow: hidden; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--navy);
+      color: var(--text-wh);
+      display: flex;
+      height: 100vh;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+    /* ═══════════════════════════════════════════════
+       SIDEBAR
+    ═══════════════════════════════════════════════ */
+    .sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      background: var(--navy-mid);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: width 0.25s ease, min-width 0.25s ease;
+      position: relative;
+      z-index: 10;
+    }
+    .sidebar.collapsed {
+      width: 0;
+      min-width: 0;
+      border-right: none;
+    }
+
+    /* Logo */
+    .sidebar-logo {
+      padding: 20px 18px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .logo-mark {
+      width: 30px; height: 30px;
+      background: var(--gold);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 14px; color: var(--navy); font-style: italic;
+      flex-shrink: 0;
+    }
+    .logo-text { font-size: 14px; font-weight: 600; letter-spacing: -0.2px; white-space: nowrap; }
+    .logo-sub { font-size: 10px; color: var(--text-mt); margin-top: 1px; white-space: nowrap; }
+
+    /* New Session */
+    .new-session-wrap {
+      padding: 14px 14px 10px;
+      flex-shrink: 0;
+    }
+    .new-session-btn {
+      width: 100%;
+      display: flex; align-items: center; gap: 8px;
+      background: var(--gold);
+      color: var(--navy);
+      border: none; border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: background 0.15s;
+      font-family: 'Inter', sans-serif;
+    }
+    .new-session-btn:hover { background: var(--gold-lt); }
+    .new-session-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+    /* Sidebar scroll area */
+    .sidebar-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 0 20px;
+    }
+
+    /* Section headers */
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-mt);
+      padding: 16px 18px 6px;
+    }
+
+    /* Session list */
+    .session-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px;
+      border-radius: 8px; margin: 1px 6px;
+      cursor: pointer; transition: background 0.15s;
+      font-size: 13px; color: var(--text-lt);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .session-item:hover { background: var(--navy-hover); color: var(--text-wh); }
+    .session-item.active { background: var(--navy-lt); color: var(--text-wh); }
+    .session-item svg { width: 13px; height: 13px; flex-shrink: 0; opacity: 0.5; }
+    .session-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Experiences */
+    .experience-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 9px 14px;
+      border-radius: 10px; margin: 2px 6px;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .experience-item:hover { background: var(--navy-hover); }
+    .exp-orb {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .exp-orb::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      opacity: 0.3;
+      background: radial-gradient(circle at 30% 30%, white, transparent 60%);
+    }
+    .exp-orb.roleplay    { background: linear-gradient(135deg, #667eea, #764ba2); }
+    .exp-orb.difficult   { background: linear-gradient(135deg, #f093fb, #f5576c); }
+    .exp-orb.stakeholder { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+    .exp-orb.plan90      { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+    .exp-orb.decision    { background: linear-gradient(135deg, #fa709a, #fee140); }
+
+    .exp-info { min-width: 0; }
+    .exp-name { font-size: 13px; font-weight: 500; color: var(--text-wh); line-height: 1.3; }
+    .exp-desc { font-size: 11px; color: var(--text-mt); margin-top: 1px; }
+
+    /* Sidebar toggle */
+    .sidebar-toggle {
+      position: absolute;
+      top: 20px; right: -14px;
+      width: 26px; height: 26px;
+      background: var(--navy-mid);
+      border: 1px solid var(--border-md);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 20;
+      transition: background 0.15s;
+    }
+    .sidebar-toggle:hover { background: var(--navy-lt); }
+    .sidebar-toggle svg { width: 12px; height: 12px; color: var(--text-mt); transition: transform 0.25s; }
+    .sidebar.collapsed ~ .main .sidebar-toggle svg,
+    .sidebar-toggle.flipped svg { transform: rotate(180deg); }
+
+    /* ═══════════════════════════════════════════════
+       MAIN AREA
+    ═══════════════════════════════════════════════ */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      min-width: 0;
+    }
+
+    /* Top bar */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .toggle-sidebar-btn {
+      width: 30px; height: 30px;
+      background: none; border: 1px solid var(--border);
+      border-radius: 8px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-mt); transition: all 0.15s;
+    }
+    .toggle-sidebar-btn:hover { border-color: var(--border-md); color: var(--text-lt); }
+    .toggle-sidebar-btn svg { width: 14px; height: 14px; }
+
+    .session-title {
+      font-size: 14px; font-weight: 500;
+      color: var(--text-lt);
+    }
+
+    .topbar-right { display: flex; align-items: center; gap: 8px; }
+    .coach-pill {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--gold-dim); border: 1px solid rgba(197,166,107,0.2);
+      border-radius: 100px; padding: 4px 12px;
+      font-size: 12px; color: var(--gold); font-weight: 500;
+    }
+    .coach-dot { width: 5px; height: 5px; border-radius: 50%; background: #22c55e; flex-shrink: 0; }
+    .coach-select {
+      background: none; border: 1px solid var(--border);
+      border-radius: 8px; padding: 6px 10px;
+      color: var(--text-lt); font-size: 12px; cursor: pointer;
+      transition: all 0.15s; font-family: 'Inter', sans-serif;
+    }
+    .coach-select:hover { border-color: var(--border-md); }
+
+    /* Messages */
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Welcome State ── */
+    .welcome-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px 24px;
+      text-align: center;
+    }
+
+    /* Animated orb */
+    .coach-orb {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      position: relative;
+      margin-bottom: 28px;
+      animation: orb-float 6s ease-in-out infinite;
+    }
+    .coach-orb::before {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(197,166,107,0.2) 0%, transparent 70%);
+      animation: orb-pulse 4s ease-in-out infinite;
+    }
+    .orb-inner {
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, #C5A66B, #2a3f6e, #7c5cbf, #C5A66B);
+      animation: orb-spin 8s linear infinite;
+      position: relative;
+      overflow: hidden;
+    }
+    .orb-inner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.35), transparent 55%);
+    }
+    @keyframes orb-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes orb-pulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+    @keyframes orb-spin {
+      from { filter: hue-rotate(0deg); }
+      to { filter: hue-rotate(360deg); }
+    }
+
+    .welcome-title {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 32px;
+      font-weight: 400;
+      margin-bottom: 10px;
+      letter-spacing: -0.5px;
+    }
+    .welcome-sub {
+      font-size: 15px;
+      color: var(--text-mt);
+      line-height: 1.6;
+      max-width: 400px;
+      margin-bottom: 32px;
+    }
+
+    /* Quick starts */
+    .quick-starts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      max-width: 560px;
+    }
+    .quick-chip {
+      padding: 8px 16px;
+      background: var(--navy-lt);
+      border: 1px solid var(--border-md);
+      border-radius: 100px;
+      font-size: 13px;
+      color: var(--text-lt);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .quick-chip:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: var(--gold-dim);
+    }
+
+    /* ── Chat Messages ── */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 24px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .msg { display: flex; gap: 12px; }
+    .msg.user { flex-direction: row-reverse; align-self: flex-end; max-width: 72%; }
+    .msg.assistant { align-self: flex-start; max-width: 78%; }
+
+    .msg-avatar {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600;
+      margin-top: 2px;
+    }
+    .msg.assistant .msg-avatar {
+      background: linear-gradient(135deg, var(--gold) 0%, #8a6d3b 100%);
+      color: var(--navy);
+    }
+    .msg.user .msg-avatar {
+      background: var(--navy-lt);
+      color: var(--text-mt);
+    }
+
+    .bubble {
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 14.5px;
+      line-height: 1.7;
+    }
+    .msg.assistant .bubble {
+      background: var(--navy-lt);
+      border: 1px solid var(--border);
+      color: var(--text-wh);
+      border-radius: 4px 16px 16px 16px;
+    }
+    .msg.user .bubble {
+      background: var(--user-bg);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: var(--text-wh);
+      border-radius: 16px 4px 16px 16px;
+    }
+
+    /* Role play indicator */
+    .roleplay-tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(102,126,234,0.15);
+      border: 1px solid rgba(102,126,234,0.3);
+      border-radius: 100px; padding: 2px 10px;
+      font-size: 11px; color: #a5b4fc; font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    /* Typing dots */
+    .typing-dots { display: flex; gap: 4px; padding: 4px 0; }
+    .typing-dot {
+      width: 6px; height: 6px;
+      background: var(--text-mt);
+      border-radius: 50%;
+      animation: bounce 1.2s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.15s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes bounce { 0%, 80%, 100% { transform: translateY(0); opacity: 0.4; } 40% { transform: translateY(-5px); opacity: 1; } }
+
+    /* ── Input Area ── */
+    .input-area {
+      padding: 12px 24px 20px;
+      flex-shrink: 0;
+    }
+
+    .input-card {
+      background: var(--navy-lt);
+      border: 1px solid var(--border-md);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .input-card:focus-within { border-color: rgba(197,166,107,0.4); }
+
+    .input-top {
+      display: flex; align-items: flex-end; gap: 10px;
+      padding: 12px 12px 8px 16px;
+    }
+    #user-input {
+      flex: 1;
+      background: none; border: none; outline: none;
+      resize: none; overflow-y: auto;
+      color: var(--text-wh);
+      font-size: 14.5px; line-height: 1.55;
+      font-family: 'Inter', sans-serif;
+      max-height: 120px;
+      placeholder-color: var(--text-mt);
+    }
+    #user-input::placeholder { color: var(--text-mt); }
+    #user-input:disabled::placeholder { color: var(--text-mt); opacity: 0.4; }
+
+    .send-btn {
+      width: 34px; height: 34px;
+      border-radius: 10px; border: none;
+      background: var(--gold); color: var(--navy);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0;
+      transition: all 0.15s;
+    }
+    .send-btn:hover { background: var(--gold-lt); }
+    .send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .send-btn svg { width: 14px; height: 14px; }
+
+    .input-bottom {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 12px 10px 16px;
+    }
+    .mode-pills { display: flex; gap: 6px; }
+    .mode-pill {
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 11px; font-weight: 500;
+      cursor: pointer; transition: all 0.15s;
+      border: 1px solid var(--border);
+      color: var(--text-mt);
+      background: none;
+      font-family: 'Inter', sans-serif;
+    }
+    .mode-pill:hover { border-color: var(--border-md); color: var(--text-lt); }
+    .mode-pill.active { background: var(--gold-dim); border-color: rgba(197,166,107,0.4); color: var(--gold); }
+
+    .input-hint { font-size: 11px; color: var(--text-mt); }
+
+    .error-msg { color: #f87171; font-style: italic; font-size: 13px; }
+
+    /* ═══════════════════════════════════════════════
+       SCENARIO CHOOSER OVERLAY
+    ═══════════════════════════════════════════════ */
+    .scenario-chooser {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #0a0f1a;
+      z-index: 100;
+      overflow-y: auto;
+      padding: 48px 40px 64px;
+    }
+    .scenario-chooser.visible { display: block; }
+
+    .scenario-chooser-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .scenario-chooser-header h1 {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 42px;
+      font-weight: 400;
+      letter-spacing: -1px;
+      color: var(--text-wh);
+      line-height: 1.1;
+    }
+    .scenario-chooser-header h1 em {
+      color: var(--gold);
+      font-style: italic;
+    }
+    .scenario-chooser-sub {
+      margin-top: 10px;
+      font-size: 15px;
+      color: var(--text-lt);
+    }
+    .scenario-chooser-close {
+      position: fixed;
+      top: 20px; right: 24px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border-md);
+      border-radius: 8px;
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-lt);
+      transition: all 0.15s;
+    }
+    .scenario-chooser-close:hover { background: rgba(255,255,255,0.14); }
+
+    .scenario-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .scenario-card {
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: var(--navy-mid);
+    }
+    .scenario-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+      border-color: rgba(255,255,255,0.16);
+    }
+    .scenario-card-art {
+      height: 180px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .scenario-card-art svg {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+    }
+    .scenario-card-title {
+      padding: 16px 18px 18px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-wh);
+      line-height: 1.3;
+    }
+    .scenario-card-subtitle {
+      padding: 0 18px 16px;
+      font-size: 12px;
+      color: var(--text-mt);
+    }
+
+    /* Scenario Detail Modal */
+    .scenario-modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .scenario-modal-bg.visible { display: flex; }
+
+    .scenario-modal {
+      background: #1a2540;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 520px;
+      width: 100%;
+      position: relative;
+    }
+    .scenario-modal-close {
+      position: absolute;
+      top: 16px; right: 16px;
+      background: rgba(255,255,255,0.08);
+      border: none;
+      border-radius: 6px;
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-lt);
+    }
+    .scenario-modal-title {
+      font-size: 20px; font-weight: 700; color: var(--text-wh);
+      margin-bottom: 16px;
+    }
+    .scenario-modal-char {
+      display: flex; gap: 14px;
+      margin-bottom: 16px;
+    }
+    .scenario-modal-avatar {
+      width: 56px; height: 56px; border-radius: 12px;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+    .scenario-modal-char-info h3 { font-size: 15px; font-weight: 600; color: var(--text-wh); }
+    .scenario-modal-char-info p { font-size: 13px; color: var(--text-lt); margin-top: 4px; line-height: 1.5; }
+
+    .scenario-modal-goal {
+      background: rgba(197,166,107,0.08);
+      border: 1px solid rgba(197,166,107,0.2);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 24px;
+    }
+    .scenario-modal-goal-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.8px; color: var(--gold); margin-bottom: 6px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .scenario-modal-goal p { font-size: 13px; color: var(--text-lt); line-height: 1.5; }
+
+    .scenario-start-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--gold);
+      color: var(--navy);
+      border: none; border-radius: 12px;
+      font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: background 0.15s;
+      font-family: 'Inter', sans-serif;
+    }
+    .scenario-start-btn:hover { background: var(--gold-lt); }
+
+    /* Roleplay banner shown during active roleplay */
+    .roleplay-banner {
+      display: none;
+      padding: 10px 20px;
+      background: rgba(102,126,234,0.1);
+      border-bottom: 1px solid rgba(102,126,234,0.2);
+      font-size: 12px;
+      color: #a5b4fc;
+      align-items: center;
+      gap: 8px;
+    }
+    .roleplay-banner.visible { display: flex; }
+    .roleplay-banner-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #a5b4fc;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+    .roleplay-end-btn {
+      margin-left: auto;
+      padding: 4px 10px;
+      background: rgba(102,126,234,0.2);
+      border: 1px solid rgba(102,126,234,0.4);
+      border-radius: 6px;
+      color: #a5b4fc; font-size: 11px; font-weight: 600;
+      cursor: pointer; font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════
+     SIDEBAR
+════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+
+  <div class="sidebar-logo">
+    <div class="logo-mark">S</div>
+    <div>
+      <div class="logo-text">Stratos AI</div>
+      <div class="logo-sub">Executive Coaching</div>
+    </div>
+  </div>
+
+  <div class="new-session-wrap">
+    <button class="new-session-btn" onclick="newSession()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 8v8M8 12h8"/>
+      </svg>
+      Start a new session
+    </button>
+  </div>
+
+  <div class="sidebar-scroll">
+
+    <!-- Session history -->
+    <div class="section-label">Your Sessions</div>
+    <div id="session-list">
+      <div style="padding: 8px 18px; font-size: 12px; color: var(--text-mt);">No sessions yet</div>
+    </div>
+
+    <!-- AI Experiences -->
+    <div class="section-label" style="margin-top: 8px;">AI Experiences</div>
+
+    <div class="experience-item" onclick="startExperience('roleplay')">
+      <div class="exp-orb roleplay"></div>
+      <div class="exp-info">
+        <div class="exp-name">Role Play Practice</div>
+        <div class="exp-desc">Simulate a real conversation</div>
+      </div>
+    </div>
+
+    <div class="experience-item" onclick="startExperience('difficult')">
+      <div class="exp-orb difficult"></div>
+      <div class="exp-info">
+        <div class="exp-name">Difficult Conversation Prep</div>
+        <div class="exp-desc">Map it before you have it</div>
+      </div>
+    </div>
+
+    <div class="experience-item" onclick="startExperience('stakeholder')">
+      <div class="exp-orb stakeholder"></div>
+      <div class="exp-info">
+        <div class="exp-name">Stakeholder Mapping</div>
+        <div class="exp-desc">Who's on board, who isn't</div>
+      </div>
+    </div>
+
+    <div class="experience-item" onclick="startExperience('plan90')">
+      <div class="exp-orb plan90"></div>
+      <div class="exp-info">
+        <div class="exp-name">90-Day Leadership Plan</div>
+        <div class="exp-desc">Build your first 90 days</div>
+      </div>
+    </div>
+
+    <div class="experience-item" onclick="startExperience('decision')">
+      <div class="exp-orb decision"></div>
+      <div class="exp-info">
+        <div class="exp-name">Decision Matrix</div>
+        <div class="exp-desc">Structure a hard choice</div>
+      </div>
+    </div>
+
+  </div>
+</aside>
+
+<!-- ════════════════════════════════
+     MAIN
+════════════════════════════════ -->
+<div class="main" id="main">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="toggle-sidebar-btn" onclick="toggleSidebar()" title="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <path d="M9 3v18"/>
+        </svg>
+      </button>
+      <span class="session-title" id="session-title">Choose a session or start new</span>
+    </div>
+    <div class="topbar-right">
+      <div class="coach-pill" id="coach-pill" style="display:none">
+        <span class="coach-dot"></span>
+        <span id="coach-pill-name">James</span>
+      </div>
+      <select class="coach-select" id="coach-select" onchange="setCoach(this.value)">
+        <option value="James">James</option>
+        <option value="Alexandra">Alexandra</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Messages area -->
+  <div class="messages" id="messages-wrap">
+
+    <!-- Welcome state -->
+    <div class="welcome-state" id="welcome-state">
+      <div class="coach-orb">
+        <div class="orb-inner"></div>
+      </div>
+      <div class="welcome-title">Your coaching session starts here.</div>
+      <div class="welcome-sub">No judgment. No generic advice. Just the kind of questions that surface what's actually going on.</div>
+
+      <div class="quick-starts">
+        <div class="quick-chip" onclick="quickStart('I\'m struggling with stakeholder alignment on a key initiative.')">Stakeholder alignment</div>
+        <div class="quick-chip" onclick="quickStart('I need to have a difficult conversation with someone on my team.')">Difficult conversation</div>
+        <div class="quick-chip" onclick="quickStart('I\'m preparing for a board presentation and want to sharpen my narrative.')">Board prep</div>
+        <div class="quick-chip" onclick="quickStart('I\'m trying to navigate a conflict between two senior leaders.')">Political conflict</div>
+        <div class="quick-chip" onclick="quickStart('I need to think through whether to take this promotion.')">Promotion decision</div>
+      </div>
+    </div>
+
+    <!-- Chat messages (hidden until session starts) -->
+    <div class="chat-messages" id="chat-messages" style="display:none"></div>
+
+  </div>
+
+  <!-- Roleplay active banner -->
+  <div class="roleplay-banner" id="roleplay-banner">
+    <div class="roleplay-banner-dot"></div>
+    <span id="roleplay-banner-text">Role Play Active</span>
+    <button class="roleplay-end-btn" onclick="endRoleplay()">End & Get Feedback</button>
+  </div>
+
+  <!-- Input area -->
+  <div class="input-area">
+    <div class="input-card">
+      <div class="input-top">
+        <textarea
+          id="user-input"
+          placeholder="What's on your mind?"
+          rows="1"
+          onkeydown="handleKey(event)"
+          oninput="autoResize(this)"
+        ></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+      <div class="input-bottom">
+        <div class="mode-pills">
+          <button class="mode-pill active" data-mode="direct" onclick="setMode('direct')">Direct</button>
+          <button class="mode-pill" data-mode="empathetic" onclick="setMode('empathetic')">Empathetic</button>
+          <button class="mode-pill" data-mode="socratic" onclick="setMode('socratic')">Socratic</button>
+        </div>
+        <span class="input-hint">Enter to send · Shift+Enter for new line</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── State ───────────────────────────────────────────────────────────────────
+let sessionId     = null;
+let selectedCoach = 'James';
+let currentMode   = 'direct';
+let isStreaming   = false;
+let isRoleplay    = false;
+let sessionName   = null;
+let pendingExperience = null;
+
+// ── Init ────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  loadSessionList();
+});
+
+// ── Sidebar ─────────────────────────────────────────────────────────────────
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('collapsed');
+}
+
+// ── Coach & Mode ─────────────────────────────────────────────────────────────
+function setCoach(name) {
+  selectedCoach = name;
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.mode === mode);
+  });
+}
+
+// ── Session List ─────────────────────────────────────────────────────────────
+async function loadSessionList() {
+  try {
+    const res = await fetch('/sessions');
+    if (!res.ok) return;
+    const data = await res.json();
+    renderSessionList(data.sessions || []);
+  } catch (_) {}
+}
+
+function renderSessionList(sessions) {
+  const list = document.getElementById('session-list');
+  if (!sessions.length) {
+    list.innerHTML = '<div style="padding: 8px 18px; font-size: 12px; color: var(--text-mt);">No sessions yet</div>';
+    return;
+  }
+  list.innerHTML = sessions.map(s => {
+    const name = s.session_name || truncate(s.session_id, 22);
+    const isActive = s.session_id === sessionId;
+    return `<div class="session-item ${isActive ? 'active' : ''}" onclick="loadSession('${s.session_id}', '${escHtml(name)}')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span class="session-name">${escHtml(name)}</span>
+    </div>`;
+  }).join('');
+}
+
+function truncate(str, n) {
+  return str && str.length > n ? str.slice(0, n) + '…' : str;
+}
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Load existing session ────────────────────────────────────────────────────
+async function loadSession(id, name) {
+  try {
+    const res = await fetch(`/sessions/${id}`);
+    if (!res.ok) return;
+    const data = await res.json();
+
+    sessionId   = id;
+    sessionName = name;
+    selectedCoach = data.coach_name || 'James';
+    document.getElementById('coach-select').value = selectedCoach;
+
+    showChatState();
+    document.getElementById('session-title').textContent = name;
+    document.getElementById('coach-pill').style.display = 'flex';
+    document.getElementById('coach-pill-name').textContent = selectedCoach;
+
+    const chatEl = document.getElementById('chat-messages');
+    chatEl.innerHTML = '';
+    for (const msg of data.messages || []) {
+      appendMessage(msg.role, msg.content, msg.role === 'assistant' ? selectedCoach : 'You');
+    }
+    enableInput();
+    loadSessionList();
+  } catch (_) {}
+}
+
+// ── New Session ───────────────────────────────────────────────────────────────
+function newSession() {
+  sessionId   = null;
+  sessionName = null;
+  isRoleplay  = false;
+  isStreaming  = false;
+  showWelcomeState();
+  document.getElementById('session-title').textContent = 'Choose a session or start new';
+  document.getElementById('coach-pill').style.display = 'none';
+  document.getElementById('roleplay-setup').classList.remove('visible');
+  enableInput();
+  loadSessionList();
+}
+
+// ── Quick start ───────────────────────────────────────────────────────────────
+async function quickStart(message) {
+  await startSessionThen(message);
+}
+
+// ── Experiences ───────────────────────────────────────────────────────────────
+const EXPERIENCE_PROMPTS = {
+  roleplay:    null, // handled via setup panel
+  difficult:   "I need to prepare for a difficult conversation. Let's map it out together before I have it.",
+  stakeholder: "I want to do a stakeholder analysis for a challenge I'm navigating. Help me map who's involved and what they care about.",
+  plan90:      "I want to build out a 90-day leadership plan. Help me structure what I should focus on and accomplish.",
+  decision:    "I have a hard decision to make and I want to use a structured framework to think it through."
+};
+
+function startExperience(type) {
+  if (type === 'roleplay') {
+    renderScenarioGrid();
+    document.getElementById('scenario-chooser').classList.add('visible');
+    return;
+  }
+  const prompt = EXPERIENCE_PROMPTS[type];
+  if (prompt) quickStart(prompt);
+}
+
+// ── Session Start ─────────────────────────────────────────────────────────────
+async function startSessionThen(firstMessage) {
+  showChatState();
+  const typingEl = showTyping();
+
+  try {
+    const res = await fetch('/sessions/new', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ coach_name: selectedCoach, mode: currentMode })
+    });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    sessionId = data.session_id;
+
+    // Use first message as session name
+    sessionName = firstMessage.length > 40 ? firstMessage.slice(0, 40) + '…' : firstMessage;
+    document.getElementById('session-title').textContent = sessionName;
+    document.getElementById('coach-pill').style.display = 'flex';
+    document.getElementById('coach-pill-name').textContent = selectedCoach;
+
+    removeTyping(typingEl);
+    appendMessage('assistant', data.opening_message, selectedCoach);
+    enableInput();
+
+    // Send first message
+    await sendMessageText(firstMessage);
+    loadSessionList();
+  } catch (err) {
+    removeTyping(typingEl);
+    appendError('Could not start session. Check server status.');
+  }
+}
+
+// ── Messaging ─────────────────────────────────────────────────────────────────
+async function sendMessage() {
+  const input = document.getElementById('user-input');
+  const text  = input.value.trim();
+  if (!text || isStreaming) return;
+  input.value = '';
+  input.style.height = 'auto';
+  // No session yet → create one with this as the first message
+  if (!sessionId) {
+    await startSessionThen(text);
+    return;
+  }
+  await sendMessageText(text);
+}
+
+async function sendMessageText(text) {
+  if (isStreaming || !sessionId) return;
+  isStreaming = true;
+  document.getElementById('send-btn').disabled = true;
+
+  appendMessage('user', text, 'You');
+  const bubbleEl = appendStreamingBubble();
+
+  try {
+    const res = await fetch('/chat/stream', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        session_id: sessionId,
+        message: text,
+        mode: currentMode
+      })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const reader  = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer    = '';
+    let fullText  = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const payload = line.slice(6).trim();
+        if (payload === '[DONE]') break;
+        try {
+          const parsed = JSON.parse(payload);
+          if (parsed.error) {
+            bubbleEl.innerHTML = `<span class="error-msg">${parsed.error}</span>`;
+            break;
+          }
+          if (parsed.text) {
+            fullText += parsed.text;
+            bubbleEl.textContent = fullText;
+            scrollBottom();
+          }
+        } catch (_) {}
+      }
+    }
+  } catch (err) {
+    bubbleEl.innerHTML = `<span class="error-msg">Connection error — please try again.</span>`;
+  } finally {
+    isStreaming = false;
+    document.getElementById('send-btn').disabled = false;
+    document.getElementById('user-input').focus();
+    scrollBottom();
+  }
+}
+
+// ── DOM helpers ───────────────────────────────────────────────────────────────
+function showWelcomeState() {
+  document.getElementById('welcome-state').style.display = 'flex';
+  document.getElementById('chat-messages').style.display = 'none';
+  document.getElementById('chat-messages').innerHTML = '';
+}
+
+function showChatState() {
+  document.getElementById('welcome-state').style.display = 'none';
+  const chatEl = document.getElementById('chat-messages');
+  chatEl.style.display = 'flex';
+  chatEl.innerHTML = '';
+}
+
+function enableInput() {
+  const inp = document.getElementById('user-input');
+  inp.disabled = false;
+  inp.focus();
+  inp.placeholder = isRoleplay ? 'Your line...' : 'What\'s on your mind?';
+  document.getElementById('send-btn').disabled = false;
+}
+
+function disableInput() {
+  document.getElementById('user-input').disabled = true;
+  document.getElementById('send-btn').disabled = true;
+}
+
+function appendMessage(role, text, label) {
+  const chatEl = document.getElementById('chat-messages');
+  const msg = document.createElement('div');
+  msg.className = `msg ${role}`;
+
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = role === 'assistant' ? label[0].toUpperCase() : 'Y';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.textContent = text;
+
+  msg.appendChild(avatar);
+  msg.appendChild(bubble);
+  chatEl.appendChild(msg);
+  scrollBottom();
+  return bubble;
+}
+
+function appendStreamingBubble() {
+  const chatEl = document.getElementById('chat-messages');
+  const msg = document.createElement('div');
+  msg.className = 'msg assistant';
+  msg.id = 'streaming-msg';
+
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = selectedCoach[0].toUpperCase();
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.innerHTML = '<div class="typing-dots"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>';
+
+  msg.appendChild(avatar);
+  msg.appendChild(bubble);
+  chatEl.appendChild(msg);
+  scrollBottom();
+  return bubble;
+}
+
+function showTyping() {
+  const chatEl = document.getElementById('chat-messages');
+  const msg = document.createElement('div');
+  msg.className = 'msg assistant';
+  msg.id = 'typing-indicator';
+
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = selectedCoach[0].toUpperCase();
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.innerHTML = '<div class="typing-dots"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>';
+
+  msg.appendChild(avatar);
+  msg.appendChild(bubble);
+  chatEl.appendChild(msg);
+  scrollBottom();
+  return msg;
+}
+
+function removeTyping(el) {
+  if (el) el.remove();
+  const existing = document.getElementById('typing-indicator');
+  if (existing) existing.remove();
+}
+
+function appendError(msg) {
+  const chatEl = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.style.cssText = 'text-align:center;padding:16px;color:#f87171;font-size:13px;';
+  div.textContent = msg;
+  chatEl.appendChild(div);
+}
+
+function scrollBottom() {
+  const chatEl = document.getElementById('chat-messages');
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+</script>
+
+<!-- ════════════════════════════════
+     SCENARIO CHOOSER OVERLAY
+════════════════════════════════ -->
+<div class="scenario-chooser" id="scenario-chooser">
+  <button class="scenario-chooser-close" onclick="closeScenarioChooser()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+  </button>
+  <div class="scenario-chooser-header">
+    <h1>Choose a <em>scenario</em></h1>
+    <p class="scenario-chooser-sub">Practice real leadership conversations before they happen</p>
+  </div>
+  <div class="scenario-grid" id="scenario-grid"></div>
+</div>
+
+<!-- Scenario Detail Modal -->
+<div class="scenario-modal-bg" id="scenario-modal-bg">
+  <div class="scenario-modal" id="scenario-modal">
+    <button class="scenario-modal-close" onclick="closeScenarioModal()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <div class="scenario-modal-title" id="modal-title"></div>
+    <div class="scenario-modal-char">
+      <div class="scenario-modal-avatar" id="modal-avatar"></div>
+      <div class="scenario-modal-char-info">
+        <h3 id="modal-char-name"></h3>
+        <p id="modal-situation"></p>
+      </div>
+    </div>
+    <div class="scenario-modal-goal">
+      <div class="scenario-modal-goal-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        Your Goal
+      </div>
+      <p id="modal-goal"></p>
+    </div>
+    <button class="scenario-start-btn" onclick="startSelectedScenario()">Start Practice →</button>
+  </div>
+</div>
+
+<script>
+// ── Scenario Data ────────────────────────────────────────────────────────────
+const SCENARIOS = [
+  {
+    id: 'career-bottleneck',
+    title: 'Career Bottleneck',
+    subtitle: 'Promotions are frozen',
+    emoji: '📈',
+    gradient: 'linear-gradient(135deg, #1a2a4a 0%, #0d1f3c 50%, #162040 100%)',
+    accentColor: '#4a9eff',
+    character: 'Marcus Chen',
+    characterTitle: 'Senior Software Engineer, 6 years at company',
+    situation: 'Marcus has been a consistent high performer for 6 years — earning promotions or meaningful raises most years. However, due to a company-wide restructuring and hiring freeze, promotions are now off the table — indefinitely. His performance merits promotion. There is no timeline. He is going to be frustrated.',
+    goal: 'Deliver the news with empathy and transparency. Keep him motivated. Find alternative ways to recognize his growth without making empty promises.',
+    avatarBg: 'linear-gradient(135deg, #1a3a6a, #0d2540)',
+  },
+  {
+    id: 'performance-rating',
+    title: 'Surprising Performance Rating',
+    subtitle: 'Lower than expected review',
+    emoji: '📋',
+    gradient: 'linear-gradient(135deg, #2d1a0e 0%, #3d2010 50%, #2a1808 100%)',
+    accentColor: '#f59e0b',
+    character: 'Alicia Torres',
+    characterTitle: 'Marketing Manager',
+    situation: 'You are giving Alicia her Q1 performance review. Her rating is "Meets Expectations" — she was expecting "Exceeds." She worked hard but the results weren\'t there. She will be defensive, possibly emotional, and will challenge your assessment.',
+    goal: 'Deliver honest feedback clearly. Hold your position under pushback without being harsh. End with a specific improvement plan that she owns — not one you prescribed.',
+    avatarBg: 'linear-gradient(135deg, #5a3010, #3d2010)',
+  },
+  {
+    id: 'resistant-report',
+    title: 'The Resistor',
+    subtitle: 'Accountability conversation',
+    emoji: '🧱',
+    gradient: 'linear-gradient(135deg, #0d2a1f 0%, #0a2218 50%, #0d2a1a 100%)',
+    accentColor: '#10b981',
+    character: 'Derek Walsh',
+    characterTitle: 'Sales Lead',
+    situation: 'Derek delivers results but ignores process, skips documentation, and dismisses feedback. You have raised this twice informally. He minimized it both times. This is the formal conversation. He will deflect, justify, and minimize again.',
+    goal: "Create real accountability without escalating to HR yet. Don't back down when he minimizes. End with specific behavioral commitments with dates attached.",
+    avatarBg: 'linear-gradient(135deg, #0a3020, #0d2518)',
+  },
+  {
+    id: 'executive-pushback',
+    title: 'Executive Sponsor Pushback',
+    subtitle: 'Defending your initiative',
+    emoji: '🏛️',
+    gradient: 'linear-gradient(135deg, #1f0d3a 0%, #180a2d 50%, #1a0d38 100%)',
+    accentColor: '#8b5cf6',
+    character: 'Diana Park',
+    characterTitle: 'Chief Revenue Officer',
+    situation: "You are presenting your team's Q2 initiative to Diana. She is skeptical — the ROI timeline looks too long, and she believes you haven't accounted for the key risks. She will push hard on your assumptions and may try to kill the project.",
+    goal: 'Defend your proposal with confidence under executive-level pressure. Show you\'ve done the homework. Earn her conditional buy-in — even if she\'s not fully sold.',
+    avatarBg: 'linear-gradient(135deg, #2d1058, #1f0a3d)',
+  },
+  {
+    id: 'skip-level',
+    title: 'Skip-Level Storm',
+    subtitle: 'Navigate up the chain',
+    emoji: '⚡',
+    gradient: 'linear-gradient(135deg, #2d0a1a 0%, #250818 50%, #2a0a1c 100%)',
+    accentColor: '#f43f5e',
+    character: 'Robert Hale',
+    characterTitle: 'VP of Engineering (your boss\'s boss)',
+    situation: "Robert calls an unexpected 1:1 and reveals he's been hearing concerns about your team's delivery pace — from peers who went around your manager. He's not angry. He wants answers. Your manager doesn't know this meeting is happening.",
+    goal: 'Be transparent without throwing your team or manager under the bus. Address the concerns directly. Navigate the political complexity without making it worse.',
+    avatarBg: 'linear-gradient(135deg, #4d1028, #320818)',
+  },
+];
+
+let selectedScenario = null;
+
+function renderScenarioGrid() {
+  const grid = document.getElementById('scenario-grid');
+  grid.innerHTML = SCENARIOS.map(s => `
+    <div class="scenario-card" onclick="openScenarioModal('${s.id}')">
+      <div class="scenario-card-art" style="background:${s.gradient}">
+        <svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg" style="opacity:0.35">
+          ${getSceneIllustration(s.id, s.accentColor)}
+        </svg>
+        <div style="position:absolute;top:16px;left:16px;font-size:28px;">${s.emoji}</div>
+      </div>
+      <div class="scenario-card-title">${s.title}</div>
+      <div class="scenario-card-subtitle">${s.subtitle}</div>
+    </div>
+  `).join('');
+}
+
+function getSceneIllustration(id, color) {
+  // Simple geometric SVG illustrations per scenario
+  const scenes = {
+    'career-bottleneck': `
+      <rect x="60" y="80" width="40" height="60" rx="4" fill="${color}" opacity="0.6"/>
+      <circle cx="80" cy="65" r="15" fill="${color}" opacity="0.7"/>
+      <rect x="130" y="95" width="40" height="45" rx="4" fill="${color}" opacity="0.4"/>
+      <circle cx="150" cy="80" r="13" fill="${color}" opacity="0.5"/>
+      <rect x="40" y="140" width="160" height="4" rx="2" fill="${color}" opacity="0.3"/>
+      <rect x="20" y="50" width="80" height="3" rx="2" fill="${color}" opacity="0.2"/>
+      <rect x="20" y="58" width="60" height="3" rx="2" fill="${color}" opacity="0.2"/>`,
+    'performance-rating': `
+      <rect x="50" y="60" width="140" height="100" rx="8" fill="${color}" opacity="0.15"/>
+      <rect x="65" y="75" width="80" height="6" rx="3" fill="${color}" opacity="0.5"/>
+      <rect x="65" y="88" width="110" height="4" rx="2" fill="${color}" opacity="0.3"/>
+      <rect x="65" y="98" width="90" height="4" rx="2" fill="${color}" opacity="0.3"/>
+      <rect x="65" y="115" width="60" height="20" rx="4" fill="${color}" opacity="0.4"/>
+      <circle cx="170" cy="100" r="20" fill="${color}" opacity="0.2"/>
+      <path d="M162 100 L168 106 L178 94" stroke="${color}" stroke-width="3" fill="none" opacity="0.6"/>`,
+    'resistant-report': `
+      <circle cx="90" cy="70" r="16" fill="${color}" opacity="0.6"/>
+      <rect x="74" y="86" width="32" height="55" rx="4" fill="${color}" opacity="0.5"/>
+      <circle cx="155" cy="70" r="16" fill="${color}" opacity="0.4"/>
+      <rect x="139" y="86" width="32" height="55" rx="4" fill="${color}" opacity="0.3"/>
+      <path d="M106 75 L138 75" stroke="${color}" stroke-width="3" opacity="0.5"/>
+      <rect x="60" y="140" width="120" height="3" rx="2" fill="${color}" opacity="0.25"/>`,
+    'executive-pushback': `
+      <rect x="20" y="60" width="200" height="4" rx="2" fill="${color}" opacity="0.2"/>
+      <rect x="30" y="70" width="180" height="80" rx="4" fill="${color}" opacity="0.08"/>
+      <circle cx="75" cy="100" r="18" fill="${color}" opacity="0.5"/>
+      <rect x="57" y="118" width="36" height="22" rx="3" fill="${color}" opacity="0.4"/>
+      <circle cx="130" cy="95" r="14" fill="${color}" opacity="0.35"/>
+      <rect x="116" y="109" width="28" height="31" rx="3" fill="${color}" opacity="0.3"/>
+      <circle cx="175" cy="98" r="14" fill="${color}" opacity="0.35"/>
+      <rect x="161" y="112" width="28" height="28" rx="3" fill="${color}" opacity="0.3"/>`,
+    'skip-level': `
+      <rect x="90" y="30" width="60" height="45" rx="6" fill="${color}" opacity="0.5"/>
+      <circle cx="120" cy="20" r="14" fill="${color}" opacity="0.6"/>
+      <path d="M120 75 L80 105 M120 75 L160 105" stroke="${color}" stroke-width="3" opacity="0.4"/>
+      <rect x="55" y="105" width="50" height="40" rx="5" fill="${color}" opacity="0.35"/>
+      <circle cx="80" cy="97" r="11" fill="${color}" opacity="0.4"/>
+      <rect x="130" y="105" width="50" height="40" rx="5" fill="${color}" opacity="0.35"/>
+      <circle cx="155" cy="97" r="11" fill="${color}" opacity="0.4"/>`,
+  };
+  return scenes[id] || '';
+}
+
+function openScenarioModal(id) {
+  const s = SCENARIOS.find(sc => sc.id === id);
+  if (!s) return;
+  selectedScenario = s;
+  document.getElementById('modal-title').textContent = s.title;
+  document.getElementById('modal-avatar').style.background = s.avatarBg;
+  document.getElementById('modal-avatar').textContent = s.emoji;
+  document.getElementById('modal-char-name').textContent = s.character + ' — ' + s.characterTitle;
+  document.getElementById('modal-situation').textContent = s.situation;
+  document.getElementById('modal-goal').textContent = s.goal;
+  document.getElementById('scenario-modal-bg').classList.add('visible');
+}
+
+function closeScenarioModal() {
+  document.getElementById('scenario-modal-bg').classList.remove('visible');
+  selectedScenario = null;
+}
+
+function closeScenarioChooser() {
+  document.getElementById('scenario-chooser').classList.remove('visible');
+  document.getElementById('scenario-modal-bg').classList.remove('visible');
+  selectedScenario = null;
+}
+
+async function startSelectedScenario() {
+  if (!selectedScenario) return;
+  closeScenarioChooser();
+
+  const s = selectedScenario;
+  showChatState();
+  const typingEl = showTyping();
+
+  try {
+    const res = await fetch('/sessions/new', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        coach_name: selectedCoach,
+        is_roleplay: true,
+        roleplay_character: s.character,
+        roleplay_situation: s.situation,
+      })
+    });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    sessionId = data.session_id;
+    sessionName = `Role Play: ${s.title}`;
+    document.getElementById('session-title').textContent = sessionName;
+    document.getElementById('coach-pill').style.display = 'flex';
+    document.getElementById('coach-pill-name').textContent = s.character;
+
+    removeTyping(typingEl);
+
+    // Show scenario context banner at top of chat
+    const contextMsg = `<div style="padding:16px 20px;background:rgba(102,126,234,0.08);border:1px solid rgba(102,126,234,0.2);border-radius:12px;margin-bottom:4px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#a5b4fc;margin-bottom:6px;">🎭 Role Play Scenario</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text-wh);margin-bottom:4px;">${s.title}</div>
+      <div style="font-size:12px;color:var(--text-lt);margin-bottom:8px;">You are practicing with <strong style="color:var(--text-wh)">${s.character}</strong> — ${s.characterTitle}</div>
+      <div style="font-size:12px;color:var(--gold);">🎯 Goal: ${s.goal}</div>
+    </div>`;
+    document.getElementById('chat-messages').insertAdjacentHTML('beforeend', contextMsg);
+
+    // Show roleplay banner
+    document.getElementById('roleplay-banner-text').textContent = `Role Play Active — ${s.character}`;
+    document.getElementById('roleplay-banner').classList.add('visible');
+
+    enableInput();
+    document.getElementById('user-input').placeholder = `Speak to ${s.character}...`;
+    loadSessionList();
+  } catch (err) {
+    removeTyping(typingEl);
+    appendError('Could not start role play session. Check server status.');
+  }
+}
+
+function endRoleplay() {
+  // Send end signal to get coaching feedback
+  const endMsg = 'end roleplay';
+  document.getElementById('user-input').value = '';
+  sendMessageWithText(endMsg);
+  document.getElementById('roleplay-banner').classList.remove('visible');
+  document.getElementById('user-input').placeholder = 'What\'s on your mind?';
+}
+
+function sendMessageWithText(text) {
+  if (isStreaming || !sessionId) return;
+  sendMessageText(text);
+}
+</script>
+</body>
+</html>
