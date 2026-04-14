@@ -77,8 +77,10 @@ async def new_session(req: NewSessionRequest):
         session.roleplay_character = req.roleplay_character
         session.roleplay_situation = req.roleplay_situation
         session.session_name = f"Role Play: {req.roleplay_character}"
-
-    opening = engine.get_opening_message(session)
+        # Character speaks first — real API call for in-character opening
+        opening = engine.generate_roleplay_opening(session)
+    else:
+        opening = engine.get_opening_message(session)
 
     # Save opening message as first assistant turn
     session.add_message("assistant", opening)
@@ -88,6 +90,8 @@ async def new_session(req: NewSessionRequest):
         "session_id": session.session_id,
         "coach_name": session.coach_name,
         "opening_message": opening,
+        "is_roleplay": session.is_roleplay,
+        "roleplay_character": session.roleplay_character,
     }
 
 
@@ -142,6 +146,23 @@ async def get_session(session_id: str):
 async def list_sessions():
     """List recent sessions."""
     return {"sessions": engine.store.list_recent(limit=20)}
+
+
+@app.post("/sessions/{session_id}/evaluate")
+async def evaluate_session(session_id: str):
+    """Generate end-of-session coaching feedback for a roleplay session."""
+    session = engine.store.get(session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    if not session.is_roleplay:
+        raise HTTPException(status_code=400, detail="Feedback only available for roleplay sessions")
+    if session.turn_count < 2:
+        raise HTTPException(status_code=400, detail="Not enough conversation to evaluate")
+    try:
+        feedback = engine.generate_feedback(session_id)
+        return {"feedback": feedback, "session_id": session_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/health")

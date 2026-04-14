@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Optional, Iterator
 from anthropic import Anthropic
 
-from system_prompt import build_system_prompt, build_roleplay_prompt
+from system_prompt import build_system_prompt, build_roleplay_prompt, build_roleplay_opener_prompt, ROLEPLAY_FEEDBACK_PROMPT
 from rag import get_rag_engine
 
 
@@ -199,11 +199,7 @@ class CoachingEngine:
         self.store.save(session)
 
     def get_opening_message(self, session: Session) -> str:
-        """Generate a context-aware opening message for a new session."""
-        if session.is_roleplay and session.roleplay_character:
-            # For roleplay, generate the character's opening in-character
-            return f"[Role Play Active — you are practicing with {session.roleplay_character}. Type your first message to begin. Say 'end roleplay' at any time to get coaching feedback.]"
-
+        """Generate a context-aware opening message for a new session (non-roleplay)."""
         coach = session.coach_name
         if coach == "Alexandra":
             return (
@@ -217,3 +213,38 @@ class CoachingEngine:
                 "My job is to help you think more clearly about the leadership situations that matter most. "
                 "What are we working on?"
             )
+
+    def generate_roleplay_opening(self, session: Session) -> str:
+        """Call Claude to generate the character's in-character opening line."""
+        opener_prompt = build_roleplay_opener_prompt(
+            session.roleplay_character,
+            session.roleplay_situation,
+        )
+        response = self.client.messages.create(
+            model=MODEL,
+            max_tokens=150,
+            messages=[{"role": "user", "content": opener_prompt}],
+        )
+        return response.content[0].text.strip()
+
+    def generate_feedback(self, session_id: str) -> str:
+        """Generate end-of-session coaching feedback for a completed roleplay."""
+        session = self.store.get(session_id)
+        if not session:
+            raise ValueError(f"Session {session_id} not found")
+
+        # Build conversation transcript for Claude to review
+        transcript_parts = []
+        for msg in session.messages:
+            role_label = session.roleplay_character if msg["role"] == "assistant" else "Leader (user)"
+            transcript_parts.append(f"**{role_label}:** {msg['content']}")
+        transcript = "\n\n".join(transcript_parts)
+
+        feedback_prompt = f"{transcript}\n\n---\n\n{ROLEPLAY_FEEDBACK_PROMPT}"
+
+        response = self.client.messages.create(
+            model=MODEL,
+            max_tokens=600,
+            messages=[{"role": "user", "content": feedback_prompt}],
+        )
+        return response.content[0].text.strip()

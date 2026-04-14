@@ -665,14 +665,89 @@
       animation: pulse 2s ease-in-out infinite;
     }
     @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
-    .roleplay-end-btn {
+    .roleplay-timer {
       margin-left: auto;
+      font-size: 12px; font-weight: 700;
+      color: #a5b4fc;
+      font-variant-numeric: tabular-nums;
+      min-width: 36px;
+    }
+    .roleplay-timer.urgent { color: #f87171; }
+    .roleplay-end-btn {
+      margin-left: 12px;
       padding: 4px 10px;
       background: rgba(102,126,234,0.2);
       border: 1px solid rgba(102,126,234,0.4);
       border-radius: 6px;
       color: #a5b4fc; font-size: 11px; font-weight: 600;
       cursor: pointer; font-family: 'Inter', sans-serif;
+    }
+
+    /* Feedback modal */
+    .feedback-modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .feedback-modal-bg.visible { display: flex; }
+    .feedback-modal {
+      background: #1a2540;
+      border: 1px solid rgba(197,166,107,0.3);
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 560px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    .feedback-modal-header {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .feedback-modal-header h2 {
+      font-size: 18px; font-weight: 700; color: var(--text-wh);
+    }
+    .feedback-modal-header p {
+      font-size: 12px; color: var(--text-lt); margin-top: 2px;
+    }
+    .feedback-body {
+      font-size: 14px; color: var(--text-lt); line-height: 1.7;
+      white-space: pre-wrap;
+    }
+    .feedback-body strong { color: var(--gold); display: block; margin-top: 16px; margin-bottom: 4px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .feedback-body strong:first-child { margin-top: 0; }
+    .feedback-close-btn {
+      width: 100%;
+      margin-top: 24px;
+      padding: 12px;
+      background: var(--gold);
+      color: var(--navy);
+      border: none; border-radius: 10px;
+      font-size: 14px; font-weight: 700;
+      cursor: pointer; font-family: 'Inter', sans-serif;
+    }
+    .feedback-loading {
+      text-align: center; padding: 40px 20px; color: var(--text-lt);
+    }
+    .scenario-eval-notice {
+      background: rgba(197,166,107,0.07);
+      border: 1px solid rgba(197,166,107,0.18);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 20px;
+      font-size: 12px;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
   </style>
 </head>
@@ -812,6 +887,7 @@
   <div class="roleplay-banner" id="roleplay-banner">
     <div class="roleplay-banner-dot"></div>
     <span id="roleplay-banner-text">Role Play Active</span>
+    <span class="roleplay-timer" id="roleplay-timer">5:00</span>
     <button class="roleplay-end-btn" onclick="endRoleplay()">End & Get Feedback</button>
   </div>
 
@@ -1220,6 +1296,24 @@ function autoResize(el) {
 </div>
 
 <!-- Scenario Detail Modal -->
+<div class="feedback-modal-bg" id="feedback-modal-bg">
+  <div class="feedback-modal" id="feedback-modal">
+    <div class="feedback-modal-header">
+      <div>
+        <h2>📊 Session Feedback</h2>
+        <p id="feedback-scenario-label">Role Play Evaluation</p>
+      </div>
+    </div>
+    <div class="feedback-body" id="feedback-body">
+      <div class="feedback-loading">
+        <div class="typing-dots" style="justify-content:center"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>
+        <p style="margin-top:12px;font-size:13px;">Analyzing your conversation…</p>
+      </div>
+    </div>
+    <button class="feedback-close-btn" onclick="closeFeedbackModal()">Start New Session</button>
+  </div>
+</div>
+
 <div class="scenario-modal-bg" id="scenario-modal-bg">
   <div class="scenario-modal" id="scenario-modal">
     <button class="scenario-modal-close" onclick="closeScenarioModal()">
@@ -1240,6 +1334,10 @@ function autoResize(el) {
       </div>
       <p id="modal-goal"></p>
     </div>
+    <div class="scenario-eval-notice">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      You'll receive a performance evaluation after 5 minutes or when you end the session
+    </div>
     <button class="scenario-start-btn" onclick="startSelectedScenario()">Start Practice →</button>
   </div>
 </div>
@@ -1249,72 +1347,74 @@ function autoResize(el) {
 const SCENARIOS = [
   {
     id: 'career-bottleneck',
-    title: 'Career Bottleneck',
-    subtitle: 'Promotions are frozen',
+    title: 'The Frozen Ladder',
+    subtitle: 'Promotion denied, no timeline',
     emoji: '📈',
     gradient: 'linear-gradient(135deg, #1a2a4a 0%, #0d1f3c 50%, #162040 100%)',
     accentColor: '#4a9eff',
     character: 'Marcus Chen',
-    characterTitle: 'Senior Software Engineer, 6 years at company',
-    situation: 'Marcus has been a consistent high performer for 6 years — earning promotions or meaningful raises most years. However, due to a company-wide restructuring and hiring freeze, promotions are now off the table — indefinitely. His performance merits promotion. There is no timeline. He is going to be frustrated.',
-    goal: 'Deliver the news with empathy and transparency. Keep him motivated. Find alternative ways to recognize his growth without making empty promises.',
+    characterTitle: 'Senior Engineer — 6 years, top performer',
+    situation: 'Marcus is a 6-year top performer who has been verbally promised a Staff Engineer promotion for two cycles running. Both times it was pulled at the last minute — first due to headcount freeze, then because his manager changed. He now has a competing offer from a competitor paying 40% more. He has scheduled this meeting himself. He is not venting. He wants answers, and he has already made up his mind to leave unless you give him a concrete reason to stay. You cannot match the salary. The promotion timeline is genuinely uncertain.',
+    goal: 'Retain Marcus without lying to him. Navigate between honesty about the uncertainty and giving him a real reason to believe in the path here. If you overpromise, he will call it out.',
     avatarBg: 'linear-gradient(135deg, #1a3a6a, #0d2540)',
   },
   {
     id: 'performance-rating',
-    title: 'Surprising Performance Rating',
-    subtitle: 'Lower than expected review',
+    title: 'The Blindside Review',
+    subtitle: 'Rating she never saw coming',
     emoji: '📋',
     gradient: 'linear-gradient(135deg, #2d1a0e 0%, #3d2010 50%, #2a1808 100%)',
     accentColor: '#f59e0b',
     character: 'Alicia Torres',
-    characterTitle: 'Marketing Manager',
-    situation: 'You are giving Alicia her Q1 performance review. Her rating is "Meets Expectations" — she was expecting "Exceeds." She worked hard but the results weren\'t there. She will be defensive, possibly emotional, and will challenge your assessment.',
-    goal: 'Deliver honest feedback clearly. Hold your position under pushback without being harsh. End with a specific improvement plan that she owns — not one you prescribed.',
+    characterTitle: 'Marketing Manager — 3 years',
+    situation: "It's Alicia's annual review. You are giving her a \"Needs Improvement\" — one level below what she expected, and a rating that will freeze her bonus and flag her for a PIP if repeated. She did not see this coming. She has documented evidence of her contributions, her peer feedback was positive, and she worked 60-hour weeks on the Q3 launch. She believes you have been inconsistent in your feedback and will say so directly. She may mention consulting HR. The rating is justified — but your feedback delivery this year has been poor, and she knows it.",
+    goal: 'Hold the rating under significant emotional and factual pushback. Acknowledge where your feedback process failed without undermining the outcome. End with a documented improvement plan.',
     avatarBg: 'linear-gradient(135deg, #5a3010, #3d2010)',
   },
   {
     id: 'resistant-report',
-    title: 'The Resistor',
-    subtitle: 'Accountability conversation',
+    title: 'The Untouchable',
+    subtitle: 'Star performer, zero accountability',
     emoji: '🧱',
     gradient: 'linear-gradient(135deg, #0d2a1f 0%, #0a2218 50%, #0d2a1a 100%)',
     accentColor: '#10b981',
     character: 'Derek Walsh',
-    characterTitle: 'Sales Lead',
-    situation: 'Derek delivers results but ignores process, skips documentation, and dismisses feedback. You have raised this twice informally. He minimized it both times. This is the formal conversation. He will deflect, justify, and minimize again.',
-    goal: "Create real accountability without escalating to HR yet. Don't back down when he minimizes. End with specific behavioral commitments with dates attached.",
+    characterTitle: 'Sales Lead — top revenue generator',
+    situation: "Derek is your highest-revenue salesperson — he brought in 40% of team quota last quarter. He also systematically ignores CRM documentation, undermines junior reps in team meetings, and has been the subject of two informal HR complaints (both dropped). You have mentioned these issues twice in 1:1s; both times he smiled, agreed, and changed nothing. He knows his numbers make him fireproof and he acts like it. This is a formal conversation. He will remind you of his numbers within the first two minutes. He will be charming and completely unmoved.",
+    goal: "Make consequences real for someone who believes they are above them. Document specific behavioral commitments. Don't let him turn this into a negotiation about his value.",
     avatarBg: 'linear-gradient(135deg, #0a3020, #0d2518)',
   },
   {
     id: 'executive-pushback',
-    title: 'Executive Sponsor Pushback',
-    subtitle: 'Defending your initiative',
+    title: 'The Kill Shot',
+    subtitle: 'C-suite about to cancel your project',
     emoji: '🏛️',
     gradient: 'linear-gradient(135deg, #1f0d3a 0%, #180a2d 50%, #1a0d38 100%)',
     accentColor: '#8b5cf6',
     character: 'Diana Park',
     characterTitle: 'Chief Revenue Officer',
-    situation: "You are presenting your team's Q2 initiative to Diana. She is skeptical — the ROI timeline looks too long, and she believes you haven't accounted for the key risks. She will push hard on your assumptions and may try to kill the project.",
-    goal: 'Defend your proposal with confidence under executive-level pressure. Show you\'ve done the homework. Earn her conditional buy-in — even if she\'s not fully sold.',
+    situation: "Diana has called this meeting — you didn't initiate it. She has already spoken to Finance and believes your team's 18-month AI platform initiative should be cancelled and the budget reallocated to a competitor acquisition. She has numbers from her own analysis that contradict yours. She is not asking for your input — she is informing you of the direction unless you can change her mind in the next 20 minutes. She respects directness and has no patience for caveats. She has cancelled three projects this year that had more support than yours.",
+    goal: "Change her mind or at minimum buy 60 days. Don't be defensive. Attack her assumptions with data she hasn't seen. Getting emotional or over-explaining will end the conversation.",
     avatarBg: 'linear-gradient(135deg, #2d1058, #1f0a3d)',
   },
   {
     id: 'skip-level',
-    title: 'Skip-Level Storm',
-    subtitle: 'Navigate up the chain',
+    title: 'The Ambush',
+    subtitle: 'Your boss\'s boss has questions',
     emoji: '⚡',
     gradient: 'linear-gradient(135deg, #2d0a1a 0%, #250818 50%, #2a0a1c 100%)',
     accentColor: '#f43f5e',
     character: 'Robert Hale',
-    characterTitle: 'VP of Engineering (your boss\'s boss)',
-    situation: "Robert calls an unexpected 1:1 and reveals he's been hearing concerns about your team's delivery pace — from peers who went around your manager. He's not angry. He wants answers. Your manager doesn't know this meeting is happening.",
-    goal: 'Be transparent without throwing your team or manager under the bus. Address the concerns directly. Navigate the political complexity without making it worse.',
+    characterTitle: 'VP of Engineering — your boss\'s boss',
+    situation: "Robert requested this 1:1 at 4pm yesterday with no agenda. He opens by telling you he has been hearing — from multiple peer directors — that your team is a bottleneck, that decisions take too long, and that engineers on your team are interviewing elsewhere because of morale issues. He has specifics: two engineers he knows by name who have complained about you directly to him. Your manager is traveling and is unreachable. Robert is not angry. He is measured and fair — but he wants to know what is actually happening on your team, and he will probe any answer that sounds like deflection.",
+    goal: "Answer honestly without panicking, throwing your team under the bus, or making promises you can't keep. The engineers he named are real people you manage. How you handle this shapes his view of you permanently.",
     avatarBg: 'linear-gradient(135deg, #4d1028, #320818)',
   },
 ];
 
 let selectedScenario = null;
+let roleplayTimer = null;
+let roleplaySecondsLeft = 300; // 5 minutes
 
 function renderScenarioGrid() {
   const grid = document.getElementById('scenario-grid');
@@ -1431,21 +1531,22 @@ async function startSelectedScenario() {
 
     removeTyping(typingEl);
 
-    // Show scenario context banner at top of chat
-    const contextMsg = `<div style="padding:16px 20px;background:rgba(102,126,234,0.08);border:1px solid rgba(102,126,234,0.2);border-radius:12px;margin-bottom:4px;">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#a5b4fc;margin-bottom:6px;">🎭 Role Play Scenario</div>
-      <div style="font-size:13px;font-weight:600;color:var(--text-wh);margin-bottom:4px;">${s.title}</div>
-      <div style="font-size:12px;color:var(--text-lt);margin-bottom:8px;">You are practicing with <strong style="color:var(--text-wh)">${s.character}</strong> — ${s.characterTitle}</div>
-      <div style="font-size:12px;color:var(--gold);">🎯 Goal: ${s.goal}</div>
+    // Show compact scenario context strip
+    const contextMsg = `<div style="padding:10px 16px;background:rgba(102,126,234,0.07);border:1px solid rgba(102,126,234,0.18);border-radius:10px;margin-bottom:12px;font-size:12px;color:var(--text-lt);">
+      <span style="color:#a5b4fc;font-weight:700;">🎭 ${s.title}</span> &nbsp;·&nbsp; Goal: ${s.goal}
     </div>`;
     document.getElementById('chat-messages').insertAdjacentHTML('beforeend', contextMsg);
 
-    // Show roleplay banner
-    document.getElementById('roleplay-banner-text').textContent = `Role Play Active — ${s.character}`;
+    // Character speaks first — display their opening message
+    appendMessage('assistant', data.opening_message, s.character);
+
+    // Show roleplay banner with timer
+    document.getElementById('roleplay-banner-text').textContent = `Role Play — ${s.character}`;
     document.getElementById('roleplay-banner').classList.add('visible');
+    startRoleplayTimer();
 
     enableInput();
-    document.getElementById('user-input').placeholder = `Speak to ${s.character}...`;
+    document.getElementById('user-input').placeholder = `Respond to ${s.character}...`;
     loadSessionList();
   } catch (err) {
     removeTyping(typingEl);
@@ -1453,13 +1554,70 @@ async function startSelectedScenario() {
   }
 }
 
-function endRoleplay() {
-  // Send end signal to get coaching feedback
-  const endMsg = 'end roleplay';
-  document.getElementById('user-input').value = '';
-  sendMessageWithText(endMsg);
+function startRoleplayTimer() {
+  roleplaySecondsLeft = 300;
+  clearInterval(roleplayTimer);
+  updateTimerDisplay();
+  roleplayTimer = setInterval(() => {
+    roleplaySecondsLeft--;
+    updateTimerDisplay();
+    if (roleplaySecondsLeft <= 0) {
+      clearInterval(roleplayTimer);
+      // Auto-trigger evaluation
+      endRoleplay();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('roleplay-timer');
+  if (!el) return;
+  const m = Math.floor(roleplaySecondsLeft / 60);
+  const s = roleplaySecondsLeft % 60;
+  el.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+  el.className = 'roleplay-timer' + (roleplaySecondsLeft <= 60 ? ' urgent' : '');
+}
+
+async function endRoleplay() {
+  clearInterval(roleplayTimer);
   document.getElementById('roleplay-banner').classList.remove('visible');
-  document.getElementById('user-input').placeholder = 'What\'s on your mind?';
+  document.getElementById('user-input').placeholder = "What's on your mind?";
+
+  if (!sessionId) return;
+
+  // Show feedback modal immediately with loading state
+  document.getElementById('feedback-scenario-label').textContent = selectedScenario ? `${selectedScenario.title} — ${selectedScenario.character}` : 'Role Play Evaluation';
+  document.getElementById('feedback-body').innerHTML = `<div class="feedback-loading">
+    <div class="typing-dots" style="justify-content:center"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>
+    <p style="margin-top:12px;font-size:13px;">Analyzing your conversation…</p>
+  </div>`;
+  document.getElementById('feedback-modal-bg').classList.add('visible');
+
+  try {
+    const res = await fetch(`/sessions/${sessionId}/evaluate`, { method: 'POST' });
+    if (!res.ok) throw new Error('Not enough conversation to evaluate.');
+    const data = await res.json();
+    renderFeedback(data.feedback);
+  } catch (err) {
+    document.getElementById('feedback-body').innerHTML = `<p style="color:var(--text-lt)">${err.message || 'Could not generate feedback. The session may have been too short.'}</p>`;
+  }
+}
+
+function renderFeedback(text) {
+  // Convert **Bold** headers to styled blocks
+  const html = text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n\n/g, '\n');
+  document.getElementById('feedback-body').innerHTML = `<div class="feedback-body">${html}</div>`;
+}
+
+function closeFeedbackModal() {
+  document.getElementById('feedback-modal-bg').classList.remove('visible');
+  // Reset to fresh state
+  sessionId = null;
+  document.getElementById('chat-messages').innerHTML = '';
+  document.getElementById('session-title').textContent = 'New Session';
+  showWelcomeState();
 }
 
 function sendMessageWithText(text) {
