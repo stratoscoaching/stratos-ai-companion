@@ -1,0 +1,35 @@
+name: Mirror to GitLab
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.GITLAB_SSH_KEY }}
+
+      - name: Add GitLab to known hosts
+        run: ssh-keyscan gitlab.com >> ~/.ssh/known_hosts
+
+      - name: Mirror to GitLab
+        continue-on-error: true
+        run: |
+          git remote add gitlab git@gitlab.com:stratoscoaching/stratos-ai-companion.git
+          echo "Attempting push..."
+          if git push gitlab main 2>&1; then
+            echo "Push succeeded"
+          else
+            echo "Regular push failed, trying force push..."
+            git push --force gitlab main 2>&1 || echo "Force push also failed — check GitLab branch protection settings"
+          fi
