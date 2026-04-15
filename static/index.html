@@ -6,55 +6,52 @@
   <title>Stratos AI — Executive Coaching</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --navy:          #080d18;
-      --navy-mid:      #0d1526;
-      --navy-lt:       #131f35;
-      --navy-card:     #111827;
-      --navy-hover:    #1a2845;
-      --gold:          #C5A66B;
-      --gold-lt:       #d4bc8e;
-      --gold-dim:      rgba(197,166,107,0.12);
-      --gold-ring:     rgba(197,166,107,0.6);
-      --green:         #22c55e;
-      --red-accent:    #ef4444;
-      --border:        rgba(255,255,255,0.06);
-      --border-md:     rgba(255,255,255,0.10);
-      --text-wh:       #eef0f6;
-      --text-lt:       #9ba8be;
-      --text-mt:       #5d6b85;
-      --user-bg:       rgba(30,44,74,0.8);
-      --sidebar-w:     260px;
-      --glass-bg:      rgba(13,21,38,0.75);
-      --glass-border:  rgba(255,255,255,0.08);
+      --bg:          #f5f2ed;
+      --sidebar-bg:  #edeae3;
+      --white:       #ffffff;
+      --navy:        #1e2d4a;
+      --navy-lt:     #2d3f5e;
+      --gold:        #c5a66b;
+      --gold-dim:    rgba(197,166,107,0.12);
+      --gold-border: rgba(197,166,107,0.55);
+      --border:      rgba(0,0,0,0.07);
+      --border-md:   rgba(0,0,0,0.11);
+      --text-dk:     #1a1f2e;
+      --text-md:     #687283;
+      --text-lt:     #a0aab8;
+      --green:       #22c55e;
+      --blue:        #3b82f6;
+      --orange:      #f97316;
+      --red:         #ef4444;
+      --sidebar-w:   248px;
     }
 
     html, body { height: 100%; overflow: hidden; }
 
     body {
-      font-family: 'Inter', -apple-system, sans-serif;
-      background: var(--navy);
-      color: var(--text-wh);
+      font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text-dk);
       display: flex;
       height: 100vh;
     }
 
-    /* ── Scrollbar ── */
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 2px; }
 
-    /* ═══════════════════════════════════════════════
+    /* ═══════════════════════════════
        SIDEBAR
-    ═══════════════════════════════════════════════ */
+    ═══════════════════════════════ */
     .sidebar {
       width: var(--sidebar-w);
       min-width: var(--sidebar-w);
-      background: var(--navy-mid);
+      background: var(--sidebar-bg);
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
@@ -62,487 +59,494 @@
       overflow: hidden;
     }
 
-    .sidebar-header {
-      padding: 20px 16px 16px;
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-
     .sidebar-brand {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 14px;
+      padding: 18px 16px 14px;
+      border-bottom: 1px solid var(--border);
     }
 
     .brand-mark {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, var(--gold), #8B6914);
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
+      background: var(--navy);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      color: #fff;
+      font-size: 13px;
       font-weight: 700;
-      color: var(--navy);
-      letter-spacing: -0.5px;
       flex-shrink: 0;
     }
 
     .brand-name {
       font-size: 14px;
-      font-weight: 600;
-      color: var(--text-wh);
-      letter-spacing: 0.2px;
+      font-weight: 700;
+      color: var(--text-dk);
+      letter-spacing: -0.2px;
     }
-    .brand-sub {
-      font-size: 10px;
-      color: var(--text-mt);
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
+
+    .sidebar-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      overflow-y: auto;
+      gap: 6px;
     }
 
     .new-session-btn {
       width: 100%;
-      padding: 9px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border-md);
+      padding: 9px 14px;
+      border-radius: 9px;
+      border: 1.5px solid var(--gold-border);
       background: transparent;
-      color: var(--text-lt);
-      font-size: 12.5px;
-      font-weight: 500;
+      color: var(--gold);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      gap: 7px;
       transition: all 0.18s ease;
+      margin-bottom: 6px;
     }
-    .new-session-btn:hover { background: var(--navy-lt); color: var(--text-wh); border-color: rgba(255,255,255,0.15); }
-    .new-session-btn svg { opacity: 0.6; }
+    .new-session-btn:hover { background: var(--gold-dim); }
+    .new-session-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      color: var(--text-lt);
+      padding: 6px 4px 4px;
+    }
+
+    /* Tool items */
+    .tool-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      touch-action: manipulation;
+    }
+    .tool-item:hover { background: rgba(0,0,0,0.04); }
+    .tool-item.active { background: rgba(30,45,74,0.07); }
+    .tool-item:focus-visible { outline: 2px solid var(--navy); outline-offset: 1px; }
+
+    .tool-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Animated icon backgrounds */
+    .tool-icon::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 9px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .tool-item:hover .tool-icon::before { opacity: 1; }
+
+    .tool-icon.gap-map-icon  { background: rgba(59,130,246,0.10); }
+    .tool-icon.roleplay-icon { background: rgba(139,105,20,0.10); }
+    .tool-icon.matrix-icon   { background: rgba(249,115,22,0.10); }
+
+    .tool-name {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-dk);
+      flex: 1;
+    }
+
+    .tool-badge {
+      font-size: 9.5px;
+      font-weight: 600;
+      color: var(--text-lt);
+      background: rgba(0,0,0,0.05);
+      border-radius: 4px;
+      padding: 2px 6px;
+    }
+
+    .sidebar-spacer { flex: 1; }
 
     .sidebar-footer {
-      padding: 12px 16px;
+      padding: 12px;
       border-top: 1px solid var(--border);
-      flex-shrink: 0;
     }
 
-    .coach-selector-mini {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 10px;
-      border-radius: 8px;
-      background: var(--navy-lt);
+    .growth-plan-btn {
+      width: 100%;
+      padding: 11px;
+      border-radius: 9px;
+      border: none;
+      background: var(--navy);
+      color: #fff;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 600;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: background 0.18s ease;
+      touch-action: manipulation;
     }
-    .coach-selector-mini:hover { background: var(--navy-hover); }
+    .growth-plan-btn:hover { background: var(--navy-lt); }
+    .growth-plan-btn:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
 
-    .coach-mini-photo {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 1.5px solid rgba(197,166,107,0.4);
-    }
-
-    .coach-mini-info { flex: 1; min-width: 0; }
-    .coach-mini-name { font-size: 12px; font-weight: 600; color: var(--text-wh); }
-    .coach-mini-role { font-size: 10px; color: var(--text-mt); }
-
-    .coach-mini-chevron { color: var(--text-mt); font-size: 10px; }
-
-    /* ═══════════════════════════════════════════════
-       MAIN AREA
-    ═══════════════════════════════════════════════ */
+    /* ═══════════════════════════════
+       MAIN
+    ═══════════════════════════════ */
     .main {
       flex: 1;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      position: relative;
-      background: var(--navy);
+      background: var(--bg);
     }
 
-    /* Ambient background */
-    .main::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 70% 50% at 50% -10%, rgba(197,166,107,0.06) 0%, transparent 70%),
-        radial-gradient(ellipse 40% 30% at 80% 80%, rgba(102,126,234,0.04) 0%, transparent 60%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* ── Top Nav ── */
-    .top-nav {
+    /* TOP BAR */
+    .top-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 24px;
-      height: 52px;
+      padding: 10px 20px;
       border-bottom: 1px solid var(--border);
+      background: var(--bg);
       flex-shrink: 0;
-      position: relative;
-      z-index: 10;
-      background: rgba(8,13,24,0.8);
-      backdrop-filter: blur(12px);
+      min-height: 56px;
     }
 
-    .nav-tabs {
-      display: flex;
-      gap: 4px;
-      background: rgba(255,255,255,0.04);
-      border-radius: 8px;
-      padding: 3px;
-    }
-
-    .nav-tab {
-      padding: 5px 14px;
-      border-radius: 6px;
-      font-size: 12.5px;
-      font-weight: 500;
-      color: var(--text-mt);
-      cursor: pointer;
-      transition: all 0.18s ease;
-      border: none;
-      background: transparent;
-      white-space: nowrap;
-    }
-    .nav-tab:hover { color: var(--text-lt); }
-    .nav-tab.active {
-      background: var(--navy-lt);
-      color: var(--text-wh);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-    }
-
-    .nav-right {
+    .coach-info {
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
-    .nav-status {
+    .coach-avatar-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+      cursor: pointer;
+      border: none;
+      transition: background 0.15s;
+      touch-action: manipulation;
+    }
+    .coach-avatar-btn:hover { background: var(--navy-lt); }
+    .coach-avatar-btn:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
+
+    .coach-meta-name { font-size: 14px; font-weight: 700; color: var(--text-dk); line-height: 1.2; }
+    .coach-meta-status { font-size: 11.5px; color: var(--text-md); }
+
+    /* Style toggles */
+    .style-toggles {
+      display: flex;
+      gap: 5px;
+    }
+
+    .style-toggle {
+      padding: 6px 15px;
+      border-radius: 20px;
+      border: 1px solid var(--border-md);
+      background: transparent;
+      color: var(--text-md);
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      touch-action: manipulation;
+      min-height: 32px;
+    }
+    .style-toggle:hover { border-color: var(--navy); color: var(--navy); }
+    .style-toggle.active {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: #fff;
+    }
+    .style-toggle:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
+
+    /* ROLEPLAY BANNER */
+    .roleplay-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 20px;
+      background: rgba(197,166,107,0.07);
+      border-bottom: 1px solid rgba(197,166,107,0.18);
+      flex-shrink: 0;
+    }
+    .roleplay-banner.active { display: flex; }
+
+    .rp-left { display: flex; align-items: center; gap: 10px; }
+
+    .rp-indicator {
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 11.5px;
-      color: var(--text-mt);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #8B6914;
     }
-    .status-dot {
-      width: 6px;
-      height: 6px;
+    .rp-dot {
+      width: 6px; height: 6px;
       border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 6px rgba(34,197,94,0.6);
-    }
-
-    /* ═══════════════════════════════════════════════
-       TAB VIEWS
-    ═══════════════════════════════════════════════ */
-    .tab-view { display: none; flex: 1; overflow: hidden; flex-direction: column; }
-    .tab-view.active { display: flex; }
-
-    /* ═══════════════════════════════════════════════
-       COACHING TAB — WELCOME / COACH HERO
-    ═══════════════════════════════════════════════ */
-    .coach-hero {
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 20px 24px 16px;
-      border-bottom: 1px solid var(--border);
-      position: relative;
-      z-index: 1;
-    }
-
-    .coach-portrait-wrap {
-      position: relative;
-      flex-shrink: 0;
-    }
-
-    .coach-portrait-ring {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      padding: 2.5px;
-      background: linear-gradient(135deg, var(--gold), rgba(197,166,107,0.3), var(--gold));
-      position: relative;
-    }
-
-    .coach-portrait-ring.speaking {
-      background: linear-gradient(135deg, var(--gold), #8B6914, var(--gold));
-      animation: ring-pulse 1.5s ease-in-out infinite;
-    }
-
-    @keyframes ring-pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(197,166,107,0.0); }
-      50%       { box-shadow: 0 0 0 6px rgba(197,166,107,0.15); }
-    }
-
-    .coach-portrait-img {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      object-fit: cover;
-      object-position: top center;
-      display: block;
-    }
-
-    .coach-status-dot {
-      position: absolute;
-      bottom: 2px;
-      right: 2px;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: var(--green);
-      border: 2px solid var(--navy);
-      box-shadow: 0 0 6px rgba(34,197,94,0.5);
-    }
-
-    /* Speaking waveform */
-    .speaking-wave {
-      display: none;
-      align-items: center;
-      gap: 2.5px;
-      height: 14px;
-    }
-    .speaking-wave.active { display: flex; }
-
-    .s-bar {
-      width: 2.5px;
-      border-radius: 2px;
       background: var(--gold);
-      opacity: 0.8;
-      animation: wave-pulse 0.9s ease-in-out infinite;
+      animation: blink 1.4s ease-in-out infinite;
     }
-    .s-bar:nth-child(1) { height: 4px;  animation-delay: 0s; }
-    .s-bar:nth-child(2) { height: 10px; animation-delay: 0.15s; }
-    .s-bar:nth-child(3) { height: 14px; animation-delay: 0.3s; }
-    .s-bar:nth-child(4) { height: 8px;  animation-delay: 0.45s; }
-    .s-bar:nth-child(5) { height: 5px;  animation-delay: 0.6s; }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
 
-    @keyframes wave-pulse {
-      0%, 100% { transform: scaleY(0.4); opacity: 0.35; }
-      50%       { transform: scaleY(1.1); opacity: 1; }
-    }
+    .rp-scenario { font-size: 12.5px; color: var(--text-md); font-weight: 500; }
 
-    .coach-info { flex: 1; min-width: 0; }
-    .coach-name-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 3px;
-    }
-    .coach-name {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--text-wh);
-      font-family: 'Instrument Serif', Georgia, serif;
-    }
-    .coach-label {
-      font-size: 11px;
-      color: var(--text-mt);
-      margin-bottom: 6px;
-      letter-spacing: 0.2px;
-    }
-    .coach-meta {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .coach-badge {
-      font-size: 10.5px;
-      font-weight: 500;
-      color: var(--gold);
-      background: var(--gold-dim);
-      border: 1px solid rgba(197,166,107,0.2);
-      border-radius: 4px;
-      padding: 2px 8px;
-      letter-spacing: 0.3px;
-    }
-    .coach-specialty {
-      font-size: 11px;
-      color: var(--text-mt);
-    }
+    .rp-right { display: flex; align-items: center; gap: 8px; }
 
-    .hero-switch-coach {
-      padding: 7px 14px;
-      border-radius: 7px;
+    .timer-pill {
+      font-size: 12.5px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-dk);
+      background: var(--white);
       border: 1px solid var(--border-md);
-      background: transparent;
-      color: var(--text-lt);
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.18s ease;
-      white-space: nowrap;
-      flex-shrink: 0;
+      padding: 4px 10px;
+      border-radius: 6px;
     }
-    .hero-switch-coach:hover { background: var(--navy-lt); color: var(--text-wh); }
+    .timer-pill.warning { color: var(--red); border-color: rgba(239,68,68,0.3); }
 
-    /* ═══════════════════════════════════════════════
+    .end-rp-btn {
+      padding: 5px 13px;
+      border-radius: 6px;
+      border: 1px solid rgba(239,68,68,0.28);
+      background: rgba(239,68,68,0.06);
+      color: #c53030;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .end-rp-btn:hover { background: rgba(239,68,68,0.12); }
+
+    /* ═══════════════════════════════
        MESSAGES
-    ═══════════════════════════════════════════════ */
+    ═══════════════════════════════ */
     .messages {
       flex: 1;
       overflow-y: auto;
-      padding: 24px;
-      position: relative;
-      z-index: 1;
+      padding: 24px 24px 8px;
+      scroll-behavior: smooth;
     }
 
-    .msg {
-      margin-bottom: 24px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ── Assistant messages ── */
-    .msg.assistant .msg-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-
-    .msg-avatar-photo {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      object-fit: cover;
-      object-position: top center;
-      border: 1.5px solid rgba(197,166,107,0.35);
-      flex-shrink: 0;
-    }
-
-    .msg-coach-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--gold-lt);
-      letter-spacing: 0.2px;
-    }
-
-    .msg-wave {
-      display: none;
-      align-items: center;
-      gap: 2px;
-      height: 12px;
-      margin-left: 2px;
-    }
-    .msg-wave.active { display: flex; }
-    .msg-wave .s-bar { animation: wave-pulse 0.9s ease-in-out infinite; }
-
-    .msg.assistant .bubble {
-      font-size: 14.5px;
-      line-height: 1.78;
-      color: var(--text-wh);
-      padding-left: 16px;
-      border-left: 2px solid rgba(197,166,107,0.4);
-      max-width: 680px;
-    }
-
-    /* ── User messages ── */
-    .msg.user {
-      align-items: flex-end;
-    }
-
-    .msg.user .bubble {
-      background: var(--user-bg);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 14px 14px 4px 14px;
-      padding: 11px 16px;
-      font-size: 14px;
-      line-height: 1.6;
-      color: var(--text-wh);
-      max-width: 520px;
-    }
-
-    /* ── Welcome state ── */
+    /* Welcome state */
     .welcome-state {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      flex: 1;
+      min-height: 70%;
       text-align: center;
-      padding: 40px 24px;
-      gap: 8px;
+      padding: 40px 20px;
     }
 
-    .welcome-greeting {
+    .welcome-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .welcome-heading {
       font-family: 'Instrument Serif', Georgia, serif;
-      font-size: 28px;
-      color: var(--text-wh);
-      line-height: 1.2;
-      margin-bottom: 6px;
+      font-size: 24px;
+      color: var(--text-dk);
+      margin-bottom: 8px;
     }
 
     .welcome-sub {
       font-size: 14px;
-      color: var(--text-lt);
-      max-width: 360px;
-      line-height: 1.6;
-      margin-bottom: 24px;
+      color: var(--text-md);
+      max-width: 320px;
+      line-height: 1.65;
+      margin-bottom: 28px;
     }
 
-    .welcome-starters {
+    .starter-chips {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       justify-content: center;
-      max-width: 520px;
+      max-width: 500px;
     }
 
     .starter-chip {
-      padding: 8px 16px;
+      padding: 9px 16px;
       border-radius: 20px;
       border: 1px solid var(--border-md);
-      background: rgba(255,255,255,0.03);
-      color: var(--text-lt);
+      background: var(--white);
+      color: var(--text-md);
+      font-family: inherit;
       font-size: 13px;
+      font-weight: 500;
       cursor: pointer;
       transition: all 0.18s ease;
+      touch-action: manipulation;
     }
-    .starter-chip:hover {
-      border-color: rgba(197,166,107,0.4);
-      color: var(--gold-lt);
-      background: var(--gold-dim);
+    .starter-chip:hover { border-color: var(--navy); color: var(--navy); background: rgba(30,45,74,0.03); }
+    .starter-chip:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
+
+    /* Message rows */
+    .msg { margin-bottom: 18px; display: flex; flex-direction: column; }
+
+    /* Assistant */
+    .msg.assistant { align-items: flex-start; }
+
+    .msg-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      max-width: 680px;
     }
 
-    /* ── Input area ── */
+    .msg-av {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .msg.assistant .bubble {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 4px 14px 14px 14px;
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.72;
+      color: var(--text-dk);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    /* Suggested tool card */
+    .suggested-tool-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--gold);
+      border-radius: 4px 14px 14px 14px;
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.72;
+      color: var(--text-dk);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .tool-card-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+
+    /* Typing indicator */
+    .typing-dots {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      padding: 14px 16px;
+    }
+    .t-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--text-lt);
+      animation: tbounce 1.2s ease-in-out infinite;
+    }
+    .t-dot:nth-child(2) { animation-delay: 0.2s; }
+    .t-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes tbounce {
+      0%,60%,100% { transform: translateY(0); opacity: 0.4; }
+      30%          { transform: translateY(-4px); opacity: 1; }
+    }
+
+    /* User */
+    .msg.user { align-items: flex-end; }
+    .msg.user .bubble {
+      background: var(--navy);
+      border-radius: 14px 14px 4px 14px;
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.65;
+      color: #fff;
+      max-width: 520px;
+    }
+
+    /* ═══════════════════════════════
+       INPUT AREA
+    ═══════════════════════════════ */
     .input-area {
       flex-shrink: 0;
-      padding: 12px 24px 20px;
-      position: relative;
-      z-index: 2;
+      padding: 10px 20px 18px;
+      background: var(--bg);
     }
 
     .input-card {
-      background: var(--glass-bg);
-      backdrop-filter: blur(16px);
-      border: 1px solid var(--glass-border);
-      border-radius: 14px;
+      background: var(--white);
+      border: 1px solid var(--border-md);
+      border-radius: 13px;
       padding: 4px 6px 4px 16px;
       display: flex;
       align-items: flex-end;
       gap: 8px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.04) inset;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      transition: border-color 0.15s ease;
     }
+    .input-card:focus-within { border-color: rgba(30,45,74,0.3); }
 
     .input-card textarea {
       flex: 1;
       background: transparent;
       border: none;
       outline: none;
-      color: var(--text-wh);
-      font-family: 'Inter', sans-serif;
+      color: var(--text-dk);
+      font-family: inherit;
       font-size: 14px;
       line-height: 1.6;
       resize: none;
@@ -550,16 +554,15 @@
       max-height: 140px;
       padding: 10px 0;
     }
-
-    .input-card textarea::placeholder { color: var(--text-mt); }
+    .input-card textarea::placeholder { color: var(--text-lt); }
 
     .send-btn {
       width: 36px;
       height: 36px;
       border-radius: 9px;
       border: none;
-      background: var(--gold);
-      color: var(--navy);
+      background: var(--navy);
+      color: #fff;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -567,807 +570,510 @@
       flex-shrink: 0;
       transition: all 0.18s ease;
       margin-bottom: 4px;
+      touch-action: manipulation;
     }
-    .send-btn:hover { background: var(--gold-lt); transform: translateY(-1px); }
-    .send-btn:disabled { background: var(--border-md); cursor: not-allowed; transform: none; }
-    .send-btn svg { width: 16px; height: 16px; }
+    .send-btn:hover { background: var(--navy-lt); transform: translateY(-1px); }
+    .send-btn:disabled { background: var(--text-lt); cursor: not-allowed; transform: none; }
+    .send-btn:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
 
-    /* ═══════════════════════════════════════════════
-       SCENARIOS TAB
-    ═══════════════════════════════════════════════ */
-    .scenarios-view {
-      flex: 1;
+    /* ═══════════════════════════════
+       ROLEPLAY SCENARIO OVERLAY
+    ═══════════════════════════════ */
+    .scenario-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 50;
+      flex-direction: column;
       overflow-y: auto;
-      padding: 24px;
+    }
+    .scenario-overlay.active { display: flex; }
+
+    .scenario-overlay-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 2;
     }
 
-    .scenarios-header {
-      margin-bottom: 24px;
+    .scenario-back-btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border-md);
+      background: var(--white);
+      color: var(--text-md);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      touch-action: manipulation;
     }
-    .scenarios-title {
+    .scenario-back-btn:hover { border-color: var(--navy); color: var(--navy); }
+    .scenario-back-btn:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
+
+    .scenario-head-text { }
+    .scenario-head-title {
       font-family: 'Instrument Serif', Georgia, serif;
       font-size: 22px;
-      color: var(--text-wh);
-      margin-bottom: 6px;
+      color: var(--text-dk);
     }
-    .scenarios-desc {
-      font-size: 13.5px;
-      color: var(--text-lt);
-      line-height: 1.5;
-    }
+    .scenario-head-sub { font-size: 13px; color: var(--text-md); margin-top: 2px; }
 
-    .scenarios-grid {
+    .scenario-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
       gap: 16px;
+      padding: 24px 28px 32px;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
     }
 
-    .scenario-card {
+    .scenario-tile {
       border-radius: 14px;
       overflow: hidden;
       cursor: pointer;
       position: relative;
-      aspect-ratio: 16/10;
-      background: var(--navy-lt);
+      aspect-ratio: 4/3;
+      background: var(--navy);
       transition: transform 0.25s ease, box-shadow 0.25s ease;
-      border: 1px solid var(--border);
+      touch-action: manipulation;
     }
-    .scenario-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+    .scenario-tile:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.14);
     }
-    .scenario-card:hover .scenario-card-image img {
-      transform: scale(1.05);
-    }
+    .scenario-tile:hover .scenario-tile-img { transform: scale(1.05); }
+    .scenario-tile:focus-visible { outline: 3px solid var(--navy); outline-offset: 2px; }
 
-    .scenario-card-image {
+    .scenario-tile-img {
       position: absolute;
       inset: 0;
-      overflow: hidden;
-    }
-    .scenario-card-image img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       transition: transform 0.5s ease;
       display: block;
     }
-    /* Fallback gradient when no image */
-    .scenario-card-image-fallback {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, var(--navy-lt) 0%, var(--navy-card) 100%);
-    }
 
-    .scenario-card-overlay {
+    .scenario-tile-overlay {
       position: absolute;
       inset: 0;
       background: linear-gradient(
         to top,
-        rgba(8,13,24,0.97) 0%,
-        rgba(8,13,24,0.6) 45%,
-        rgba(8,13,24,0.1) 100%
+        rgba(10,16,30,0.94) 0%,
+        rgba(10,16,30,0.45) 48%,
+        rgba(10,16,30,0.08) 100%
       );
     }
 
-    .scenario-card-content {
+    .scenario-tile-body {
       position: absolute;
       inset: 0;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      padding: 16px;
+      padding: 18px;
     }
 
-    .scenario-card-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
+    .scenario-tile-tag {
       font-size: 10px;
-      font-weight: 600;
+      font-weight: 700;
       letter-spacing: 0.8px;
       text-transform: uppercase;
       color: var(--gold);
-      margin-bottom: 6px;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
-    .scenario-card-tag .tag-dot {
-      width: 5px;
-      height: 5px;
+    .scenario-tile-tag::before {
+      content: '';
+      width: 5px; height: 5px;
       border-radius: 50%;
       background: var(--gold);
+      flex-shrink: 0;
     }
 
-    .scenario-card-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-wh);
-      line-height: 1.3;
-      margin-bottom: 5px;
+    .scenario-tile-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.25;
+      margin-bottom: 6px;
     }
 
-    .scenario-card-desc {
+    .scenario-tile-desc {
       font-size: 12px;
-      color: rgba(168,180,200,0.85);
+      color: rgba(255,255,255,0.72);
       line-height: 1.5;
     }
 
-    .scenario-card-footer {
+    /* Difficulty pips */
+    .scenario-tile-footer {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-top: 10px;
     }
+    .diff-pips { display: flex; gap: 3px; }
+    .diff-pip { width: 18px; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.2); }
+    .diff-pip.on { background: var(--gold); }
+    .diff-pip.on.hard { background: #f87171; }
 
-    .scenario-card-difficulty {
-      display: flex;
-      gap: 3px;
-    }
-    .diff-pip {
-      width: 16px;
-      height: 3px;
-      border-radius: 2px;
-      background: var(--border-md);
-    }
-    .diff-pip.filled { background: var(--gold); }
-    .diff-pip.filled.hard { background: var(--red-accent); }
-
-    .scenario-card-arrow {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: rgba(197,166,107,0.15);
-      border: 1px solid rgba(197,166,107,0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .scenario-card-arrow svg { width: 10px; height: 10px; color: var(--gold); }
-
-    /* ═══════════════════════════════════════════════
-       PROGRESS TAB
-    ═══════════════════════════════════════════════ */
-    .progress-view {
-      flex: 1;
-      overflow-y: auto;
-      padding: 24px;
-    }
-
-    .progress-header {
-      margin-bottom: 24px;
-    }
-    .progress-title {
-      font-family: 'Instrument Serif', Georgia, serif;
-      font-size: 22px;
-      color: var(--text-wh);
-      margin-bottom: 6px;
-    }
-    .progress-subtitle {
-      font-size: 13.5px;
-      color: var(--text-lt);
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-
-    .stat-card {
-      background: var(--navy-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      position: relative;
-      overflow: hidden;
-    }
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--gold), transparent);
-    }
-
-    .stat-value {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--text-wh);
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-    .stat-label {
-      font-size: 11.5px;
-      color: var(--text-mt);
-      letter-spacing: 0.2px;
-    }
-    .stat-delta {
-      font-size: 11px;
-      color: var(--green);
-      margin-top: 8px;
-    }
-
-    .section-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--text-mt);
-      margin-bottom: 12px;
-    }
-
-    .skill-rows {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-
-    .skill-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .skill-name {
-      font-size: 13px;
-      color: var(--text-lt);
-      width: 160px;
-      flex-shrink: 0;
-    }
-
-    .skill-bar-track {
-      flex: 1;
-      height: 4px;
-      background: var(--border-md);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    .skill-bar-fill {
-      height: 100%;
-      border-radius: 2px;
-      background: linear-gradient(90deg, var(--gold), var(--gold-lt));
-      transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .skill-pct {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--gold);
-      width: 36px;
-      text-align: right;
-      flex-shrink: 0;
-    }
-
-    .recent-sessions-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .recent-session-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
-      background: var(--navy-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.18s ease;
-    }
-    .recent-session-item:hover { border-color: var(--border-md); background: var(--navy-lt); }
-
-    .rs-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      background: var(--gold-dim);
-      border: 1px solid rgba(197,166,107,0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .rs-icon svg { width: 16px; height: 16px; color: var(--gold); }
-
-    .rs-info { flex: 1; min-width: 0; }
-    .rs-name { font-size: 13px; font-weight: 500; color: var(--text-wh); margin-bottom: 2px; }
-    .rs-meta { font-size: 11.5px; color: var(--text-mt); }
-
-    .rs-score {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--gold);
-    }
-
-    .empty-progress {
-      text-align: center;
-      padding: 60px 24px;
-      color: var(--text-mt);
-    }
-    .empty-progress-icon { font-size: 40px; margin-bottom: 16px; opacity: 0.4; }
-    .empty-progress h3 { font-size: 16px; color: var(--text-lt); margin-bottom: 8px; }
-    .empty-progress p { font-size: 13.5px; line-height: 1.6; }
-
-    /* ═══════════════════════════════════════════════
-       ROLEPLAY MODE
-    ═══════════════════════════════════════════════ */
-    .roleplay-banner {
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 24px;
-      background: linear-gradient(90deg, rgba(197,166,107,0.08), rgba(197,166,107,0.04));
-      border-bottom: 1px solid rgba(197,166,107,0.15);
-      flex-shrink: 0;
-    }
-    .roleplay-banner.active { display: flex; }
-
-    .roleplay-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .roleplay-indicator {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11.5px;
-      font-weight: 600;
-      color: var(--gold);
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-    .rp-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--gold);
-      animation: blink 1.4s ease-in-out infinite;
-    }
-    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
-
-    .roleplay-scenario-name {
-      font-size: 12.5px;
-      color: var(--text-lt);
-      font-weight: 500;
-    }
-
-    .roleplay-controls {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .timer-display {
-      font-size: 13px;
-      font-weight: 600;
-      font-variant-numeric: tabular-nums;
-      color: var(--text-wh);
-      background: rgba(255,255,255,0.06);
-      padding: 4px 10px;
-      border-radius: 6px;
-    }
-    .timer-display.warning { color: var(--red-accent); }
-
-    .end-roleplay-btn {
-      padding: 5px 12px;
-      border-radius: 6px;
-      border: 1px solid rgba(239,68,68,0.3);
-      background: rgba(239,68,68,0.08);
-      color: #f87171;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.18s ease;
-    }
-    .end-roleplay-btn:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.5); }
-
-    /* ═══════════════════════════════════════════════
-       COACH SELECTION MODAL
-    ═══════════════════════════════════════════════ */
+    /* ═══════════════════════════════
+       MODALS
+    ═══════════════════════════════ */
     .modal-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.75);
+      background: rgba(0,0,0,0.35);
       z-index: 100;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(6px);
+      backdrop-filter: blur(4px);
     }
     .modal-overlay.active { display: flex; }
 
     .modal {
-      background: var(--navy-mid);
-      border: 1px solid var(--border-md);
-      border-radius: 18px;
-      padding: 28px;
-      width: 480px;
+      background: var(--white);
+      border-radius: 16px;
+      padding: 26px;
+      width: 460px;
       max-width: 92vw;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.14);
+      animation: modal-in 0.2s ease-out;
+    }
+    @keyframes modal-in {
+      from { opacity: 0; transform: scale(0.96) translateY(8px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
     }
 
     .modal-title {
       font-family: 'Instrument Serif', Georgia, serif;
       font-size: 20px;
-      color: var(--text-wh);
-      margin-bottom: 6px;
+      color: var(--text-dk);
+      margin-bottom: 5px;
     }
-    .modal-desc {
-      font-size: 13.5px;
-      color: var(--text-lt);
-      margin-bottom: 22px;
-      line-height: 1.5;
-    }
+    .modal-desc { font-size: 13.5px; color: var(--text-md); margin-bottom: 20px; line-height: 1.5; }
 
-    .coach-cards {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
+    .coach-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
     .coach-card {
       border: 2px solid var(--border);
-      border-radius: 14px;
+      border-radius: 12px;
       overflow: hidden;
       cursor: pointer;
-      transition: all 0.2s ease;
-      background: var(--navy-lt);
+      transition: all 0.18s ease;
     }
-    .coach-card:hover { border-color: rgba(197,166,107,0.4); transform: translateY(-2px); }
-    .coach-card.selected { border-color: var(--gold); background: var(--gold-dim); }
+    .coach-card:hover { border-color: rgba(30,45,74,0.3); }
+    .coach-card.selected { border-color: var(--navy); background: rgba(30,45,74,0.03); }
 
     .coach-card-photo {
-      width: 100%;
-      height: 130px;
+      width: 100%; height: 120px;
       object-fit: cover;
       object-position: top center;
       display: block;
     }
+    .coach-card-body { padding: 10px 12px; }
+    .coach-card-name { font-size: 14px; font-weight: 700; color: var(--text-dk); margin-bottom: 3px; }
+    .coach-card-style { font-size: 11.5px; color: var(--text-md); }
 
-    .coach-card-body {
-      padding: 12px 14px;
-    }
-    .coach-card-name {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-wh);
-      margin-bottom: 3px;
-    }
-    .coach-card-style {
-      font-size: 11.5px;
-      color: var(--text-mt);
-      line-height: 1.4;
-    }
-
-    .modal-btn-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 22px;
-    }
+    .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
     .modal-btn {
       flex: 1;
       padding: 11px;
       border-radius: 9px;
+      font-family: inherit;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.18s ease;
+      touch-action: manipulation;
     }
-    .modal-btn.primary {
-      background: var(--gold);
-      border: none;
-      color: var(--navy);
-    }
-    .modal-btn.primary:hover { background: var(--gold-lt); }
-    .modal-btn.secondary {
-      background: transparent;
-      border: 1px solid var(--border-md);
-      color: var(--text-lt);
-    }
-    .modal-btn.secondary:hover { background: var(--navy-lt); }
+    .modal-btn.primary { background: var(--navy); border: none; color: #fff; }
+    .modal-btn.primary:hover { background: var(--navy-lt); }
+    .modal-btn.secondary { background: transparent; border: 1px solid var(--border-md); color: var(--text-md); }
+    .modal-btn.secondary:hover { border-color: var(--navy); color: var(--navy); }
 
-    /* ═══════════════════════════════════════════════
-       FEEDBACK MODAL
-    ═══════════════════════════════════════════════ */
-    .feedback-modal {
-      max-width: 560px;
-    }
+    /* Feedback modal */
+    .feedback-modal { max-width: 520px; }
 
-    .feedback-score-row {
+    .score-row {
       display: flex;
       align-items: center;
-      gap: 16px;
-      margin-bottom: 20px;
-      padding: 16px;
-      background: var(--navy-lt);
+      gap: 14px;
+      padding: 14px;
+      background: rgba(30,45,74,0.04);
       border-radius: 10px;
+      margin-bottom: 18px;
     }
 
-    .score-circle {
-      width: 64px;
-      height: 64px;
+    .score-ring {
+      width: 56px; height: 56px;
       border-radius: 50%;
-      background: conic-gradient(var(--gold) 0deg, var(--gold) calc(var(--pct) * 3.6deg), var(--border-md) calc(var(--pct) * 3.6deg));
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: conic-gradient(var(--navy) 0deg, var(--navy) calc(var(--pct) * 3.6deg), #e5e7eb calc(var(--pct) * 3.6deg));
+      display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
-      position: relative;
     }
-    .score-circle-inner {
-      width: 48px;
-      height: 48px;
+    .score-inner {
+      width: 42px; height: 42px;
       border-radius: 50%;
-      background: var(--navy-lt);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--gold);
+      background: var(--white);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 700; color: var(--navy);
     }
 
-    .score-label-wrap { flex: 1; }
-    .score-headline { font-size: 15px; font-weight: 600; color: var(--text-wh); margin-bottom: 4px; }
-    .score-tagline { font-size: 12.5px; color: var(--text-lt); }
+    .score-text .score-headline { font-size: 15px; font-weight: 700; color: var(--text-dk); margin-bottom: 3px; }
+    .score-text .score-sub { font-size: 12.5px; color: var(--text-md); }
 
-    .feedback-section { margin-bottom: 14px; }
-    .feedback-section-title {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
-      color: var(--text-mt);
-      margin-bottom: 8px;
+    .fb-section { margin-bottom: 14px; }
+    .fb-label {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.9px; text-transform: uppercase;
+      color: var(--text-lt); margin-bottom: 7px;
     }
-    .feedback-text {
-      font-size: 13.5px;
-      color: var(--text-lt);
-      line-height: 1.65;
+    .fb-list { list-style: none; }
+    .fb-list li {
+      display: flex; align-items: flex-start; gap: 8px;
+      font-size: 13.5px; color: var(--text-md);
+      line-height: 1.55; margin-bottom: 5px;
     }
-    .feedback-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .feedback-list li {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      font-size: 13.5px;
-      color: var(--text-lt);
-      line-height: 1.5;
-    }
-    .feedback-list li::before {
+    .fb-list li::before {
       content: '';
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: var(--gold);
-      margin-top: 7px;
-      flex-shrink: 0;
+      width: 5px; height: 5px;
+      border-radius: 50%; background: var(--navy);
+      margin-top: 7px; flex-shrink: 0;
     }
 
-    /* ═══════════════════════════════════════════════
-       TYPING INDICATOR
-    ═══════════════════════════════════════════════ */
-    .typing-dots {
-      display: flex;
-      gap: 4px;
-      align-items: center;
-      padding-left: 16px;
-      height: 24px;
-    }
-    .typing-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--gold);
-      opacity: 0.4;
-      animation: typing-bounce 1.2s ease-in-out infinite;
-    }
-    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes typing-bounce {
-      0%,60%,100% { transform: translateY(0); opacity: 0.4; }
-      30%          { transform: translateY(-5px); opacity: 1; }
-    }
-
-    /* ═══════════════════════════════════════════════
-       UTILITIES
-    ═══════════════════════════════════════════════ */
     .hidden { display: none !important; }
 
     @media (max-width: 768px) {
       .sidebar { display: none; }
-      .stats-grid { grid-template-columns: 1fr 1fr; }
-      .coach-cards { grid-template-columns: 1fr; }
+      .style-toggles { display: none; }
+      .scenario-grid { grid-template-columns: 1fr 1fr; padding: 16px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ═══════ SIDEBAR ═══════ -->
-<aside class="sidebar">
-  <div class="sidebar-header">
-    <div class="sidebar-brand">
-      <div class="brand-mark">S</div>
-      <div>
-        <div class="brand-name">Stratos AI</div>
-        <div class="brand-sub">Executive Coaching</div>
-      </div>
-    </div>
-    <button class="new-session-btn" onclick="startNewSession()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+<!-- ══════════════════ SIDEBAR ══════════════════ -->
+<aside class="sidebar" role="navigation" aria-label="Main navigation">
+
+  <div class="sidebar-brand">
+    <div class="brand-mark" aria-hidden="true">S</div>
+    <div class="brand-name">Stratos Coach</div>
+  </div>
+
+  <div class="sidebar-body">
+    <button class="new-session-btn" onclick="startNewSession()" aria-label="Start a new coaching session">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       New Session
     </button>
+
+    <div class="section-label">Coaching Tools</div>
+
+    <!-- Gap Map -->
+    <div class="tool-item" onclick="activateTool('gap-map', this)" role="button" tabindex="0"
+         aria-label="Gap Map tool" onkeydown="if(event.key==='Enter')activateTool('gap-map',this)">
+      <div class="tool-icon gap-map-icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <!-- Radar/target rings with gap -->
+          <circle cx="12" cy="12" r="9" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5 3" opacity="0.5"/>
+          <circle cx="12" cy="12" r="5.5" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3.5 2.5" opacity="0.75"/>
+          <circle cx="12" cy="12" r="2" fill="#3b82f6"/>
+          <!-- Arrow pointing to gap -->
+          <path d="M17 5 L19.5 7.5" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M19.5 5 L19.5 7.5 L17 7.5" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </div>
+      <div class="tool-name">Gap Map</div>
+      <div class="tool-badge">Analysis</div>
+    </div>
+
+    <!-- Roleplay -->
+    <div class="tool-item" onclick="openScenarioOverlay()" role="button" tabindex="0"
+         aria-label="Roleplay practice tool" onkeydown="if(event.key==='Enter')openScenarioOverlay()">
+      <div class="tool-icon roleplay-icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <!-- Two overlapping chat bubbles -->
+          <path d="M20 2H8C6.9 2 6 2.9 6 4v12l4-4h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"
+                fill="rgba(139,105,20,0.15)" stroke="#8B6914" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M4 6H2C0.9 6 0 6.9 0 8v10l3-3h9c1.1 0 2-.9 2-2v-1"
+                fill="rgba(139,105,20,0.08)" stroke="#8B6914" stroke-width="1.5" stroke-linejoin="round" transform="translate(2,2)"/>
+          <circle cx="10" cy="9" r="1" fill="#8B6914"/>
+          <circle cx="14" cy="9" r="1" fill="#8B6914"/>
+        </svg>
+      </div>
+      <div class="tool-name">Roleplay</div>
+      <div class="tool-badge">Practice</div>
+    </div>
+
+    <!-- Decision Matrix -->
+    <div class="tool-item" onclick="activateTool('decision-matrix', this)" role="button" tabindex="0"
+         aria-label="Decision Matrix tool" onkeydown="if(event.key==='Enter')activateTool('decision-matrix',this)">
+      <div class="tool-icon matrix-icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <!-- 2×2 grid with dynamic fill states -->
+          <rect x="2" y="2" width="9" height="9" rx="2"
+                fill="rgba(249,115,22,0.2)" stroke="#f97316" stroke-width="1.5"/>
+          <rect x="13" y="2" width="9" height="9" rx="2"
+                fill="rgba(249,115,22,0.06)" stroke="#f97316" stroke-width="1.5" stroke-dasharray="3 2"/>
+          <rect x="2" y="13" width="9" height="9" rx="2"
+                fill="rgba(249,115,22,0.06)" stroke="#f97316" stroke-width="1.5" stroke-dasharray="3 2"/>
+          <rect x="13" y="13" width="9" height="9" rx="2"
+                fill="rgba(249,115,22,0.25)" stroke="#f97316" stroke-width="1.5"/>
+          <!-- Check marks on filled quadrants -->
+          <path d="M4.5 6.5 L5.8 7.8 L8.5 5" stroke="#f97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M15.5 17.5 L16.8 18.8 L19.5 16" stroke="#f97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="tool-name">Decision Matrix</div>
+      <div class="tool-badge">Clarity</div>
+    </div>
+
+    <div class="sidebar-spacer"></div>
   </div>
 
   <div class="sidebar-footer">
-    <div class="coach-selector-mini" onclick="openCoachModal()">
-      <img class="coach-mini-photo" id="coachMiniPhoto" src="/static/images/coach-james.jpg" alt="Coach">
-      <div class="coach-mini-info">
-        <div class="coach-mini-name" id="coachMiniName">James</div>
-        <div class="coach-mini-role">Executive Coach</div>
-      </div>
-      <div class="coach-mini-chevron">⌄</div>
-    </div>
+    <button class="growth-plan-btn" onclick="activateTool('growth-plan', null)">
+      Growth Plan
+    </button>
   </div>
+
 </aside>
 
-<!-- ═══════ MAIN ═══════ -->
+<!-- ══════════════════ MAIN ══════════════════ -->
 <main class="main">
 
-  <!-- Top Nav -->
-  <nav class="top-nav">
-    <div class="nav-tabs">
-      <button class="nav-tab active" onclick="switchTab('coaching', this)">Coaching</button>
-      <button class="nav-tab" onclick="switchTab('scenarios', this)">Scenarios</button>
-      <button class="nav-tab" onclick="switchTab('progress', this)">Progress</button>
-    </div>
-    <div class="nav-right">
-      <div class="nav-status">
-        <div class="status-dot"></div>
-        AI Online
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="coach-info">
+      <button class="coach-avatar-btn" id="coachAvatar" onclick="openCoachModal()" aria-label="Switch coach">
+        J
+      </button>
+      <div>
+        <div class="coach-meta-name" id="coachName">Stratos AI Coach</div>
+        <div class="coach-meta-status" id="coachStatus">Ready to coach</div>
       </div>
     </div>
-  </nav>
-
-  <!-- ─── COACHING TAB ─── -->
-  <div class="tab-view active" id="tab-coaching">
-
-    <!-- Coach Hero -->
-    <div class="coach-hero">
-      <div class="coach-portrait-wrap">
-        <div class="coach-portrait-ring" id="coachPortraitRing">
-          <img class="coach-portrait-img" id="coachPortraitImg" src="/static/images/coach-james.jpg" alt="Coach James">
-        </div>
-        <div class="coach-status-dot"></div>
-      </div>
-      <div class="coach-info">
-        <div class="coach-name-row">
-          <div class="coach-name" id="coachHeroName">James</div>
-          <div class="speaking-wave" id="heroSpeakingWave">
-            <div class="s-bar"></div>
-            <div class="s-bar"></div>
-            <div class="s-bar"></div>
-            <div class="s-bar"></div>
-            <div class="s-bar"></div>
-          </div>
-        </div>
-        <div class="coach-label" id="coachHeroLabel">Senior Executive Coach · Leadership & Strategy</div>
-        <div class="coach-meta">
-          <span class="coach-badge" id="coachHeroBadge">Direct · Diagnostic</span>
-          <span class="coach-specialty" id="coachHeroSpecialty">C-Suite · VP-Level Transitions</span>
-        </div>
-      </div>
-      <button class="hero-switch-coach" onclick="openCoachModal()">Switch Coach</button>
+    <div class="style-toggles" role="group" aria-label="Coaching style">
+      <button class="style-toggle active" onclick="setStyle('direct', this)">Direct</button>
+      <button class="style-toggle" onclick="setStyle('empathetic', this)">Empathetic</button>
+      <button class="style-toggle" onclick="setStyle('socratic', this)">Socratic</button>
     </div>
+  </div>
 
-    <!-- Roleplay Banner -->
-    <div class="roleplay-banner" id="roleplayBanner">
-      <div class="roleplay-info">
-        <div class="roleplay-indicator">
-          <div class="rp-dot"></div>
-          Live Roleplay
-        </div>
-        <div class="roleplay-scenario-name" id="roleplayScenarioName"></div>
-      </div>
-      <div class="roleplay-controls">
-        <div class="timer-display" id="timerDisplay">5:00</div>
-        <button class="end-roleplay-btn" onclick="endRoleplay()">End Session</button>
-      </div>
+  <!-- Roleplay Banner -->
+  <div class="roleplay-banner" id="roleplayBanner" role="status" aria-live="polite">
+    <div class="rp-left">
+      <div class="rp-indicator"><div class="rp-dot" aria-hidden="true"></div>Live Roleplay</div>
+      <div class="rp-scenario" id="rpScenarioName"></div>
     </div>
-
-    <!-- Messages -->
-    <div class="messages" id="messages">
-      <div class="welcome-state" id="welcomeState">
-        <div class="welcome-greeting" id="welcomeGreeting">Good to see you.</div>
-        <div class="welcome-sub">What leadership challenge are you working through today?</div>
-        <div class="welcome-starters">
-          <div class="starter-chip" onclick="sendStarter(this)">I have a difficult conversation coming up</div>
-          <div class="starter-chip" onclick="sendStarter(this)">My team isn't performing</div>
-          <div class="starter-chip" onclick="sendStarter(this)">I need to align stakeholders</div>
-          <div class="starter-chip" onclick="sendStarter(this)">I'm going for a promotion</div>
-        </div>
-      </div>
+    <div class="rp-right">
+      <div class="timer-pill" id="timerDisplay">5:00</div>
+      <button class="end-rp-btn" onclick="endRoleplay()">End Session</button>
     </div>
+  </div>
 
-    <!-- Input -->
-    <div class="input-area">
-      <div class="input-card">
-        <textarea id="msgInput" placeholder="Message your coach…" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-        <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-          </svg>
-        </button>
+  <!-- Messages -->
+  <div class="messages" id="messages" role="log" aria-live="polite" aria-label="Coaching conversation">
+    <div class="welcome-state" id="welcomeState">
+      <div class="welcome-avatar" id="welcomeAv" aria-hidden="true">J</div>
+      <div class="welcome-heading">Ready when you are.</div>
+      <div class="welcome-sub">Tell me what leadership challenge is on your mind right now.</div>
+      <div class="starter-chips" role="list">
+        <button class="starter-chip" role="listitem" onclick="sendStarter(this)">I have a difficult conversation coming up</button>
+        <button class="starter-chip" role="listitem" onclick="sendStarter(this)">My team isn't performing</button>
+        <button class="starter-chip" role="listitem" onclick="sendStarter(this)">I need to align stakeholders</button>
+        <button class="starter-chip" role="listitem" onclick="sendStarter(this)">I'm going for a promotion</button>
       </div>
     </div>
   </div>
 
-  <!-- ─── SCENARIOS TAB ─── -->
-  <div class="tab-view" id="tab-scenarios">
-    <div class="scenarios-view">
-      <div class="scenarios-header">
-        <div class="scenarios-title">Practice Scenarios</div>
-        <div class="scenarios-desc">Immersive roleplay situations designed to sharpen your executive edge.</div>
-      </div>
-      <div class="scenarios-grid" id="scenariosGrid"></div>
-    </div>
-  </div>
-
-  <!-- ─── PROGRESS TAB ─── -->
-  <div class="tab-view" id="tab-progress">
-    <div class="progress-view" id="progressView">
-      <div class="progress-header">
-        <div class="progress-title">Your Progress</div>
-        <div class="progress-subtitle">Track your leadership development journey</div>
-      </div>
-      <div id="progressContent"></div>
+  <!-- Input -->
+  <div class="input-area">
+    <div class="input-card">
+      <textarea id="msgInput" placeholder="Message your coach…" rows="1"
+                aria-label="Message input"
+                onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled aria-label="Send message">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
     </div>
   </div>
 
 </main>
 
-<!-- ═══════ COACH SELECTION MODAL ═══════ -->
-<div class="modal-overlay" id="coachModal">
+<!-- ══════════════════ SCENARIO OVERLAY ══════════════════ -->
+<div class="scenario-overlay" id="scenarioOverlay" role="dialog" aria-modal="true" aria-label="Choose a roleplay scenario">
+  <div class="scenario-overlay-head">
+    <div class="scenario-head-text">
+      <div class="scenario-head-title">Choose Your Scenario</div>
+      <div class="scenario-head-sub">Practice high-stakes leadership conversations in a safe space.</div>
+    </div>
+    <button class="scenario-back-btn" onclick="closeScenarioOverlay()" aria-label="Back to coaching">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Back to coaching
+    </button>
+  </div>
+  <div class="scenario-grid" id="scenarioGrid" role="list"></div>
+</div>
+
+<!-- ══════════════════ COACH MODAL ══════════════════ -->
+<div class="modal-overlay" id="coachModal" role="dialog" aria-modal="true" aria-label="Select a coach">
   <div class="modal">
     <div class="modal-title">Choose Your Coach</div>
-    <div class="modal-desc">Each coach brings a distinct methodology. Select the approach that fits your current challenge.</div>
+    <div class="modal-desc">Each coach brings a distinct methodology tailored to your challenge.</div>
     <div class="coach-cards">
-      <div class="coach-card selected" id="card-james" onclick="selectCoach('james')">
-        <img class="coach-card-photo" src="/static/images/coach-james.jpg" alt="James">
+      <div class="coach-card selected" id="card-james" onclick="selectCoach('james')"
+           role="radio" aria-checked="true" tabindex="0" aria-label="Select James">
+        <img class="coach-card-photo" src="/static/images/coach-james.jpg" alt="James, Direct and diagnostic coach">
         <div class="coach-card-body">
           <div class="coach-card-name">James</div>
           <div class="coach-card-style">Direct & diagnostic. Gets to the core fast.</div>
         </div>
       </div>
-      <div class="coach-card" id="card-alexandra" onclick="selectCoach('alexandra')">
-        <img class="coach-card-photo" src="/static/images/coach-alexandra.jpg" alt="Alexandra">
+      <div class="coach-card" id="card-alexandra" onclick="selectCoach('alexandra')"
+           role="radio" aria-checked="false" tabindex="0" aria-label="Select Alexandra">
+        <img class="coach-card-photo" src="/static/images/coach-alexandra.jpg" alt="Alexandra, Empathetic and strategic coach">
         <div class="coach-card-body">
           <div class="coach-card-name">Alexandra</div>
           <div class="coach-card-style">Empathetic & strategic. Systems thinking.</div>
         </div>
       </div>
     </div>
-    <div class="modal-btn-row">
+    <div class="modal-btns">
       <button class="modal-btn secondary" onclick="closeCoachModal()">Cancel</button>
       <button class="modal-btn primary" onclick="confirmCoach()">Select Coach</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════ FEEDBACK MODAL ═══════ -->
-<div class="modal-overlay" id="feedbackModal">
+<!-- ══════════════════ FEEDBACK MODAL ══════════════════ -->
+<div class="modal-overlay" id="feedbackModal" role="dialog" aria-modal="true" aria-label="Session feedback">
   <div class="modal feedback-modal">
     <div class="modal-title">Session Feedback</div>
     <div id="feedbackContent"></div>
-    <div class="modal-btn-row">
+    <div class="modal-btns">
       <button class="modal-btn secondary" onclick="closeFeedbackModal()">Close</button>
       <button class="modal-btn primary" onclick="startNewSession()">New Session</button>
     </div>
@@ -1375,264 +1081,189 @@
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════
-   STATE
-═══════════════════════════════════════════════ */
+/* ─── STATE ─── */
 let currentSessionId = null;
 let currentCoach     = 'james';
+let currentStyle     = 'direct';
 let isStreaming      = false;
 let isRoleplay       = false;
 let timerInterval    = null;
 let timerSeconds     = 300;
-let allSessions      = [];
+let pendingCoach     = 'james';
 
-const COACH_DATA = {
-  james: {
-    photo:     '/static/images/coach-james.jpg',
-    name:      'James',
-    label:     'Senior Executive Coach · Leadership & Strategy',
-    badge:     'Direct · Diagnostic',
-    specialty: 'C-Suite · VP-Level Transitions',
-  },
-  alexandra: {
-    photo:     '/static/images/coach-alexandra.jpg',
-    name:      'Alexandra',
-    label:     'Senior Executive Coach · Organizational Psychology',
-    badge:     'Empathetic · Strategic',
-    specialty: 'Team Dynamics · Change Leadership',
-  }
+const COACHES = {
+  james:     { initial: 'J', name: 'Stratos AI Coach', label: 'Executive Coach · Leadership & Strategy' },
+  alexandra: { initial: 'A', name: 'Stratos AI Coach', label: 'Executive Coach · Organizational Psychology' },
 };
 
 const SCENARIOS = [
   {
     id: 'difficult-feedback',
     title: 'Delivering Difficult Feedback',
-    desc: 'Your top performer is creating team friction. Address performance without losing them.',
     tag: 'Feedback',
-    difficulty: 2,
+    desc: 'Your top performer is creating team friction. Address it without losing them.',
     img: '/static/images/scenario-feedback.jpg',
+    difficulty: 2,
   },
   {
     id: 'performance-review',
     title: 'High-Stakes Performance Review',
-    desc: 'An underperforming direct report needs a PIP conversation. Navigate it with precision.',
     tag: 'Performance',
-    difficulty: 3,
+    desc: 'Navigate a critical performance conversation that could reshape someone\'s trajectory.',
     img: '/static/images/scenario-performance.jpg',
-  },
-  {
-    id: 'micromanager-boss',
-    title: 'Managing Your Manager',
-    desc: 'A micromanaging boss is killing your team\'s autonomy. Reclaim it without the political fallout.',
-    tag: 'Upward Management',
     difficulty: 3,
-    img: '/static/images/scenario-micromanager.jpg',
-  },
-  {
-    id: 'peer-conflict',
-    title: 'Peer Conflict Resolution',
-    desc: 'A cross-functional peer is blocking your project. Resolve it without going over their head.',
-    tag: 'Conflict',
-    difficulty: 2,
-    img: '/static/images/scenario-peer.jpg',
-  },
-  {
-    id: 'board-communication',
-    title: 'Board-Level Communication',
-    desc: 'Present a failed initiative to the board without losing their confidence.',
-    tag: 'Executive Presence',
-    difficulty: 4,
-    img: '/static/images/scenario-boardroom.jpg',
-  },
-  {
-    id: 'change-resistance',
-    title: 'Leading Through Resistance',
-    desc: 'Your team is resisting a critical org change. Win them over before it derails.',
-    tag: 'Change Management',
-    difficulty: 3,
-    img: '/static/images/scenario-change.jpg',
   },
   {
     id: 'stakeholder-alignment',
     title: 'Stakeholder Alignment',
-    desc: 'Three executives have conflicting priorities on your initiative. Build consensus fast.',
     tag: 'Influence',
-    difficulty: 3,
+    desc: 'Three executives have conflicting priorities. Build consensus before the initiative stalls.',
     img: '/static/images/scenario-stakeholder.jpg',
-  },
-  {
-    id: 'promotion-conversation',
-    title: 'Making the Case for Promotion',
-    desc: 'Advocate for your advancement without sounding entitled or desperate.',
-    tag: 'Career Growth',
-    difficulty: 2,
-    img: '/static/images/scenario-promotion.jpg',
+    difficulty: 3,
   },
   {
     id: 'team-conflict',
     title: 'Team Conflict Mediation',
-    desc: 'Two high-performers are in open conflict. Mediate before it spreads.',
-    tag: 'Team Leadership',
-    difficulty: 3,
+    tag: 'Conflict',
+    desc: 'Two high-performers are in open conflict. Mediate before it spreads across the team.',
     img: '/static/images/scenario-conflict.jpg',
+    difficulty: 3,
   },
   {
-    id: 'executive-vision',
-    title: 'Communicating Executive Vision',
-    desc: 'Rally your organization around a bold strategic pivot with clarity and conviction.',
-    tag: 'Strategy',
+    id: 'board-communication',
+    title: 'Board-Level Communication',
+    tag: 'Executive Presence',
+    desc: 'Present a failed initiative to the board without losing their confidence in your leadership.',
+    img: '/static/images/scenario-boardroom.jpg',
     difficulty: 4,
-    img: '/static/images/hero-coaching.jpg',
   },
 ];
 
-/* ═══════════════════════════════════════════════
-   INIT
-═══════════════════════════════════════════════ */
-window.addEventListener('DOMContentLoaded', async () => {
+/* ─── INIT ─── */
+window.addEventListener('DOMContentLoaded', () => {
   renderScenarios();
-  await loadSessions();
-  updateCoachUI();
-  initInput();
-  renderProgress();
+  document.getElementById('msgInput').addEventListener('input', () => {
+    document.getElementById('sendBtn').disabled = !document.getElementById('msgInput').value.trim();
+  });
 });
 
-function initInput() {
-  const input = document.getElementById('msgInput');
-  const btn   = document.getElementById('sendBtn');
-  input.addEventListener('input', () => {
-    btn.disabled = !input.value.trim();
-  });
-}
-
-/* ═══════════════════════════════════════════════
-   TABS
-═══════════════════════════════════════════════ */
-function switchTab(id, btn) {
-  document.querySelectorAll('.tab-view').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + id).classList.add('active');
-  btn.classList.add('active');
-  if (id === 'progress') renderProgress();
-}
-
-/* ═══════════════════════════════════════════════
-   COACH UI
-═══════════════════════════════════════════════ */
+/* ─── COACH ─── */
 function updateCoachUI() {
-  const c = COACH_DATA[currentCoach];
-  // Hero
-  document.getElementById('coachPortraitImg').src = c.photo;
-  document.getElementById('coachHeroName').textContent = c.name;
-  document.getElementById('coachHeroLabel').textContent = c.label;
-  document.getElementById('coachHeroBadge').textContent = c.badge;
-  document.getElementById('coachHeroSpecialty').textContent = c.specialty;
-  // Sidebar mini
-  document.getElementById('coachMiniPhoto').src = c.photo;
-  document.getElementById('coachMiniName').textContent = c.name;
-  // Welcome
-  document.getElementById('welcomeGreeting').textContent = 'Good to see you.';
+  const c = COACHES[currentCoach];
+  document.getElementById('coachAvatar').textContent = c.initial;
+  document.getElementById('coachName').textContent = c.name;
+  document.getElementById('welcomeAv').textContent = c.initial;
 }
 
-function setSpeaking(active) {
-  const ring = document.getElementById('coachPortraitRing');
-  const wave = document.getElementById('heroSpeakingWave');
-  if (active) {
-    ring.classList.add('speaking');
-    wave.classList.add('active');
-  } else {
-    ring.classList.remove('speaking');
-    wave.classList.remove('active');
+/* ─── STYLE TOGGLES ─── */
+function setStyle(style, btn) {
+  currentStyle = style;
+  document.querySelectorAll('.style-toggle').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+/* ─── TOOL ACTIVATION ─── */
+function activateTool(tool, el) {
+  document.querySelectorAll('.tool-item').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const prompts = {
+    'gap-map':         'Help me run a gap analysis on my current leadership effectiveness versus where I need to be.',
+    'decision-matrix': 'Help me build a decision matrix for a key strategic decision I\'m facing right now.',
+    'growth-plan':     'Help me design a 90-day executive growth plan with clear milestones and focus areas.',
+  };
+  if (prompts[tool]) {
+    document.getElementById('msgInput').value = prompts[tool];
+    document.getElementById('sendBtn').disabled = false;
+    sendMessage();
   }
 }
 
-/* ═══════════════════════════════════════════════
-   COACH MODAL
-═══════════════════════════════════════════════ */
-let pendingCoach = null;
-function openCoachModal() {
-  pendingCoach = currentCoach;
-  document.querySelectorAll('.coach-card').forEach(c => c.classList.remove('selected'));
-  document.getElementById('card-' + currentCoach).classList.add('selected');
-  document.getElementById('coachModal').classList.add('active');
-}
-function closeCoachModal() {
-  document.getElementById('coachModal').classList.remove('active');
-}
-function selectCoach(name) {
-  pendingCoach = name;
-  document.querySelectorAll('.coach-card').forEach(c => c.classList.remove('selected'));
-  document.getElementById('card-' + name).classList.add('selected');
-}
-function confirmCoach() {
-  currentCoach = pendingCoach;
-  updateCoachUI();
-  closeCoachModal();
-}
-
-/* ═══════════════════════════════════════════════
-   SESSIONS
-═══════════════════════════════════════════════ */
-async function loadSessions() {
-  try {
-    const r = await fetch('/sessions');
-    const d = await r.json();
-    allSessions = d.sessions || [];
-    renderSessionList();
-  } catch(e) { console.error(e); }
+/* ─── SCENARIOS ─── */
+function renderScenarios() {
+  document.getElementById('scenarioGrid').innerHTML = SCENARIOS.map(s => {
+    const pips = [1,2,3,4].map(i => {
+      const on   = i <= s.difficulty;
+      const hard = on && s.difficulty >= 4;
+      return `<div class="diff-pip ${on ? 'on' : ''} ${hard ? 'hard' : ''}"></div>`;
+    }).join('');
+    return `
+      <div class="scenario-tile" role="listitem" tabindex="0"
+           onclick="launchScenario('${s.id}')"
+           onkeydown="if(event.key==='Enter')launchScenario('${s.id}')"
+           aria-label="${escHtml(s.title)}: ${escHtml(s.desc)}">
+        <img class="scenario-tile-img" src="${s.img}" alt="" loading="lazy">
+        <div class="scenario-tile-overlay" aria-hidden="true"></div>
+        <div class="scenario-tile-body">
+          <div class="scenario-tile-tag">${escHtml(s.tag)}</div>
+          <div class="scenario-tile-title">${escHtml(s.title)}</div>
+          <div class="scenario-tile-desc">${escHtml(s.desc)}</div>
+          <div class="scenario-tile-footer">
+            <div class="diff-pips" aria-label="Difficulty ${s.difficulty} of 4">${pips}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
-function renderSessionList() {
-  const list = document.getElementById('sessionList');
-  if (!allSessions.length) {
-    list.innerHTML = '<div style="padding:12px 16px;font-size:12px;color:var(--text-mt);">No sessions yet</div>';
-    return;
-  }
-  list.innerHTML = allSessions.slice(0, 20).map(s => `
-    <div class="session-item ${s.session_id === currentSessionId ? 'active' : ''}"
-         onclick="loadSession('${s.session_id}')">
-      <div class="session-dot"></div>
-      <div class="session-name">${escHtml(s.title || 'Coaching Session')}</div>
-    </div>
-  `).join('');
+function openScenarioOverlay() {
+  document.getElementById('scenarioOverlay').classList.add('active');
+  document.querySelector('.scenario-back-btn').focus();
 }
 
-async function loadSession(id) {
-  currentSessionId = id;
-  renderSessionList();
-  try {
-    const r = await fetch('/session/' + id);
-    const d = await r.json();
-    clearMessages();
-    d.messages.forEach(m => appendMessage(m.role, m.content));
-    if (d.messages.length) hideWelcome();
-    document.getElementById('msgInput').focus();
-  } catch(e) { console.error(e); }
+function closeScenarioOverlay() {
+  document.getElementById('scenarioOverlay').classList.remove('active');
 }
 
+async function launchScenario(id) {
+  const s = SCENARIOS.find(sc => sc.id === id);
+  if (!s) return;
+  closeScenarioOverlay();
+  isRoleplay = true;
+  startNewSession();
+
+  document.getElementById('roleplayBanner').classList.add('active');
+  document.getElementById('rpScenarioName').textContent = s.title;
+  document.getElementById('coachStatus').textContent = 'Roleplay in progress';
+
+  startTimer();
+
+  document.getElementById('msgInput').value =
+    `[ROLEPLAY:${id}] Start the "${s.title}" scenario. You play the other person. Open with a realistic first statement — don't wait for me.`;
+  document.getElementById('sendBtn').disabled = false;
+  await sendMessage();
+}
+
+/* ─── SESSIONS ─── */
 function startNewSession() {
   currentSessionId = null;
   isRoleplay = false;
-  clearMessages();
-  showWelcome();
   stopTimer();
   document.getElementById('roleplayBanner').classList.remove('active');
+  document.getElementById('coachStatus').textContent = 'Ready to coach';
   closeFeedbackModal();
-  renderSessionList();
+  clearMessages();
+  document.querySelectorAll('.tool-item').forEach(t => t.classList.remove('active'));
 }
 
-/* ═══════════════════════════════════════════════
-   MESSAGES
-═══════════════════════════════════════════════ */
+/* ─── MESSAGES ─── */
 function clearMessages() {
-  const msgs = document.getElementById('messages');
-  msgs.innerHTML = '<div class="welcome-state hidden" id="welcomeState"><div class="welcome-greeting" id="welcomeGreeting">Good to see you.</div><div class="welcome-sub">What leadership challenge are you working through today?</div><div class="welcome-starters"><div class="starter-chip" onclick="sendStarter(this)">I have a difficult conversation coming up</div><div class="starter-chip" onclick="sendStarter(this)">My team isn\'t performing</div><div class="starter-chip" onclick="sendStarter(this)">I need to align stakeholders</div><div class="starter-chip" onclick="sendStarter(this)">I\'m going for a promotion</div></div></div>';
+  const init = COACHES[currentCoach].initial;
+  document.getElementById('messages').innerHTML = `
+    <div class="welcome-state" id="welcomeState">
+      <div class="welcome-avatar" id="welcomeAv" aria-hidden="true">${init}</div>
+      <div class="welcome-heading">Ready when you are.</div>
+      <div class="welcome-sub">Tell me what leadership challenge is on your mind right now.</div>
+      <div class="starter-chips" role="list">
+        <button class="starter-chip" role="listitem" onclick="sendStarter(this)">I have a difficult conversation coming up</button>
+        <button class="starter-chip" role="listitem" onclick="sendStarter(this)">My team isn't performing</button>
+        <button class="starter-chip" role="listitem" onclick="sendStarter(this)">I need to align stakeholders</button>
+        <button class="starter-chip" role="listitem" onclick="sendStarter(this)">I'm going for a promotion</button>
+      </div>
+    </div>
+  `;
 }
 
-function showWelcome() {
-  const ws = document.getElementById('welcomeState');
-  if (ws) ws.classList.remove('hidden');
-}
 function hideWelcome() {
   const ws = document.getElementById('welcomeState');
   if (ws) ws.classList.add('hidden');
@@ -1640,57 +1271,62 @@ function hideWelcome() {
 
 function appendMessage(role, content) {
   hideWelcome();
-  const c = COACH_DATA[currentCoach];
   const msgs = document.getElementById('messages');
-  const div = document.createElement('div');
+  const init = COACHES[currentCoach].initial;
+  const div  = document.createElement('div');
   div.className = 'msg ' + role;
+
   if (role === 'assistant') {
-    div.innerHTML = `
-      <div class="msg-header">
-        <img class="msg-avatar-photo" src="${c.photo}" alt="${c.name}">
-        <span class="msg-coach-label">${c.name}</span>
-        <div class="msg-wave"><div class="s-bar"></div><div class="s-bar"></div><div class="s-bar"></div><div class="s-bar"></div><div class="s-bar"></div></div>
-      </div>
-      <div class="bubble">${marked(content)}</div>
-    `;
+    const isTool = content.includes('[SUGGESTED_TOOL]');
+    const clean  = content.replace('[SUGGESTED_TOOL]', '').trim();
+    if (isTool) {
+      div.innerHTML = `
+        <div class="msg-row">
+          <div class="msg-av" aria-hidden="true">${init}</div>
+          <div class="suggested-tool-card" role="note">
+            <div class="tool-card-label">Suggested Tool</div>
+            ${markedText(clean)}
+          </div>
+        </div>`;
+    } else {
+      div.innerHTML = `
+        <div class="msg-row">
+          <div class="msg-av" aria-hidden="true">${init}</div>
+          <div class="bubble">${markedText(content)}</div>
+        </div>`;
+    }
   } else {
     div.innerHTML = `<div class="bubble">${escHtml(content)}</div>`;
   }
+
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
   return div;
 }
 
-function appendTypingIndicator() {
+function appendTyping() {
   const msgs = document.getElementById('messages');
-  const c = COACH_DATA[currentCoach];
-  const div = document.createElement('div');
+  const init = COACHES[currentCoach].initial;
+  const div  = document.createElement('div');
   div.className = 'msg assistant';
   div.id = 'typingIndicator';
   div.innerHTML = `
-    <div class="msg-header">
-      <img class="msg-avatar-photo" src="${c.photo}" alt="${c.name}">
-      <span class="msg-coach-label">${c.name}</span>
-    </div>
-    <div class="typing-dots">
-      <div class="typing-dot"></div>
-      <div class="typing-dot"></div>
-      <div class="typing-dot"></div>
-    </div>
-  `;
+    <div class="msg-row">
+      <div class="msg-av" aria-hidden="true">${init}</div>
+      <div class="bubble">
+        <div class="typing-dots" aria-label="Coach is typing">
+          <div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div>
+        </div>
+      </div>
+    </div>`;
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
   return div;
 }
 
-/* ═══════════════════════════════════════════════
-   SEND / STREAM
-═══════════════════════════════════════════════ */
+/* ─── SEND ─── */
 function handleKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 }
 
 function autoResize(el) {
@@ -1699,8 +1335,7 @@ function autoResize(el) {
 }
 
 function sendStarter(el) {
-  const input = document.getElementById('msgInput');
-  input.value = el.textContent;
+  document.getElementById('msgInput').value = el.textContent;
   document.getElementById('sendBtn').disabled = false;
   sendMessage();
 }
@@ -1713,39 +1348,28 @@ async function sendMessage() {
   input.value = '';
   input.style.height = 'auto';
   document.getElementById('sendBtn').disabled = true;
-
-  appendMessage('user', text);
-  const typing = appendTypingIndicator();
-  setSpeaking(true);
   isStreaming = true;
 
-  try {
-    const payload = {
-      message: text,
-      coach: currentCoach,
-      session_id: currentSessionId,
-    };
+  appendMessage('user', text);
+  const typing = appendTyping();
+  document.getElementById('coachStatus').textContent = 'Thinking…';
 
+  try {
     const resp = await fetch('/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ message: text, coach: currentCoach, style: currentStyle, session_id: currentSessionId }),
     });
 
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
-
     const sid = resp.headers.get('X-Session-Id');
-    if (sid) {
-      currentSessionId = sid;
-      await loadSessions();
-    }
+    if (sid) currentSessionId = sid;
 
     const reader  = resp.body.getReader();
     const decoder = new TextDecoder();
     let   buffer  = '';
     let   full    = '';
     let   aiDiv   = null;
-    let   bubble  = null;
 
     typing.remove();
 
@@ -1761,132 +1385,54 @@ async function sendMessage() {
         const raw = line.slice(6).trim();
         if (raw === '[DONE]') break;
         try {
-          const obj = JSON.parse(raw);
+          const obj   = JSON.parse(raw);
           const chunk = obj.content || obj.delta || '';
           if (!chunk) continue;
           full += chunk;
           if (!aiDiv) {
-            aiDiv  = appendMessage('assistant', full);
-            bubble = aiDiv.querySelector('.bubble');
-            // show wave on the message
-            const mw = aiDiv.querySelector('.msg-wave');
-            if (mw) mw.classList.add('active');
-          } else if (bubble) {
-            bubble.innerHTML = marked(full);
+            aiDiv = appendMessage('assistant', full);
+          } else {
+            const isTool = full.includes('[SUGGESTED_TOOL]');
+            const clean  = full.replace('[SUGGESTED_TOOL]', '').trim();
+            const init   = COACHES[currentCoach].initial;
+            if (isTool) {
+              aiDiv.innerHTML = `<div class="msg-row"><div class="msg-av" aria-hidden="true">${init}</div><div class="suggested-tool-card" role="note"><div class="tool-card-label">Suggested Tool</div>${markedText(clean)}</div></div>`;
+            } else {
+              aiDiv.innerHTML = `<div class="msg-row"><div class="msg-av" aria-hidden="true">${init}</div><div class="bubble">${markedText(full)}</div></div>`;
+            }
             document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
           }
-        } catch(e) { /* skip */ }
+        } catch(e) { /* skip malformed */ }
       }
     }
-
-    // hide message wave
-    if (aiDiv) {
-      const mw = aiDiv.querySelector('.msg-wave');
-      if (mw) mw.classList.remove('active');
-    }
-
   } catch(err) {
     typing.remove();
-    appendMessage('assistant', 'Connection issue. Please try again.');
+    appendMessage('assistant', 'Connection issue — please try again.');
     console.error(err);
   } finally {
-    setSpeaking(false);
     isStreaming = false;
     document.getElementById('sendBtn').disabled = false;
+    document.getElementById('coachStatus').textContent = isRoleplay ? 'Roleplay in progress' : 'Session in progress';
   }
 }
 
-/* ═══════════════════════════════════════════════
-   SCENARIOS
-═══════════════════════════════════════════════ */
-function renderScenarios() {
-  const grid = document.getElementById('scenariosGrid');
-  grid.innerHTML = SCENARIOS.map(s => {
-    const pips = [1,2,3,4].map(i => {
-      const filled = i <= s.difficulty;
-      const hard   = filled && s.difficulty >= 4;
-      return `<div class="diff-pip ${filled ? 'filled' : ''} ${hard ? 'hard' : ''}"></div>`;
-    }).join('');
-
-    const imgHtml = s.img
-      ? `<div class="scenario-card-image"><img src="${s.img}" alt="${escHtml(s.title)}" loading="lazy"></div>`
-      : `<div class="scenario-card-image"><div class="scenario-card-image-fallback"></div></div>`;
-
-    return `
-      <div class="scenario-card" onclick="launchScenario('${s.id}')">
-        ${imgHtml}
-        <div class="scenario-card-overlay"></div>
-        <div class="scenario-card-content">
-          <div class="scenario-card-tag">
-            <div class="tag-dot"></div>
-            ${escHtml(s.tag)}
-          </div>
-          <div class="scenario-card-title">${escHtml(s.title)}</div>
-          <div class="scenario-card-desc">${escHtml(s.desc)}</div>
-          <div class="scenario-card-footer">
-            <div class="scenario-card-difficulty">${pips}</div>
-            <div class="scenario-card-arrow">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-async function launchScenario(id) {
-  const scenario = SCENARIOS.find(s => s.id === id);
-  if (!scenario) return;
-
-  // Switch to coaching tab
-  switchTab('coaching', document.querySelector('[onclick*="coaching"]'));
-
-  isRoleplay = true;
-  startNewSession();
-
-  document.getElementById('roleplayBanner').classList.add('active');
-  document.getElementById('roleplayScenarioName').textContent = scenario.title;
-
-  startTimer();
-
-  // Send scenario setup to backend
-  const input = document.getElementById('msgInput');
-  const text   = `[ROLEPLAY:${id}] Start the ${scenario.title} scenario. You play the other person. Speak first.`;
-  input.value  = text;
-  document.getElementById('sendBtn').disabled = false;
-  await sendMessage();
-}
-
-/* ═══════════════════════════════════════════════
-   ROLEPLAY TIMER
-═══════════════════════════════════════════════ */
+/* ─── TIMER ─── */
 function startTimer() {
   timerSeconds = 300;
   stopTimer();
-  updateTimerDisplay();
+  updateTimer();
   timerInterval = setInterval(() => {
     timerSeconds--;
-    updateTimerDisplay();
-    if (timerSeconds <= 0) {
-      stopTimer();
-      endRoleplay();
-    }
+    updateTimer();
+    if (timerSeconds <= 0) { stopTimer(); endRoleplay(); }
   }, 1000);
 }
-
-function stopTimer() {
-  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-}
-
-function updateTimerDisplay() {
-  const m   = Math.floor(timerSeconds / 60);
-  const s   = timerSeconds % 60;
-  const str = m + ':' + String(s).padStart(2, '0');
-  const el  = document.getElementById('timerDisplay');
-  el.textContent = str;
+function stopTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
+function updateTimer() {
+  const el = document.getElementById('timerDisplay');
+  const m  = Math.floor(timerSeconds / 60);
+  const s  = timerSeconds % 60;
+  el.textContent = m + ':' + String(s).padStart(2, '0');
   el.classList.toggle('warning', timerSeconds <= 60);
 }
 
@@ -1894,169 +1440,93 @@ async function endRoleplay() {
   stopTimer();
   isRoleplay = false;
   document.getElementById('roleplayBanner').classList.remove('active');
-  await getFeedback();
-}
-
-async function getFeedback() {
-  if (!currentSessionId) return;
-  try {
-    const r = await fetch('/feedback/' + currentSessionId, { method: 'POST' });
-    const d = await r.json();
-    showFeedbackModal(d);
-  } catch(e) {
-    console.error(e);
+  document.getElementById('coachStatus').textContent = 'Session complete';
+  if (currentSessionId) {
+    try {
+      const r = await fetch('/feedback/' + currentSessionId, { method: 'POST' });
+      const d = await r.json();
+      showFeedbackModal(d);
+    } catch(e) { console.error(e); }
   }
 }
 
 function showFeedbackModal(d) {
-  const score = d.score || 72;
-  const pct   = score;
-  let scoreLabel = 'Solid Performance';
-  if (score >= 90) scoreLabel = 'Exceptional';
-  else if (score >= 80) scoreLabel = 'Strong Performance';
-  else if (score < 60) scoreLabel = 'Needs Development';
+  const score = d.score || 74;
+  let label = 'Solid Performance';
+  if (score >= 90) label = 'Exceptional';
+  else if (score >= 80) label = 'Strong Performance';
+  else if (score < 60) label = 'Needs Development';
 
-  const strengthsHtml = (d.strengths || ['Engaged actively in the conversation', 'Demonstrated awareness of the dynamic']).map(s =>
-    `<li>${escHtml(s)}</li>`
-  ).join('');
-
-  const developHtml = (d.areas_for_development || ['Consider asking more clarifying questions', 'Watch your pacing under pressure']).map(s =>
-    `<li>${escHtml(s)}</li>`
-  ).join('');
+  const strengths = (d.strengths || ['Engaged actively in the conversation', 'Demonstrated situational awareness'])
+    .map(s => `<li>${escHtml(s)}</li>`).join('');
+  const develop = (d.areas_for_development || ['Practice more direct questioning', 'Watch your pacing under pressure'])
+    .map(s => `<li>${escHtml(s)}</li>`).join('');
 
   document.getElementById('feedbackContent').innerHTML = `
-    <div class="feedback-score-row">
-      <div class="score-circle" style="--pct:${pct}">
-        <div class="score-circle-inner">${score}</div>
+    <div class="score-row">
+      <div class="score-ring" style="--pct:${score}" role="img" aria-label="Score: ${score} out of 100">
+        <div class="score-inner">${score}</div>
       </div>
-      <div class="score-label-wrap">
-        <div class="score-headline">${escHtml(scoreLabel)}</div>
-        <div class="score-tagline">${escHtml(d.summary || 'You handled this scenario with professionalism.')}</div>
+      <div class="score-text">
+        <div class="score-headline">${escHtml(label)}</div>
+        <div class="score-sub">${escHtml(d.summary || 'You handled this scenario professionally.')}</div>
       </div>
     </div>
-    <div class="feedback-section">
-      <div class="feedback-section-title">What Worked</div>
-      <ul class="feedback-list">${strengthsHtml}</ul>
+    <div class="fb-section">
+      <div class="fb-label">What Worked</div>
+      <ul class="fb-list">${strengths}</ul>
     </div>
-    <div class="feedback-section">
-      <div class="feedback-section-title">Areas to Sharpen</div>
-      <ul class="feedback-list">${developHtml}</ul>
+    <div class="fb-section">
+      <div class="fb-label">Areas to Sharpen</div>
+      <ul class="fb-list">${develop}</ul>
     </div>
-    ${d.coach_note ? `<div class="feedback-section"><div class="feedback-section-title">Coach's Note</div><div class="feedback-text">${escHtml(d.coach_note)}</div></div>` : ''}
+    ${d.coach_note ? `<div class="fb-section"><div class="fb-label">Coach's Note</div><p style="font-size:13.5px;color:var(--text-md);line-height:1.65;">${escHtml(d.coach_note)}</p></div>` : ''}
   `;
   document.getElementById('feedbackModal').classList.add('active');
 }
+function closeFeedbackModal() { document.getElementById('feedbackModal').classList.remove('active'); }
 
-function closeFeedbackModal() {
-  document.getElementById('feedbackModal').classList.remove('active');
-}
-
-/* ═══════════════════════════════════════════════
-   PROGRESS
-═══════════════════════════════════════════════ */
-function renderProgress() {
-  const el = document.getElementById('progressContent');
-  if (!allSessions.length) {
-    el.innerHTML = `
-      <div class="empty-progress">
-        <div class="empty-progress-icon">◎</div>
-        <h3>No sessions yet</h3>
-        <p>Start a coaching session or practice a scenario to begin tracking your leadership development.</p>
-      </div>
-    `;
-    return;
-  }
-
-  const totalSessions = allSessions.length;
-  const practicing = allSessions.filter(s => s.title && s.title.toLowerCase().includes('roleplay')).length;
-  const streak = Math.min(totalSessions, 7);
-
-  const skills = [
-    { name: 'Executive Communication', pct: Math.min(95, 40 + totalSessions * 8) },
-    { name: 'Conflict Navigation',     pct: Math.min(90, 30 + totalSessions * 7) },
-    { name: 'Stakeholder Influence',   pct: Math.min(88, 25 + totalSessions * 9) },
-    { name: 'Strategic Framing',       pct: Math.min(85, 35 + totalSessions * 6) },
-    { name: 'Feedback Delivery',       pct: Math.min(92, 28 + totalSessions * 8) },
-  ];
-
-  el.innerHTML = `
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-value">${totalSessions}</div>
-        <div class="stat-label">Total Sessions</div>
-        <div class="stat-delta">↑ Growing</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">${practicing}</div>
-        <div class="stat-label">Scenarios Practiced</div>
-        <div class="stat-delta">Immersive practice</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">${streak}</div>
-        <div class="stat-label">Day Streak</div>
-        <div class="stat-delta">Keep going</div>
-      </div>
-    </div>
-
-    <div class="section-label" style="margin-bottom:12px;">Leadership Skills</div>
-    <div class="skill-rows" id="skillRows">
-      ${skills.map(sk => `
-        <div class="skill-row">
-          <div class="skill-name">${escHtml(sk.name)}</div>
-          <div class="skill-bar-track">
-            <div class="skill-bar-fill" style="width:0%" data-pct="${sk.pct}"></div>
-          </div>
-          <div class="skill-pct">${sk.pct}%</div>
-        </div>
-      `).join('')}
-    </div>
-
-    <div class="section-label" style="margin-bottom:12px;margin-top:8px;">Recent Sessions</div>
-    <div class="recent-sessions-list">
-      ${allSessions.slice(0, 6).map(s => `
-        <div class="recent-session-item" onclick="loadSession('${s.session_id}'); switchTab('coaching', document.querySelector('[onclick*=coaching]'))">
-          <div class="rs-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-          </div>
-          <div class="rs-info">
-            <div class="rs-name">${escHtml(s.title || 'Coaching Session')}</div>
-            <div class="rs-meta">${s.message_count || 0} exchanges · ${s.coach || 'James'}</div>
-          </div>
-          <div class="rs-score">${Math.floor(70 + Math.random()*25)}%</div>
-        </div>
-      `).join('')}
-    </div>
-  `;
-
-  // Animate skill bars
-  requestAnimationFrame(() => {
-    document.querySelectorAll('.skill-bar-fill').forEach(bar => {
-      bar.style.width = bar.dataset.pct + '%';
-    });
+/* ─── COACH MODAL ─── */
+function openCoachModal() {
+  pendingCoach = currentCoach;
+  document.querySelectorAll('.coach-card').forEach(c => {
+    c.classList.remove('selected');
+    c.setAttribute('aria-checked', 'false');
   });
+  document.getElementById('card-' + currentCoach).classList.add('selected');
+  document.getElementById('card-' + currentCoach).setAttribute('aria-checked', 'true');
+  document.getElementById('coachModal').classList.add('active');
+}
+function closeCoachModal() { document.getElementById('coachModal').classList.remove('active'); }
+function selectCoach(name) {
+  pendingCoach = name;
+  document.querySelectorAll('.coach-card').forEach(c => {
+    c.classList.remove('selected');
+    c.setAttribute('aria-checked', 'false');
+  });
+  document.getElementById('card-' + name).classList.add('selected');
+  document.getElementById('card-' + name).setAttribute('aria-checked', 'true');
+}
+function confirmCoach() {
+  currentCoach = pendingCoach;
+  updateCoachUI();
+  closeCoachModal();
 }
 
-/* ═══════════════════════════════════════════════
-   UTILS
-═══════════════════════════════════════════════ */
+/* ─── UTILS ─── */
 function escHtml(str) {
   return String(str)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// Minimal markdown renderer
-function marked(text) {
+function markedText(text) {
   return text
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
     .replace(/\*(.+?)\*/g,'<em>$1</em>')
-    .replace(/`(.+?)`/g,'<code>$1</code>')
-    .replace(/\n\n/g,'</p><p>')
+    .replace(/`(.+?)`/g,'<code style="background:rgba(0,0,0,0.06);padding:1px 5px;border-radius:3px;font-size:13px;font-family:monospace;">$1</code>')
+    .replace(/\n\n/g,'</p><p style="margin-top:10px;">')
     .replace(/\n/g,'<br>')
     .replace(/^(.+)$/,'<p>$1</p>');
 }
