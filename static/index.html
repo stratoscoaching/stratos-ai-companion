@@ -1104,6 +1104,8 @@ const SCENARIOS = [
     desc: 'Your top performer is creating team friction. Address it without losing them.',
     img: '/static/images/scenario-feedback.jpg',
     difficulty: 2,
+    character: 'Marcus Chen, Senior Engineer',
+    situation: 'You are Marcus Chen, a brilliant senior engineer who consistently delivers exceptional technical work but has been dismissive of teammates in design reviews, cutting people off and rolling your eyes at ideas he considers below his standards. Your manager is about to give you direct feedback about this behavior. You value your work deeply and are defensive when criticized — start the conversation by asking how things are going, not knowing what\'s coming.',
   },
   {
     id: 'performance-review',
@@ -1112,6 +1114,8 @@ const SCENARIOS = [
     desc: 'Navigate a critical performance conversation that could reshape someone\'s trajectory.',
     img: '/static/images/scenario-performance.jpg',
     difficulty: 3,
+    character: 'Alicia Torres, Product Manager',
+    situation: 'You are Alicia Torres, a product manager who has been struggling this quarter — two launches missed deadlines, stakeholder communication has been inconsistent, and your manager has received complaints from engineering. You suspect the review won\'t be easy but you believe external factors (scope creep, under-resourced team) are largely to blame. Open the conversation by saying you\'ve been under a lot of pressure lately.',
   },
   {
     id: 'stakeholder-alignment',
@@ -1120,6 +1124,8 @@ const SCENARIOS = [
     desc: 'Three executives have conflicting priorities. Build consensus before the initiative stalls.',
     img: '/static/images/scenario-stakeholder.jpg',
     difficulty: 3,
+    character: 'Derek Walsh, VP of Sales',
+    situation: 'You are Derek Walsh, VP of Sales. The company is considering a major platform migration that engineering wants to push through in Q3. You are strongly opposed — your team has three massive deals in flight and any disruption to the CRM or customer-facing tools could cost the company $2M+ in revenue. You\'ve heard the other VPs are lukewarm supportive. Open by expressing your frustration that this decision seems already made without your input.',
   },
   {
     id: 'team-conflict',
@@ -1128,6 +1134,8 @@ const SCENARIOS = [
     desc: 'Two high-performers are in open conflict. Mediate before it spreads across the team.',
     img: '/static/images/scenario-conflict.jpg',
     difficulty: 3,
+    character: 'Diana Park, Design Lead',
+    situation: 'You are Diana Park, Design Lead. You and Jordan (the Engineering Lead) have been clashing for weeks. Jordan keeps shipping features without design sign-off, calling your process "too slow." You feel disrespected and worried about product quality. Your manager has called this meeting to address the conflict. Open by saying you\'re glad someone is finally taking this seriously, because the situation has become untenable.',
   },
   {
     id: 'board-communication',
@@ -1136,6 +1144,8 @@ const SCENARIOS = [
     desc: 'Present a failed initiative to the board without losing their confidence in your leadership.',
     img: '/static/images/scenario-boardroom.jpg',
     difficulty: 4,
+    character: 'Robert Hale, Board Member',
+    situation: 'You are Robert Hale, a board member who has been skeptical of this initiative from the start. The company spent $1.8M and 8 months on a product expansion that has now been shelved. You want accountability, clear lessons learned, and a credible path forward — not spin. You are not hostile but you are direct and will push back on vague answers. Open the meeting by saying the board is expecting a frank debrief, not a polished deck.',
   },
 ];
 
@@ -1220,18 +1230,40 @@ async function launchScenario(id) {
   if (!s) return;
   closeScenarioOverlay();
   isRoleplay = true;
-  startNewSession();
+  startNewSession(); // clears currentSessionId and chat
 
   document.getElementById('roleplayBanner').classList.add('active');
   document.getElementById('rpScenarioName').textContent = s.title;
   document.getElementById('coachStatus').textContent = 'Roleplay in progress';
-
   startTimer();
 
-  document.getElementById('msgInput').value =
-    `[ROLEPLAY:${id}] Start the "${s.title}" scenario. You play the other person. Open with a realistic first statement — don't wait for me.`;
-  document.getElementById('sendBtn').disabled = false;
-  await sendMessage();
+  // Show typing indicator while AI generates opening
+  const typing = appendTyping();
+
+  try {
+    const resp = await fetch('/sessions/new', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        coach_name: COACHES[currentCoach].name,
+        is_roleplay: true,
+        roleplay_character: s.character,
+        roleplay_situation: s.situation,
+      }),
+    });
+    if (!resp.ok) throw new Error('Session create failed: ' + resp.status);
+    const data = await resp.json();
+    currentSessionId = data.session_id;
+    typing.remove();
+    appendMessage('assistant', data.opening_message);
+  } catch (err) {
+    typing.remove();
+    appendMessage('assistant', 'Could not start the scenario. Please try again.');
+    console.error(err);
+    isRoleplay = false;
+    stopTimer();
+    document.getElementById('roleplayBanner').classList.remove('active');
+  }
 }
 
 /* ─── SESSIONS ─── */
