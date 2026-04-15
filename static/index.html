@@ -1092,8 +1092,8 @@ let timerSeconds     = 300;
 let pendingCoach     = 'james';
 
 const COACHES = {
-  james:     { initial: 'J', name: 'Stratos AI Coach', label: 'Executive Coach · Leadership & Strategy' },
-  alexandra: { initial: 'A', name: 'Stratos AI Coach', label: 'Executive Coach · Organizational Psychology' },
+  james:     { initial: 'J', name: 'James', label: 'Executive Coach · Leadership & Strategy' },
+  alexandra: { initial: 'A', name: 'Alexandra', label: 'Executive Coach · Organizational Psychology' },
 };
 
 const SCENARIOS = [
@@ -1392,7 +1392,7 @@ async function sendMessage() {
       const sessResp = await fetch('/sessions/new', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ coach: currentCoach, mode: currentStyle }),
+        body: JSON.stringify({ coach_name: COACHES[currentCoach].name }),
       });
       if (!sessResp.ok) throw new Error('Session create failed: ' + sessResp.status);
       const sessData = await sessResp.json();
