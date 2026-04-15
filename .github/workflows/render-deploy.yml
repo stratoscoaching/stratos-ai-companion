@@ -1,1 +1,18 @@
+name: Deploy to Render
 
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render Deploy
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" \
+            | grep -qE "^(200|201)$" \
+            && echo "Deploy triggered successfully" \
+            || echo "Deploy trigger returned unexpected status"
