@@ -1355,15 +1355,25 @@ async function sendMessage() {
   document.getElementById('coachStatus').textContent = 'Thinking…';
 
   try {
-    const resp = await fetch('/chat', {
+    // Create session if we don't have one
+    if (!currentSessionId) {
+      const sessResp = await fetch('/sessions/new', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ coach: currentCoach, mode: currentStyle }),
+      });
+      if (!sessResp.ok) throw new Error('Session create failed: ' + sessResp.status);
+      const sessData = await sessResp.json();
+      currentSessionId = sessData.session_id;
+    }
+
+    const resp = await fetch('/chat/stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: text, coach: currentCoach, style: currentStyle, session_id: currentSessionId }),
     });
 
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const sid = resp.headers.get('X-Session-Id');
-    if (sid) currentSessionId = sid;
 
     const reader  = resp.body.getReader();
     const decoder = new TextDecoder();
@@ -1386,7 +1396,7 @@ async function sendMessage() {
         if (raw === '[DONE]') break;
         try {
           const obj   = JSON.parse(raw);
-          const chunk = obj.content || obj.delta || '';
+          const chunk = obj.text || obj.content || obj.delta || '';
           if (!chunk) continue;
           full += chunk;
           if (!aiDiv) {
@@ -1443,7 +1453,7 @@ async function endRoleplay() {
   document.getElementById('coachStatus').textContent = 'Session complete';
   if (currentSessionId) {
     try {
-      const r = await fetch('/feedback/' + currentSessionId, { method: 'POST' });
+      const r = await fetch('/sessions/' + currentSessionId + '/evaluate', { method: 'POST' });
       const d = await r.json();
       showFeedbackModal(d);
     } catch(e) { console.error(e); }
