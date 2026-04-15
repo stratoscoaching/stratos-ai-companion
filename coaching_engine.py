@@ -253,7 +253,7 @@ class CoachingEngine:
 
         response = self.client.messages.create(
             model=MODEL,
-            max_tokens=900,
+            max_tokens=1400,
             messages=[{"role": "user", "content": feedback_prompt}],
         )
         raw = response.content[0].text.strip()

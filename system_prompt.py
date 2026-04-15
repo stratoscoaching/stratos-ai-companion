@@ -130,6 +130,14 @@ CRITICAL RULES:
 - Quote or closely paraphrase actual user messages when citing evidence
 - The score must match the written analysis — if breakdown sections are harsh, score low
 
+SKILLS SCORING — evaluate these 5 dimensions independently, using the same rubric:
+- dots 5: Exceptional execution of this dimension
+- dots 4: Strong, clear evidence it worked
+- dots 3: Adequate, held their own but missed moments
+- dots 2: Developing, this was a liability in the conversation
+- dots 1: Beginning, this dimension actively hurt the outcome
+- level must match dots: 5=Exceptional, 4=Strong, 3=Proficient, 2=Developing, 1=Beginning
+
 Return ONLY valid JSON, no markdown, no explanation outside the JSON:
 {
   "score": <integer 0-100>,
@@ -139,7 +147,14 @@ Return ONLY valid JSON, no markdown, no explanation outside the JSON:
   "where_it_broke_down": ["<specific moment with quote — what was said and why it hurt>", "<second moment if applicable>"],
   "missed_opportunity": "<one specific moment — quote what they said, then what they should have said instead>",
   "technique_to_practice": "<named technique relevant to what failed in THIS conversation>",
-  "coach_note": "<1-2 sentences of direct coaching — blunt, specific to this session, no fluff>"
+  "coach_note": "<1-2 sentences of direct coaching — blunt, specific to this session, no fluff>",
+  "skills": [
+    {"name": "Goal Attainment", "dots": <1-5>, "level": "<Exceptional|Strong|Proficient|Developing|Beginning>", "explanation": "<one specific sentence citing what happened — did they achieve the session goal?>"},
+    {"name": "Conversational Focus", "dots": <1-5>, "level": "...", "explanation": "<one specific sentence — did they stay on the real issue or get sidetracked?>"},
+    {"name": "Emotional Intelligence", "dots": <1-5>, "level": "...", "explanation": "<one specific sentence — how well did they read and respond to the other person's emotional state?>"},
+    {"name": "Communication Clarity", "dots": <1-5>, "level": "...", "explanation": "<one specific sentence — were their messages clear, direct, and purposeful?>"},
+    {"name": "Adaptability", "dots": <1-5>, "level": "...", "explanation": "<one specific sentence — did they adjust their approach when the other person pushed back?>"}
+  ]
 }"""
 
 

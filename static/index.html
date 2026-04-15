@@ -815,6 +815,19 @@
       border-radius: 16px;
     }
 
+    .modal-close {
+      position: absolute; top: 14px; right: 14px;
+      width: 28px; height: 28px;
+      border-radius: 6px; border: none;
+      background: rgba(0,0,0,0.06);
+      color: var(--text-md);
+      font-size: 14px; line-height: 1;
+      cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .modal-close:hover { background: rgba(0,0,0,0.12); color: var(--text-dk); }
+
     /* Legacy score-ring — kept but unused */
     .score-ring { display: none; }
 
@@ -1003,16 +1016,60 @@
       margin-top: 7px; flex-shrink: 0;
     }
 
-    /* ── Feedback: Score Breakdown panel ── */
-    .fb-breakdown-row {
-      display: flex; align-items: center;
-      gap: 10px; padding: 10px 0;
+    /* ── Feedback: Score Breakdown (skills) ── */
+    .fb-skill-row {
+      padding: 14px 0;
       border-bottom: 1px solid var(--border);
-      font-size: 13px;
     }
-    .fb-breakdown-row:last-child { border-bottom: none; }
-    .fb-breakdown-label { flex: 1; color: var(--text-dk); font-weight: 500; }
-    .fb-breakdown-score { font-weight: 700; color: var(--navy); width: 36px; text-align: right; }
+    .fb-skill-row:last-child { border-bottom: none; }
+    .fb-skill-top {
+      display: flex; align-items: center; gap: 10px;
+      flex-wrap: wrap; margin-bottom: 8px;
+    }
+    .fb-skill-name {
+      font-size: 13.5px; font-weight: 600; color: var(--text-dk);
+      flex: 1; min-width: 120px;
+    }
+    .fb-skill-explanation {
+      font-size: 12.5px; color: var(--text-md); line-height: 1.6;
+    }
+
+    /* ── Inline annotation cards ── */
+    .annotation-card {
+      display: flex; align-items: flex-start; gap: 10px;
+      max-width: 480px;
+      margin: 6px 0 12px 42px; /* indent past avatar */
+      padding: 10px 14px;
+      border-radius: 10px;
+      border-left: 3px solid;
+      animation: ann-in 0.25s ease-out;
+    }
+    @keyframes ann-in {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .annotation-card.praise {
+      background: #f0fdf4;
+      border-left-color: #22c55e;
+    }
+    .annotation-card.tip {
+      background: #fffbeb;
+      border-left-color: #f59e0b;
+    }
+    .annotation-icon { font-size: 16px; flex-shrink: 0; line-height: 1.4; }
+    .annotation-meta { flex: 1; }
+    .annotation-type {
+      font-size: 9.5px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+    .annotation-card.praise .annotation-type { color: #15803d; }
+    .annotation-card.tip   .annotation-type { color: #b45309; }
+    .annotation-text {
+      font-size: 12.5px; line-height: 1.55;
+    }
+    .annotation-card.praise .annotation-text { color: #1a3a2a; }
+    .annotation-card.tip   .annotation-text { color: #3d2a00; }
 
     .hidden { display: none !important; }
 
@@ -1390,6 +1447,9 @@ let currentScenarioId   = null;
 let currentScenarioTitle = '';
 let currentScenarioDesc  = '';
 let currentScenarioImg   = '';
+let roleplayTurnCount   = 0;
+let shownAnnotationKeys = new Set();
+let lastAiDiv           = null;
 
 const COACHES = {
   james:     { initial: 'J', name: 'James', label: 'Executive Coach · Leadership & Strategy' },
@@ -1535,7 +1595,11 @@ async function launchScenario(id) {
   currentScenarioDesc  = s.desc;
   currentScenarioImg   = s.img || '';
   isRoleplay = true;
-  startNewSession(); // clears currentSessionId and chat
+  roleplayTurnCount = 0;
+  shownAnnotationKeys = new Set();
+  lastAiDiv = null;
+  startNewSession(); // clears currentSessionId and chat — also resets isRoleplay, fix below
+  isRoleplay = true; // restore after startNewSession resets it
 
   document.getElementById('roleplayBanner').classList.add('active');
   document.getElementById('rpScenarioName').textContent = s.title;
@@ -1586,6 +1650,9 @@ function startNewSession() {
   currentSessionId = null;
   isRoleplay = false;
   stopTimer();
+  roleplayTurnCount = 0;
+  shownAnnotationKeys = new Set();
+  lastAiDiv = null;
   document.getElementById('roleplayBanner').classList.remove('active');
   document.getElementById('coachStatus').textContent = 'Ready to coach';
   closeFeedbackModal();
@@ -1762,6 +1829,15 @@ async function sendMessage() {
         } catch(e) { /* skip malformed */ }
       }
     }
+
+    // Inline annotation card during roleplay (every 2 user turns)
+    if (isRoleplay && currentSessionId && aiDiv) {
+      roleplayTurnCount++;
+      lastAiDiv = aiDiv;
+      if (roleplayTurnCount % 2 === 0) {
+        fetchAnnotationForMessage(aiDiv);
+      }
+    }
   } catch(err) {
     typing.remove();
     appendMessage('assistant', 'Connection issue — please try again.');
@@ -1805,6 +1881,75 @@ async function endRoleplay() {
       showFeedbackModal(d);
     } catch(e) { console.error(e); }
   }
+}
+
+async function fetchAnnotationForMessage(afterEl) {
+  if (!currentSessionId) return;
+  try {
+    const r = await fetch('/sessions/' + currentSessionId + '/annotate', { method: 'POST' });
+    if (!r.ok) return;
+    const d = await r.json();
+    const annotations = d.annotations || {};
+    const keys = Object.keys(annotations).sort((a, b) => Number(a) - Number(b));
+    if (!keys.length) return;
+
+    // Find the first annotation we haven't shown yet
+    let ann = null;
+    let annKey = null;
+    for (let i = keys.length - 1; i >= 0; i--) {
+      const k = keys[i];
+      if (!shownAnnotationKeys.has(k)) {
+        ann = annotations[k];
+        annKey = k;
+        break;
+      }
+    }
+    if (!ann || !annKey) return;
+    shownAnnotationKeys.add(annKey);
+
+    const card = document.createElement('div');
+    card.className = 'annotation-card ' + (ann.type === 'praise' ? 'praise' : 'tip');
+    card.innerHTML = `
+      <div class="annotation-icon">${ann.type === 'praise' ? '👍' : '💡'}</div>
+      <div class="annotation-meta">
+        <div class="annotation-type">${ann.type === 'praise' ? 'Coaching Praise' : 'Coaching Tip'}</div>
+        <div class="annotation-text">${escHtml(ann.text)}</div>
+      </div>`;
+    afterEl.parentNode.insertBefore(card, afterEl.nextSibling);
+    document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+  } catch(e) { /* silent — annotation is optional */ }
+}
+
+function buildSkillsHTML(skills, overallScore) {
+  if (!Array.isArray(skills) || !skills.length) {
+    // Fallback if backend didn't return skills (old sessions or short sessions)
+    return `
+      <div class="fb-score-row" style="margin-bottom:0;">
+        <span class="fb-score-label">Overall Score</span>
+        <span class="fb-score-badge ${overallScore >= 85 ? 'strong' : overallScore >= 70 ? 'adequate' : 'developing'}">${overallScore}</span>
+        <span class="fb-score-summary">Complete a longer session to see skill-by-skill breakdown.</span>
+      </div>`;
+  }
+
+  return skills.map(skill => {
+    const dots = Number(skill.dots) || 1;
+    const dotsHTML = [1,2,3,4,5].map(i =>
+      `<div class="fb-dot${i <= dots ? ' filled' : ''}"></div>`
+    ).join('');
+    let badgeClass = 'adequate';
+    if (dots >= 4) badgeClass = 'strong';
+    if (dots <= 2) badgeClass = 'developing';
+    const levelLabel = skill.level || (dots >= 4 ? 'Strong' : dots >= 3 ? 'Proficient' : 'Developing');
+    return `
+      <div class="fb-skill-row">
+        <div class="fb-skill-top">
+          <span class="fb-skill-name">${escHtml(skill.name)}</span>
+          <div class="fb-dots" aria-label="${dots} of 5">${dotsHTML}</div>
+          <span class="fb-score-badge ${badgeClass}">${escHtml(levelLabel)}</span>
+        </div>
+        <div class="fb-skill-explanation">${escHtml(skill.explanation || '')}</div>
+      </div>`;
+  }).join('');
 }
 
 function showFeedbackModal(d) {
@@ -1916,26 +2061,7 @@ function showFeedbackModal(d) {
 
     <!-- Score Breakdown panel -->
     <div class="fb-panel" id="fb-breakdown" role="tabpanel">
-      <div class="fb-breakdown-row">
-        <span class="fb-breakdown-label">Overall Performance</span>
-        <span class="fb-breakdown-score">${score}</span>
-      </div>
-      <div class="fb-breakdown-row">
-        <span class="fb-breakdown-label">Communication Clarity</span>
-        <span class="fb-breakdown-score">${d.clarity_score || '—'}</span>
-      </div>
-      <div class="fb-breakdown-row">
-        <span class="fb-breakdown-label">Empathy & Rapport</span>
-        <span class="fb-breakdown-score">${d.empathy_score || '—'}</span>
-      </div>
-      <div class="fb-breakdown-row">
-        <span class="fb-breakdown-label">Problem Solving</span>
-        <span class="fb-breakdown-score">${d.problem_solving_score || '—'}</span>
-      </div>
-      <div class="fb-breakdown-row">
-        <span class="fb-breakdown-label">Executive Presence</span>
-        <span class="fb-breakdown-score">${d.presence_score || '—'}</span>
-      </div>
+      ${buildSkillsHTML(d.skills, score)}
     </div>
   `;
   document.getElementById('feedbackModal').classList.add('active');
