@@ -121,55 +121,6 @@
     .new-session-btn:hover { background: var(--navy-lt); color: var(--text-wh); border-color: rgba(255,255,255,0.15); }
     .new-session-btn svg { opacity: 0.6; }
 
-    .sidebar-section-label {
-      padding: 14px 16px 6px;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--text-mt);
-      flex-shrink: 0;
-    }
-
-    .session-list {
-      flex: 1;
-      overflow-y: auto;
-      padding: 0 8px;
-    }
-
-    .session-item {
-      padding: 9px 10px;
-      border-radius: 7px;
-      cursor: pointer;
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      transition: background 0.15s;
-      margin-bottom: 1px;
-    }
-    .session-item:hover { background: var(--navy-lt); }
-    .session-item.active { background: var(--gold-dim); }
-    .session-item.active .session-name { color: var(--gold-lt); }
-
-    .session-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--text-mt);
-      margin-top: 5px;
-      flex-shrink: 0;
-    }
-    .session-item.active .session-dot { background: var(--gold); }
-
-    .session-name {
-      font-size: 12.5px;
-      color: var(--text-lt);
-      line-height: 1.4;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
     .sidebar-footer {
       padding: 12px 16px;
       border-top: 1px solid var(--border);
@@ -1255,9 +1206,6 @@
       New Session
     </button>
   </div>
-
-  <div class="sidebar-section-label">Recent Sessions</div>
-  <div class="session-list" id="sessionList"></div>
 
   <div class="sidebar-footer">
     <div class="coach-selector-mini" onclick="openCoachModal()">
