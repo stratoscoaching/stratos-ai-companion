@@ -197,6 +197,7 @@ async def root():
 @app.post("/sessions/new")
 async def new_session(req: NewSessionRequest):
     """Create a new coaching session."""
+    import asyncio
     if req.coach_name not in ("James", "Alexandra"):
         raise HTTPException(status_code=400, detail="coach_name must be 'James' or 'Alexandra'")
 
@@ -208,8 +209,14 @@ async def new_session(req: NewSessionRequest):
         session.roleplay_character = req.roleplay_character
         session.roleplay_situation = req.roleplay_situation
         session.session_name = f"Role Play: {req.roleplay_character}"
-        # Character speaks first — real API call for in-character opening
-        opening = engine.generate_roleplay_opening(session)
+        # Run blocking Claude API call in thread pool with timeout
+        try:
+            opening = await asyncio.wait_for(
+                asyncio.to_thread(engine.generate_roleplay_opening, session),
+                timeout=25.0
+            )
+        except asyncio.TimeoutError:
+            opening = f"*takes a breath and looks up*\n\nAlright — let's get into it."
     else:
         opening = engine.get_opening_message(session)
 

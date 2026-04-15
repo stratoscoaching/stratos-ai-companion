@@ -1241,6 +1241,8 @@ async function launchScenario(id) {
   const typing = appendTyping();
 
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
     const resp = await fetch('/sessions/new', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1250,16 +1252,24 @@ async function launchScenario(id) {
         roleplay_character: s.character,
         roleplay_situation: s.situation,
       }),
+      signal: controller.signal,
     });
-    if (!resp.ok) throw new Error('Session create failed: ' + resp.status);
+    clearTimeout(timeoutId);
+    if (!resp.ok) {
+      const errBody = await resp.text();
+      throw new Error(`HTTP ${resp.status}: ${errBody}`);
+    }
     const data = await resp.json();
     currentSessionId = data.session_id;
     typing.remove();
     appendMessage('assistant', data.opening_message);
   } catch (err) {
     typing.remove();
-    appendMessage('assistant', 'Could not start the scenario. Please try again.');
-    console.error(err);
+    const msg = err.name === 'AbortError'
+      ? 'Taking longer than usual — please try again.'
+      : 'Could not start the scenario: ' + err.message;
+    appendMessage('assistant', msg);
+    console.error('launchScenario error:', err);
     isRoleplay = false;
     stopTimer();
     document.getElementById('roleplayBanner').classList.remove('active');
