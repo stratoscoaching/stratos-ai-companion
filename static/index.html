@@ -823,7 +823,7 @@
     .score-ring {
       width: 56px; height: 56px;
       border-radius: 50%;
-      background: conic-gradient(var(--navy) 0deg, var(--navy) calc(var(--pct) * 3.6deg), #e5e7eb calc(var(--pct) * 3.6deg));
+      background: conic-gradient(var(--ring-color, var(--navy)) 0deg, var(--ring-color, var(--navy)) calc(var(--pct) * 3.6deg), #e5e7eb calc(var(--pct) * 3.6deg));
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
@@ -1503,36 +1503,65 @@ async function endRoleplay() {
 }
 
 function showFeedbackModal(d) {
-  const score = d.score || 74;
-  let label = 'Solid Performance';
-  if (score >= 90) label = 'Exceptional';
-  else if (score >= 80) label = 'Strong Performance';
-  else if (score < 60) label = 'Needs Development';
+  const score = typeof d.score === 'number' ? d.score : 60;
+  let scoreColor = '#c5a66b'; // gold — adequate
+  if (score >= 85) scoreColor = '#2d6a4f';      // green — strong
+  else if (score >= 70) scoreColor = '#1e2d4a';  // navy — adequate
+  else if (score < 60) scoreColor = '#9b2335';   // red — needs work
 
-  const strengths = (d.strengths || ['Engaged actively in the conversation', 'Demonstrated situational awareness'])
-    .map(s => `<li>${escHtml(s)}</li>`).join('');
-  const develop = (d.areas_for_development || ['Practice more direct questioning', 'Watch your pacing under pressure'])
-    .map(s => `<li>${escHtml(s)}</li>`).join('');
+  const headline = escHtml(d.headline || 'Session Complete');
+  const summary  = escHtml(d.summary  || '');
+
+  const workedItems = Array.isArray(d.what_worked) ? d.what_worked : [];
+  const brokeItems  = Array.isArray(d.where_it_broke_down) ? d.where_it_broke_down : [];
+
+  const workedHTML = workedItems.length
+    ? workedItems.map(s => `<li>${escHtml(s)}</li>`).join('')
+    : '<li>No specific strengths identified in this session.</li>';
+
+  const brokeHTML = brokeItems.length
+    ? brokeItems.map(s => `<li>${escHtml(s)}</li>`).join('')
+    : '<li>No significant breakdowns noted.</li>';
+
+  const missedHTML = d.missed_opportunity
+    ? `<div class="fb-section">
+        <div class="fb-label">Missed Opportunity</div>
+        <p style="font-size:13.5px;color:var(--text-md);line-height:1.65;">${escHtml(d.missed_opportunity)}</p>
+       </div>` : '';
+
+  const techniqueHTML = d.technique_to_practice
+    ? `<div class="fb-section">
+        <div class="fb-label">Drill This Next</div>
+        <p style="font-size:13.5px;color:var(--text-md);line-height:1.65;font-style:italic;">${escHtml(d.technique_to_practice)}</p>
+       </div>` : '';
+
+  const coachNoteHTML = d.coach_note
+    ? `<div class="fb-section" style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px;">
+        <div class="fb-label">Coach's Take</div>
+        <p style="font-size:13.5px;color:var(--text-dk);line-height:1.65;">${escHtml(d.coach_note)}</p>
+       </div>` : '';
 
   document.getElementById('feedbackContent').innerHTML = `
     <div class="score-row">
-      <div class="score-ring" style="--pct:${score}" role="img" aria-label="Score: ${score} out of 100">
-        <div class="score-inner">${score}</div>
+      <div class="score-ring" style="--pct:${score};--ring-color:${scoreColor}" role="img" aria-label="Score: ${score} out of 100">
+        <div class="score-inner" style="color:${scoreColor}">${score}</div>
       </div>
       <div class="score-text">
-        <div class="score-headline">${escHtml(label)}</div>
-        <div class="score-sub">${escHtml(d.summary || 'You handled this scenario professionally.')}</div>
+        <div class="score-headline">${headline}</div>
+        <div class="score-sub">${summary}</div>
       </div>
     </div>
     <div class="fb-section">
       <div class="fb-label">What Worked</div>
-      <ul class="fb-list">${strengths}</ul>
+      <ul class="fb-list">${workedHTML}</ul>
     </div>
     <div class="fb-section">
-      <div class="fb-label">Areas to Sharpen</div>
-      <ul class="fb-list">${develop}</ul>
+      <div class="fb-label">Where It Broke Down</div>
+      <ul class="fb-list">${brokeHTML}</ul>
     </div>
-    ${d.coach_note ? `<div class="fb-section"><div class="fb-label">Coach's Note</div><p style="font-size:13.5px;color:var(--text-md);line-height:1.65;">${escHtml(d.coach_note)}</p></div>` : ''}
+    ${missedHTML}
+    ${techniqueHTML}
+    ${coachNoteHTML}
   `;
   document.getElementById('feedbackModal').classList.add('active');
 }

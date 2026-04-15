@@ -228,24 +228,49 @@ class CoachingEngine:
         )
         return response.content[0].text.strip()
 
-    def generate_feedback(self, session_id: str) -> str:
+    def generate_feedback(self, session_id: str) -> dict:
         """Generate end-of-session coaching feedback for a completed roleplay."""
+        import json, re
         session = self.store.get(session_id)
         if not session:
             raise ValueError(f"Session {session_id} not found")
 
-        # Build conversation transcript for Claude to review
+        # Build conversation transcript — label each speaker clearly
         transcript_parts = []
         for msg in session.messages:
             role_label = session.roleplay_character if msg["role"] == "assistant" else "Leader (user)"
-            transcript_parts.append(f"**{role_label}:** {msg['content']}")
+            transcript_parts.append(f"{role_label}: {msg['content']}")
         transcript = "\n\n".join(transcript_parts)
 
-        feedback_prompt = f"{transcript}\n\n---\n\n{ROLEPLAY_FEEDBACK_PROMPT}"
+        turn_count = sum(1 for m in session.messages if m["role"] == "user")
+
+        feedback_prompt = (
+            f"SCENARIO: {session.roleplay_character}\n"
+            f"TOTAL USER TURNS: {turn_count}\n\n"
+            f"TRANSCRIPT:\n{transcript}\n\n"
+            f"---\n\n{ROLEPLAY_FEEDBACK_PROMPT}"
+        )
 
         response = self.client.messages.create(
             model=MODEL,
-            max_tokens=600,
+            max_tokens=900,
             messages=[{"role": "user", "content": feedback_prompt}],
         )
-        return response.content[0].text.strip()
+        raw = response.content[0].text.strip()
+
+        # Parse JSON — strip any accidental markdown fences
+        raw_clean = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw, flags=re.MULTILINE).strip()
+        try:
+            return json.loads(raw_clean)
+        except json.JSONDecodeError:
+            # Fallback: return raw text wrapped in expected structure
+            return {
+                "score": 65,
+                "headline": "Session Complete",
+                "summary": raw_clean[:300],
+                "what_worked": [],
+                "where_it_broke_down": [],
+                "missed_opportunity": "",
+                "technique_to_practice": "",
+                "coach_note": raw_clean[:200],
+            }

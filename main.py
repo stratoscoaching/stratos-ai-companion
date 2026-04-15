@@ -297,8 +297,9 @@ async def evaluate_session(session_id: str):
     if session.turn_count < 2:
         raise HTTPException(status_code=400, detail="Not enough conversation to evaluate")
     try:
-        feedback = engine.generate_feedback(session_id)
-        return {"feedback": feedback, "session_id": session_id}
+        import asyncio
+        feedback = await asyncio.to_thread(engine.generate_feedback, session_id)
+        return feedback  # structured dict with score, headline, summary, etc.
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

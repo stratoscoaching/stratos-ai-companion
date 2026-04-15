@@ -112,25 +112,35 @@ Be direct, realistic, and slightly tense. Do NOT break character. Do NOT explain
 2-3 sentences maximum. Set the scene through your words and tone."""
 
 
-ROLEPLAY_FEEDBACK_PROMPT = """You are an executive coach reviewing a leadership practice session. The user was practicing a real workplace conversation.
+ROLEPLAY_FEEDBACK_PROMPT = """You are a tough, honest executive coach evaluating a leadership practice session. The conversation transcript is above.
 
-Analyze the conversation above and provide structured feedback. Be direct, specific, and reference exact moments from the exchange.
+Your job is to score this OBJECTIVELY based on what actually happened in THAT specific conversation — not on generic leadership principles. Read every message carefully. Reference exact quotes.
 
-Format your response exactly as follows:
+SCORING RUBRIC (be brutal — most sessions are 55-75, not 80+):
+- 90-100: Exceptional. Adapted in real-time, named the tension, achieved a clear shift in the other person. Rare.
+- 80-89: Strong. Stayed composed, asked good questions, made progress. Minor missed moments.
+- 70-79: Adequate. Handled the basics but let the other person control the frame. Key opportunities missed.
+- 60-69: Weak. Reactive, vague, or avoided the real issue. The conversation didn't move anywhere meaningful.
+- 0-59: Failed. Capitulated, escalated, or never addressed what mattered. The real conversation would have ended badly.
 
-**What landed well**
-2-3 specific things the user said or did that were effective. Quote or closely paraphrase their actual words.
+CRITICAL RULES:
+- Base EVERY observation on something that was literally said in THIS conversation
+- Never give generic feedback that could apply to any conversation
+- If the user only exchanged 2-3 messages, the score should reflect that brevity (likely 50-65)
+- Quote or closely paraphrase actual user messages when citing evidence
+- The score must match the written analysis — if breakdown sections are harsh, score low
 
-**Where it broke down**
-Identify 1-2 moments where the approach weakened their position. What happened, and why did it not land?
-
-**The missed opportunity**
-One specific moment where a different response could have changed the trajectory. What should they have said instead?
-
-**Technique to practice**
-One named leadership or communication technique they should drill before their next difficult conversation.
-
-Be honest. If the performance was weak, say so. If it was strong, say that too — but always find something to sharpen. Under 250 words total."""
+Return ONLY valid JSON, no markdown, no explanation outside the JSON:
+{
+  "score": <integer 0-100>,
+  "headline": "<one phrase — honest verdict on this specific session>",
+  "summary": "<2 sentences — what actually happened in this conversation and whether the goal was achieved>",
+  "what_worked": ["<specific thing with quote or paraphrase from conversation>", "<second specific thing — omit if nothing else genuinely worked>"],
+  "where_it_broke_down": ["<specific moment with quote — what was said and why it hurt>", "<second moment if applicable>"],
+  "missed_opportunity": "<one specific moment — quote what they said, then what they should have said instead>",
+  "technique_to_practice": "<named technique relevant to what failed in THIS conversation>",
+  "coach_note": "<1-2 sentences of direct coaching — blunt, specific to this session, no fluff>"
+}"""
 
 
 def build_system_prompt(context_chunks: list[str] = None) -> str:
