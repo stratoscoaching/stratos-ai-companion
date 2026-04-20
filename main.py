@@ -458,6 +458,79 @@ async def api_complete(req: CompleteRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+GOOGLE_CLIENT_ID = os.environ.get(
+    "GOOGLE_CLIENT_ID",
+    "963430267713-166vehnmd1ftvd9cdp5s611ra6ool1uk.apps.googleusercontent.com",
+)
+
+USERS_FILE = Path("sessions") / "users.json"
+
+
+def _load_users() -> dict:
+    if USERS_FILE.exists():
+        try:
+            return json.loads(USERS_FILE.read_text())
+        except Exception:
+            return {}
+    return {}
+
+
+def _save_users(users: dict) -> None:
+    USERS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    USERS_FILE.write_text(json.dumps(users, indent=2))
+
+
+class GoogleAuthIn(BaseModel):
+    credential: str
+
+
+@app.post("/auth/google")
+async def auth_google(body: GoogleAuthIn):
+    from google.oauth2 import id_token
+    from google.auth.transport import requests as google_requests
+    import time
+
+    try:
+        info = id_token.verify_oauth2_token(
+            body.credential,
+            google_requests.Request(),
+            GOOGLE_CLIENT_ID,
+            clock_skew_in_seconds=10,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=401, detail=f"Invalid Google token: {e}")
+
+    if info.get("iss") not in ("accounts.google.com", "https://accounts.google.com"):
+        raise HTTPException(status_code=401, detail="Invalid token issuer")
+
+    sub = info.get("sub")
+    email = info.get("email")
+    if not sub or not email:
+        raise HTTPException(status_code=401, detail="Token missing required fields")
+
+    users = _load_users()
+    existing = users.get(sub)
+    is_new = existing is None
+    record = existing or {"sub": sub, "created_at": int(time.time())}
+    record.update({
+        "email": email,
+        "email_verified": bool(info.get("email_verified")),
+        "name": info.get("name", ""),
+        "picture": info.get("picture", ""),
+        "last_login": int(time.time()),
+    })
+    users[sub] = record
+    _save_users(users)
+
+    return {
+        "is_new": is_new,
+        "email": email,
+        "name": info.get("name", ""),
+        "picture": info.get("picture", ""),
+        "sub": sub,
+    }
+
+
 @app.get("/health")
 async def health():
     api_key_set = bool(os.environ.get("ANTHROPIC_API_KEY"))
