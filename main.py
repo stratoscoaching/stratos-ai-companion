@@ -497,7 +497,7 @@ async def auth_google(body: GoogleAuthIn):
             GOOGLE_CLIENT_ID,
             clock_skew_in_seconds=10,
         )
-    except ValueError as e:
+    except Exception as e:
         raise HTTPException(status_code=401, detail=f"Invalid Google token: {e}")
 
     if info.get("iss") not in ("accounts.google.com", "https://accounts.google.com"):
