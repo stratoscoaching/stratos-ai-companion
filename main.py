@@ -486,9 +486,12 @@ class GoogleAuthIn(BaseModel):
 
 @app.post("/auth/google")
 async def auth_google(body: GoogleAuthIn):
-    from google.oauth2 import id_token
-    from google.auth.transport import requests as google_requests
     import time
+    try:
+        from google.oauth2 import id_token
+        from google.auth.transport import requests as google_requests
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Auth library not available: {e}")
 
     try:
         info = id_token.verify_oauth2_token(
