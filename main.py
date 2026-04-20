@@ -184,6 +184,12 @@ class ChatRequest(BaseModel):
     message: str
 
 
+class CompleteRequest(BaseModel):
+    prompt: str | None = None
+    messages: list[dict] | None = None
+    max_tokens: int = 2048
+
+
 # ── Routes ────────────────────────────────────────────────────────────────────
 @app.get("/", response_class=HTMLResponse)
 async def root():
@@ -412,6 +418,44 @@ Return ONLY valid JSON."""
     if json_match:
         return json.loads(json_match.group())
     return {"annotations": {}}
+
+
+@app.post("/api/complete")
+async def api_complete(req: CompleteRequest):
+    """
+    Generic Claude completion endpoint — emulates the window.claude.complete()
+    sandbox helper so static front-ends (ai2) can reuse our server-side key.
+
+    Accepts either:
+      - { "prompt": "..." }                       → single user message
+      - { "messages": [{ role, content }, ...] }  → full messages array
+    Returns: { "text": "<completion>" }
+    """
+    if not req.prompt and not req.messages:
+        raise HTTPException(status_code=400, detail="Provide either 'prompt' or 'messages'")
+
+    messages = req.messages or [{"role": "user", "content": req.prompt}]
+    for m in messages:
+        if m.get("role") not in ("user", "assistant"):
+            raise HTTPException(status_code=400, detail="Each message needs role=user|assistant")
+
+    try:
+        import asyncio
+
+        def _call():
+            resp = engine.client.messages.create(
+                model=MODEL,
+                max_tokens=max(1, min(req.max_tokens, 4096)),
+                messages=messages,
+            )
+            return "".join(block.text for block in resp.content if block.type == "text")
+
+        text = await asyncio.wait_for(asyncio.to_thread(_call), timeout=45.0)
+        return {"text": text}
+    except asyncio.TimeoutError:
+        raise HTTPException(status_code=504, detail="Claude request timed out")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/health")
