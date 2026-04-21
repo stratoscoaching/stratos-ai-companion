@@ -188,6 +188,7 @@ class CompleteRequest(BaseModel):
     prompt: str | None = None
     messages: list[dict] | None = None
     max_tokens: int = 2048
+    model: str | None = None  # Optional override — e.g. "claude-haiku-4-5-20251001" for speed-critical calls
 
 
 # ── Routes ────────────────────────────────────────────────────────────────────
@@ -442,15 +443,25 @@ async def api_complete(req: CompleteRequest):
     try:
         import asyncio
 
+        # Whitelist allowed models to prevent arbitrary model selection
+        ALLOWED_MODELS = {
+            "claude-sonnet-4-6",
+            "claude-haiku-4-5-20251001",
+            "claude-opus-4-7",
+        }
+        chosen_model = req.model if req.model in ALLOWED_MODELS else MODEL
+
         def _call():
             resp = engine.client.messages.create(
-                model=MODEL,
+                model=chosen_model,
                 max_tokens=max(1, min(req.max_tokens, 8192)),
                 messages=messages,
             )
             return "".join(block.text for block in resp.content if block.type == "text")
 
-        text = await asyncio.wait_for(asyncio.to_thread(_call), timeout=150.0)
+        # Haiku is fast; sonnet/opus may take longer. Timeouts reflect that.
+        timeout_s = 60.0 if chosen_model.startswith("claude-haiku") else 150.0
+        text = await asyncio.wait_for(asyncio.to_thread(_call), timeout=timeout_s)
         return {"text": text}
     except asyncio.TimeoutError:
         raise HTTPException(status_code=504, detail="Claude request timed out")
