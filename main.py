@@ -445,12 +445,12 @@ async def api_complete(req: CompleteRequest):
         def _call():
             resp = engine.client.messages.create(
                 model=MODEL,
-                max_tokens=max(1, min(req.max_tokens, 4096)),
+                max_tokens=max(1, min(req.max_tokens, 8192)),
                 messages=messages,
             )
             return "".join(block.text for block in resp.content if block.type == "text")
 
-        text = await asyncio.wait_for(asyncio.to_thread(_call), timeout=45.0)
+        text = await asyncio.wait_for(asyncio.to_thread(_call), timeout=150.0)
         return {"text": text}
     except asyncio.TimeoutError:
         raise HTTPException(status_code=504, detail="Claude request timed out")
