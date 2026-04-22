@@ -187,6 +187,7 @@ class ChatRequest(BaseModel):
 class CompleteRequest(BaseModel):
     prompt: str | None = None
     messages: list[dict] | None = None
+    system: str | None = None  # Separate system prompt — cached on Anthropic side when long enough
     max_tokens: int = 2048
     model: str | None = None  # Optional override — e.g. "claude-haiku-4-5-20251001" for speed-critical calls
 
@@ -451,12 +452,32 @@ async def api_complete(req: CompleteRequest):
         }
         chosen_model = req.model if req.model in ALLOWED_MODELS else MODEL
 
+        # Prompt caching: if a system prompt is provided and is long enough to be
+        # worth caching (Anthropic's minimum is 1024 tokens for sonnet/opus, 2048
+        # for haiku — we approximate at ~3500 chars to be safe), mark it cacheable.
+        # Cache reads cost 10% of normal input price; cache writes cost 1.25x.
+        # Net savings kick in after the 2nd reuse within the 5-minute TTL.
+        system_param = None
+        if req.system and req.system.strip():
+            sys_text = req.system.strip()
+            if len(sys_text) >= 3500:
+                system_param = [{
+                    "type": "text",
+                    "text": sys_text,
+                    "cache_control": {"type": "ephemeral"},
+                }]
+            else:
+                system_param = sys_text
+
         def _call():
-            resp = engine.client.messages.create(
-                model=chosen_model,
-                max_tokens=max(1, min(req.max_tokens, 8192)),
-                messages=messages,
-            )
+            kwargs = {
+                "model": chosen_model,
+                "max_tokens": max(1, min(req.max_tokens, 8192)),
+                "messages": messages,
+            }
+            if system_param is not None:
+                kwargs["system"] = system_param
+            resp = engine.client.messages.create(**kwargs)
             return "".join(block.text for block in resp.content if block.type == "text")
 
         # Haiku is fast; sonnet/opus may take longer. Timeouts reflect that.
