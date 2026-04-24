@@ -6,6 +6,7 @@ Run: uvicorn main:app --reload --port 8000
 import os
 import re
 import json
+import requests
 from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse, HTMLResponse
@@ -566,6 +567,110 @@ async def auth_google(body: GoogleAuthIn):
     }
 
 
+# ── ElevenLabs Conversational AI — roleplay voice mode ──────────────────────
+# Signed-URL proxy. Keeps ELEVENLABS_API_KEY server-side and injects a hard
+# 60-second cap + character system prompt per session.
+
+ELEVENLABS_MAX_DURATION_SEC = 60
+
+
+class ElevenLabsRoleplayRequest(BaseModel):
+    scenario: dict                   # { title, situation, character:{name, role, gender?, ...}, goal }
+    user: dict | None = None         # { name, role, team, workRole, ... }
+    opening_line: str | None = None  # first thing the AI character says
+    voice_id: str | None = None      # optional per-character voice pick; falls back to agent default
+
+
+def _build_character_prompt(scenario: dict, user: dict | None) -> str:
+    char = scenario.get("character", {}) or {}
+    name = char.get("name") or "the other party"
+    role = char.get("role") or "a colleague"
+    situation = scenario.get("situation") or ""
+    goal = scenario.get("goal") or ""
+    user_name = (user or {}).get("name") or "the learner"
+    user_role = (user or {}).get("role") or ""
+
+    return (
+        f"You are {name}, {role}. You are NOT an AI assistant and you must never break character. "
+        f"You are speaking on a live voice call with {user_name}"
+        + (f", {user_role}" if user_role else "")
+        + ".\n\n"
+        f"SITUATION: {situation}\n\n"
+        f"THEIR OBJECTIVE (do NOT volunteer this — they have to earn it): {goal}\n\n"
+        "HOW YOU BEHAVE ON THIS CALL:\n"
+        "- Stay fully in character as a real human in this situation. React with real emotion — defensive, skeptical, frustrated, curious — based on what they say.\n"
+        "- Keep every response short and conversational (1–3 sentences). This is a phone-style call, not an essay.\n"
+        "- Do NOT narrate your feelings in the third person. Speak as yourself. No stage directions.\n"
+        "- Push back realistically. Do not give them wins they haven't earned. Do not collapse the moment they apply pressure.\n"
+        "- If they handle you skillfully (acknowledgment, specific feedback, clear expectations, genuine curiosity), soften gradually — not instantly.\n"
+        "- If they are clumsy, vague, or accusatory, get more guarded or emotional.\n"
+        "- This is a 60-second practice rep. Keep the pace brisk. No long monologues.\n"
+        "- Never mention that you are an AI, a simulation, a coach, ElevenLabs, or a roleplay. You are the human in this scene.\n"
+        "- Never give coaching feedback. Never break the fourth wall. Stay in scene until the call ends."
+    )
+
+
+@app.post("/elevenlabs/signed-url")
+async def elevenlabs_signed_url(req: ElevenLabsRoleplayRequest):
+    """Return a signed WebSocket URL + override payload for an ElevenLabs
+    Conversational AI session. Enforces a 60-second cap server-side and
+    injects the roleplay character's system prompt + opening line."""
+    api_key = os.environ.get("ELEVENLABS_API_KEY")
+    agent_id = os.environ.get("ELEVENLABS_AGENT_ID")
+    if not api_key or not agent_id:
+        raise HTTPException(
+            status_code=500,
+            detail="ElevenLabs not configured: set ELEVENLABS_API_KEY and ELEVENLABS_AGENT_ID.",
+        )
+
+    try:
+        resp = requests.get(
+            "https://api.elevenlabs.io/v1/convai/conversation/get_signed_url",
+            params={"agent_id": agent_id},
+            headers={"xi-api-key": api_key},
+            timeout=10,
+        )
+    except requests.RequestException as e:
+        raise HTTPException(status_code=502, detail=f"ElevenLabs unreachable: {e}")
+
+    if resp.status_code != 200:
+        raise HTTPException(status_code=502, detail=f"ElevenLabs error {resp.status_code}: {resp.text[:300]}")
+
+    signed_url = resp.json().get("signed_url")
+    if not signed_url:
+        raise HTTPException(status_code=502, detail="ElevenLabs did not return a signed_url.")
+
+    prompt = _build_character_prompt(req.scenario, req.user)
+    char = req.scenario.get("character", {}) or {}
+    first_message = req.opening_line or (
+        f"Hi {(req.user or {}).get('name', 'there')} — thanks for making time. What did you want to talk about?"
+    )
+
+    agent_override: dict = {
+        "prompt": {"prompt": prompt},
+        "first_message": first_message,
+        "language": "en",
+    }
+    tts_override: dict = {}
+    if req.voice_id:
+        tts_override["voice_id"] = req.voice_id
+
+    overrides: dict = {
+        "agent": agent_override,
+        "conversation": {"max_duration_seconds": ELEVENLABS_MAX_DURATION_SEC},
+    }
+    if tts_override:
+        overrides["tts"] = tts_override
+
+    return {
+        "signed_url": signed_url,
+        "agent_id": agent_id,
+        "max_duration_seconds": ELEVENLABS_MAX_DURATION_SEC,
+        "overrides": overrides,
+        "character_name": char.get("name"),
+    }
+
+
 @app.get("/health")
 async def health():
     api_key_set = bool(os.environ.get("ANTHROPIC_API_KEY"))
@@ -575,4 +680,5 @@ async def health():
         "api_key_configured": api_key_set,
         "rag_chunks_loaded": rag_chunks,
         "model": "claude-sonnet-4-6",
+        "elevenlabs_configured": bool(os.environ.get("ELEVENLABS_API_KEY") and os.environ.get("ELEVENLABS_AGENT_ID")),
     }
