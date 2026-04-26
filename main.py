@@ -6,13 +6,17 @@ Run: uvicorn main:app --reload --port 8000
 import os
 import re
 import json
+import time
 import requests
 from pathlib import Path
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import StreamingResponse, HTMLResponse
+from collections import defaultdict, deque
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import StreamingResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -26,12 +30,92 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# CORS — explicit allowlist. Override via ALLOWED_ORIGINS env (comma-separated).
+_default_origins = [
+    "https://stratoscoaching.com",
+    "https://www.stratoscoaching.com",
+    "https://stratos-ai-companion.onrender.com",
+    "http://localhost:8000",
+    "http://localhost:8765",
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1:8765",
+]
+_env_origins = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "").split(",") if o.strip()]
+ALLOWED_ORIGINS = _env_origins or _default_origins
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
+    max_age=600,
 )
+
+# Restrict Host header to known domains (defends against Host-header attacks).
+app.add_middleware(
+    TrustedHostMiddleware,
+    allowed_hosts=[
+        "stratos-ai-companion.onrender.com",
+        "stratoscoaching.com",
+        "www.stratoscoaching.com",
+        "localhost",
+        "127.0.0.1",
+        "*.onrender.com",  # Render assigns subdomains during preview deploys
+    ],
+)
+
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    """Attach baseline security headers to every response."""
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        response.headers["Permissions-Policy"] = "geolocation=(), payment=(), usb=(), camera=()"
+        # API responses are JSON/SSE — strip any inline-script vectors.
+        if request.url.path.startswith(("/api", "/sessions", "/chat", "/scenarios", "/health", "/elevenlabs")):
+            response.headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'"
+        return response
+
+
+app.add_middleware(SecurityHeadersMiddleware)
+
+
+# ── Rate limiting ─────────────────────────────────────────────────────────────
+# Simple in-memory sliding window. Render runs single-instance for our plan, so
+# this is sufficient. Bump RATE_LIMIT_PER_MINUTE env var to tune.
+_RATE_LIMIT_PER_MINUTE = int(os.getenv("RATE_LIMIT_PER_MINUTE", "60"))
+_rate_buckets: dict[str, deque] = defaultdict(deque)
+
+
+class RateLimitMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Only meter the AI-bearing endpoints. Static/health/auth are unmetered.
+        path = request.url.path
+        if not path.startswith(("/chat", "/sessions", "/api/complete", "/elevenlabs")):
+            return await call_next(request)
+        client_ip = (request.headers.get("x-forwarded-for", "") or request.client.host or "").split(",")[0].strip()
+        if not client_ip:
+            return await call_next(request)
+        now = time.time()
+        bucket = _rate_buckets[client_ip]
+        cutoff = now - 60.0
+        while bucket and bucket[0] < cutoff:
+            bucket.popleft()
+        if len(bucket) >= _RATE_LIMIT_PER_MINUTE:
+            return JSONResponse(
+                status_code=429,
+                content={"error": "rate_limit_exceeded", "retry_after_seconds": 60},
+                headers={"Retry-After": "60"},
+            )
+        bucket.append(now)
+        return await call_next(request)
+
+
+app.add_middleware(RateLimitMiddleware)
 
 # Serve static files (chat UI)
 static_dir = Path("static")
@@ -181,16 +265,16 @@ class NewSessionRequest(BaseModel):
 
 
 class ChatRequest(BaseModel):
-    session_id: str
-    message: str
+    session_id: str = Field(..., min_length=1, max_length=128)
+    message: str = Field(..., min_length=1, max_length=8000)
 
 
 class CompleteRequest(BaseModel):
-    prompt: str | None = None
+    prompt: str | None = Field(default=None, max_length=200_000)
     messages: list[dict] | None = None
-    system: str | None = None  # Separate system prompt — cached on Anthropic side when long enough
-    max_tokens: int = 2048
-    model: str | None = None  # Optional override — e.g. "claude-haiku-4-5-20251001" for speed-critical calls
+    system: str | None = Field(default=None, max_length=200_000)
+    max_tokens: int = Field(default=2048, ge=1, le=8192)
+    model: str | None = Field(default=None, max_length=64)
 
 
 # ── Routes ────────────────────────────────────────────────────────────────────
