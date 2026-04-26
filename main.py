@@ -755,6 +755,74 @@ async def elevenlabs_signed_url(req: ElevenLabsRoleplayRequest):
     }
 
 
+
+class ElevenLabsTTSRequest(BaseModel):
+    text: str
+    voice_id: str | None = None
+    model_id: str | None = None
+
+
+@app.post("/elevenlabs/tts")
+async def elevenlabs_tts(req: ElevenLabsTTSRequest):
+    """Plain text-to-speech for the AI Coach chat.
+    Reuses ELEVENLABS_API_KEY. Defaults to Turbo v2.5 (lowest credit cost) and
+    Rachel voice (warm, natural). Returns audio/mpeg.
+    """
+    api_key = os.environ.get("ELEVENLABS_API_KEY")
+    if not api_key:
+        raise HTTPException(
+            status_code=500,
+            detail="ElevenLabs not configured: set ELEVENLABS_API_KEY.",
+        )
+
+    text = (req.text or "").strip()
+    if not text:
+        raise HTTPException(status_code=400, detail="text is required")
+
+    # Cost guardrail for the POC. ~1500 chars is roughly 90 seconds of audio.
+    if len(text) > 1500:
+        text = text[:1500]
+
+    voice_id = req.voice_id or "21m00Tcm4TlvDq8ikWAM"  # Rachel
+    model_id = req.model_id or "eleven_turbo_v2_5"
+
+    try:
+        upstream = requests.post(
+            f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
+            headers={
+                "xi-api-key": api_key,
+                "Accept": "audio/mpeg",
+                "Content-Type": "application/json",
+            },
+            json={
+                "text": text,
+                "model_id": model_id,
+                "voice_settings": {
+                    "stability": 0.5,
+                    "similarity_boost": 0.75,
+                    "style": 0.0,
+                    "use_speaker_boost": True,
+                },
+            },
+            stream=True,
+            timeout=30,
+        )
+    except requests.RequestException as e:
+        raise HTTPException(status_code=502, detail=f"ElevenLabs upstream error: {e}")
+
+    if upstream.status_code != 200:
+        raise HTTPException(
+            status_code=upstream.status_code,
+            detail=f"ElevenLabs error: {upstream.text[:300]}",
+        )
+
+    def iter_audio():
+        for chunk in upstream.iter_content(chunk_size=4096):
+            if chunk:
+                yield chunk
+
+    return StreamingResponse(iter_audio(), media_type="audio/mpeg")
+
 @app.get("/health")
 async def health():
     api_key_set = bool(os.environ.get("ANTHROPIC_API_KEY"))
