@@ -9,7 +9,7 @@ import json
 import time
 import requests
 from pathlib import Path
-from collections import defaultdict, deque
+from collections import deque
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import StreamingResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -88,29 +88,77 @@ app.add_middleware(SecurityHeadersMiddleware)
 # Simple in-memory sliding window. Render runs single-instance for our plan, so
 # this is sufficient. Bump RATE_LIMIT_PER_MINUTE env var to tune.
 _RATE_LIMIT_PER_MINUTE = int(os.getenv("RATE_LIMIT_PER_MINUTE", "60"))
-_rate_buckets: dict[str, deque] = defaultdict(deque)
+# How many proxies in front of the app append to X-Forwarded-For. Callers can
+# write their own values at the start of that header, so we only trust the
+# entry the hosting proxy added, counted from the right. 0 ignores the header.
+_TRUSTED_PROXY_HOPS = int(os.getenv("TRUSTED_PROXY_HOPS", "1"))
+# Ceiling on paid AI calls per minute across all callers together. A spend
+# backstop that no header or address rotation can get around.
+_GLOBAL_AI_CALLS_PER_MINUTE = int(os.getenv("GLOBAL_AI_CALLS_PER_MINUTE", "240"))
+_RATE_WINDOW_SECONDS = 60.0
+_rate_buckets: dict[str, deque] = {}
+_global_ai_calls: deque = deque()
+_last_bucket_sweep = 0.0
+
+# Every path here counts toward the per-caller limit.
+_METERED_PREFIXES = ("/chat", "/sessions", "/api/complete", "/elevenlabs", "/progress", "/auth/google")
+# POSTs to these paths can spend Anthropic or ElevenLabs credit.
+_AI_PREFIXES = ("/chat", "/sessions", "/api/complete", "/elevenlabs", "/progress")
+
+
+def _client_key(request: Request) -> str:
+    """Address of the caller as seen by the hosting proxy."""
+    if _TRUSTED_PROXY_HOPS > 0:
+        forwarded = ",".join(request.headers.getlist("x-forwarded-for"))
+        hops = [h.strip() for h in forwarded.split(",") if h.strip()]
+        if len(hops) >= _TRUSTED_PROXY_HOPS:
+            return hops[-_TRUSTED_PROXY_HOPS]
+    return (request.client.host if request.client else "") or "unknown"
+
+
+def _evict_idle_buckets(now: float) -> None:
+    """Drop buckets with no requests in the current window, at most once a window."""
+    global _last_bucket_sweep
+    if now - _last_bucket_sweep < _RATE_WINDOW_SECONDS:
+        return
+    _last_bucket_sweep = now
+    cutoff = now - _RATE_WINDOW_SECONDS
+    for key in [k for k, b in _rate_buckets.items() if not b or b[-1] < cutoff]:
+        del _rate_buckets[key]
+
+
+def _rate_limited() -> JSONResponse:
+    return JSONResponse(
+        status_code=429,
+        content={"error": "rate_limit_exceeded", "retry_after_seconds": 60},
+        headers={"Retry-After": "60"},
+    )
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        # Only meter the AI-bearing endpoints. Static/health/auth are unmetered.
+        # Only meter the AI-bearing endpoints and sign-in. Static/health are unmetered.
         path = request.url.path
-        if not path.startswith(("/chat", "/sessions", "/api/complete", "/elevenlabs")):
-            return await call_next(request)
-        client_ip = (request.headers.get("x-forwarded-for", "") or request.client.host or "").split(",")[0].strip()
-        if not client_ip:
+        if not path.startswith(_METERED_PREFIXES):
             return await call_next(request)
         now = time.time()
-        bucket = _rate_buckets[client_ip]
-        cutoff = now - 60.0
+        cutoff = now - _RATE_WINDOW_SECONDS
+        _evict_idle_buckets(now)
+
+        bucket = _rate_buckets.setdefault(_client_key(request), deque())
         while bucket and bucket[0] < cutoff:
             bucket.popleft()
         if len(bucket) >= _RATE_LIMIT_PER_MINUTE:
-            return JSONResponse(
-                status_code=429,
-                content={"error": "rate_limit_exceeded", "retry_after_seconds": 60},
-                headers={"Retry-After": "60"},
-            )
+            return _rate_limited()
+
+        counts_globally = request.method == "POST" and path.startswith(_AI_PREFIXES)
+        if counts_globally:
+            while _global_ai_calls and _global_ai_calls[0] < cutoff:
+                _global_ai_calls.popleft()
+            if len(_global_ai_calls) >= _GLOBAL_AI_CALLS_PER_MINUTE:
+                return _rate_limited()
+            _global_ai_calls.append(now)
+
         bucket.append(now)
         return await call_next(request)
 
