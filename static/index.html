@@ -1436,6 +1436,7 @@
 <script>
 /* ─── STATE ─── */
 let currentSessionId    = null;
+let currentSessionToken = null; // owner token from /sessions/new; proves this browser owns the session
 let currentCoach        = 'james';
 let currentStyle        = 'direct';
 let isStreaming         = false;
@@ -1630,6 +1631,7 @@ async function launchScenario(id) {
     }
     const data = await resp.json();
     currentSessionId = data.session_id;
+    currentSessionToken = data.session_token;
     typing.remove();
     appendMessage('assistant', data.opening_message);
   } catch (err) {
@@ -1646,8 +1648,14 @@ async function launchScenario(id) {
 }
 
 /* ─── SESSIONS ─── */
+// Header that proves this browser owns the current session (sent on every session call).
+function sessionAuthHeader() {
+  return currentSessionToken ? { 'Authorization': 'Bearer ' + currentSessionToken } : {};
+}
+
 function startNewSession() {
   currentSessionId = null;
+  currentSessionToken = null;
   isRoleplay = false;
   stopTimer();
   roleplayTurnCount = 0;
@@ -1779,11 +1787,12 @@ async function sendMessage() {
       if (!sessResp.ok) throw new Error('Session create failed: ' + sessResp.status);
       const sessData = await sessResp.json();
       currentSessionId = sessData.session_id;
+      currentSessionToken = sessData.session_token;
     }
 
     const resp = await fetch('/chat/stream', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...sessionAuthHeader() },
       body: JSON.stringify({ message: text, coach: currentCoach, style: currentStyle, session_id: currentSessionId }),
     });
 
@@ -1876,7 +1885,7 @@ async function endRoleplay() {
   document.getElementById('coachStatus').textContent = 'Session complete';
   if (currentSessionId) {
     try {
-      const r = await fetch('/sessions/' + currentSessionId + '/evaluate', { method: 'POST' });
+      const r = await fetch('/sessions/' + currentSessionId + '/evaluate', { method: 'POST', headers: sessionAuthHeader() });
       const d = await r.json();
       showFeedbackModal(d);
     } catch(e) { console.error(e); }
@@ -1886,7 +1895,7 @@ async function endRoleplay() {
 async function fetchAnnotationForMessage(afterEl) {
   if (!currentSessionId) return;
   try {
-    const r = await fetch('/sessions/' + currentSessionId + '/annotate', { method: 'POST' });
+    const r = await fetch('/sessions/' + currentSessionId + '/annotate', { method: 'POST', headers: sessionAuthHeader() });
     if (!r.ok) return;
     const d = await r.json();
     const annotations = d.annotations || {};
