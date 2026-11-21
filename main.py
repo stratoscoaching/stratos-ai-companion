@@ -9,6 +9,7 @@ import json
 import time
 import logging
 import requests
+from urllib.parse import quote
 from pathlib import Path
 from collections import deque
 from fastapi import FastAPI, HTTPException, Request
@@ -678,8 +679,9 @@ async def auth_google(body: GoogleAuthIn):
     try:
         from google.oauth2 import id_token
         from google.auth.transport import requests as google_requests
-    except Exception as e:
-        raise HTTPException(status_code=503, detail=f"Auth library not available: {e}")
+    except Exception:
+        logger.exception("Google auth library failed to load")
+        raise HTTPException(status_code=503, detail="Sign-in is not available right now")
 
     try:
         info = id_token.verify_oauth2_token(
@@ -689,7 +691,9 @@ async def auth_google(body: GoogleAuthIn):
             clock_skew_in_seconds=10,
         )
     except Exception as e:
-        raise HTTPException(status_code=401, detail=f"Invalid Google token: {e}")
+        # Log the error type only: some messages quote the token itself.
+        logger.info("Rejected Google token (%s)", type(e).__name__)
+        raise HTTPException(status_code=401, detail="Invalid Google token")
 
     if info.get("iss") not in ("accounts.google.com", "https://accounts.google.com"):
         raise HTTPException(status_code=401, detail="Invalid token issuer")
@@ -723,10 +727,26 @@ async def auth_google(body: GoogleAuthIn):
 
 
 # ── ElevenLabs Conversational AI — roleplay voice mode ──────────────────────
-# Signed-URL proxy. Keeps ELEVENLABS_API_KEY server-side and injects a hard
-# 60-second cap + character system prompt per session.
+# Signed-URL proxy. Keeps ELEVENLABS_API_KEY server-side and passes the client
+# a 60-second cap + character system prompt per session. The client applies the
+# cap, so the hard limit must also be set on the agent in the ElevenLabs dashboard.
 
 ELEVENLABS_MAX_DURATION_SEC = 60
+ELEVENLABS_DEFAULT_VOICE_ID = "21m00Tcm4TlvDq8ikWAM"  # Rachel
+ELEVENLABS_DEFAULT_TTS_MODEL = "eleven_turbo_v2_5"
+# Low-cost models only; anything else falls back to the default.
+ELEVENLABS_TTS_MODELS = {"eleven_turbo_v2_5", "eleven_flash_v2_5"}
+_VOICE_ID_RE = re.compile(r"[A-Za-z0-9]{16,32}")
+
+
+def _check_voice_id(voice_id: str | None) -> str | None:
+    """ElevenLabs voice IDs are short letter/digit strings. Reject anything
+    else so a caller cannot steer requests to other ElevenLabs operations."""
+    if not voice_id:
+        return None
+    if not _VOICE_ID_RE.fullmatch(voice_id):
+        raise HTTPException(status_code=400, detail="voice_id is not valid")
+    return voice_id
 
 
 class ElevenLabsRoleplayRequest(BaseModel):
@@ -768,8 +788,9 @@ def _build_character_prompt(scenario: dict, user: dict | None) -> str:
 @app.post("/elevenlabs/signed-url")
 async def elevenlabs_signed_url(req: ElevenLabsRoleplayRequest):
     """Return a signed WebSocket URL + override payload for an ElevenLabs
-    Conversational AI session. Enforces a 60-second cap server-side and
+    Conversational AI session. Passes a 60-second cap to the client and
     injects the roleplay character's system prompt + opening line."""
+    voice_id = _check_voice_id(req.voice_id)
     api_key = os.environ.get("ELEVENLABS_API_KEY")
     agent_id = os.environ.get("ELEVENLABS_AGENT_ID")
     if not api_key or not agent_id:
@@ -785,11 +806,13 @@ async def elevenlabs_signed_url(req: ElevenLabsRoleplayRequest):
             headers={"xi-api-key": api_key},
             timeout=10,
         )
-    except requests.RequestException as e:
-        raise HTTPException(status_code=502, detail=f"ElevenLabs unreachable: {e}")
+    except requests.RequestException:
+        logger.exception("ElevenLabs signed-url request failed")
+        raise HTTPException(status_code=502, detail="Voice service is unavailable")
 
     if resp.status_code != 200:
-        raise HTTPException(status_code=502, detail=f"ElevenLabs error {resp.status_code}: {resp.text[:300]}")
+        logger.error("ElevenLabs signed-url error %s: %s", resp.status_code, resp.text[:300])
+        raise HTTPException(status_code=502, detail="Voice service is unavailable")
 
     signed_url = resp.json().get("signed_url")
     if not signed_url:
@@ -807,8 +830,8 @@ async def elevenlabs_signed_url(req: ElevenLabsRoleplayRequest):
         "language": "en",
     }
     tts_override: dict = {}
-    if req.voice_id:
-        tts_override["voice_id"] = req.voice_id
+    if voice_id:
+        tts_override["voice_id"] = voice_id
 
     overrides: dict = {
         "agent": agent_override,
@@ -839,6 +862,9 @@ async def elevenlabs_tts(req: ElevenLabsTTSRequest):
     Reuses ELEVENLABS_API_KEY. Defaults to Turbo v2.5 (lowest credit cost) and
     Rachel voice (warm, natural). Returns audio/mpeg.
     """
+    voice_id = _check_voice_id(req.voice_id) or ELEVENLABS_DEFAULT_VOICE_ID
+    model_id = req.model_id if req.model_id in ELEVENLABS_TTS_MODELS else ELEVENLABS_DEFAULT_TTS_MODEL
+
     api_key = os.environ.get("ELEVENLABS_API_KEY")
     if not api_key:
         raise HTTPException(
@@ -854,12 +880,10 @@ async def elevenlabs_tts(req: ElevenLabsTTSRequest):
     if len(text) > 1500:
         text = text[:1500]
 
-    voice_id = req.voice_id or "21m00Tcm4TlvDq8ikWAM"  # Rachel
-    model_id = req.model_id or "eleven_turbo_v2_5"
-
     try:
         upstream = requests.post(
-            f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
+            # voice_id is validated above; quoting keeps it a single path segment regardless.
+            f"https://api.elevenlabs.io/v1/text-to-speech/{quote(voice_id, safe='')}",
             headers={
                 "xi-api-key": api_key,
                 "Accept": "audio/mpeg",
@@ -878,14 +902,14 @@ async def elevenlabs_tts(req: ElevenLabsTTSRequest):
             stream=True,
             timeout=30,
         )
-    except requests.RequestException as e:
-        raise HTTPException(status_code=502, detail=f"ElevenLabs upstream error: {e}")
+    except requests.RequestException:
+        logger.exception("ElevenLabs TTS request failed")
+        raise HTTPException(status_code=502, detail="Voice service is unavailable")
 
     if upstream.status_code != 200:
-        raise HTTPException(
-            status_code=upstream.status_code,
-            detail=f"ElevenLabs error: {upstream.text[:300]}",
-        )
+        logger.error("ElevenLabs TTS error %s: %s", upstream.status_code, upstream.text[:300])
+        upstream.close()
+        raise HTTPException(status_code=502, detail="Voice service is unavailable")
 
     def iter_audio():
         for chunk in upstream.iter_content(chunk_size=4096):
