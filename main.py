@@ -9,20 +9,24 @@ import json
 import time
 import logging
 import requests
+from urllib.parse import quote
 from pathlib import Path
-from collections import defaultdict, deque
+from collections import deque
 from fastapi import FastAPI, HTTPException, Request, Header
 from fastapi.responses import StreamingResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
-from pydantic import BaseModel, Field
+from typing import Literal
+from pydantic import BaseModel, Field, model_validator
 from dotenv import load_dotenv
 
 load_dotenv()
 
 from coaching_engine import CoachingEngine
+
+logger = logging.getLogger(__name__)
 
 # ── App Setup ────────────────────────────────────────────────────────────────
 app = FastAPI(
@@ -89,29 +93,77 @@ app.add_middleware(SecurityHeadersMiddleware)
 # Simple in-memory sliding window. Render runs single-instance for our plan, so
 # this is sufficient. Bump RATE_LIMIT_PER_MINUTE env var to tune.
 _RATE_LIMIT_PER_MINUTE = int(os.getenv("RATE_LIMIT_PER_MINUTE", "60"))
-_rate_buckets: dict[str, deque] = defaultdict(deque)
+# How many proxies in front of the app append to X-Forwarded-For. Callers can
+# write their own values at the start of that header, so we only trust the
+# entry the hosting proxy added, counted from the right. 0 ignores the header.
+_TRUSTED_PROXY_HOPS = int(os.getenv("TRUSTED_PROXY_HOPS", "1"))
+# Ceiling on paid AI calls per minute across all callers together. A spend
+# backstop that no header or address rotation can get around.
+_GLOBAL_AI_CALLS_PER_MINUTE = int(os.getenv("GLOBAL_AI_CALLS_PER_MINUTE", "240"))
+_RATE_WINDOW_SECONDS = 60.0
+_rate_buckets: dict[str, deque] = {}
+_global_ai_calls: deque = deque()
+_last_bucket_sweep = 0.0
+
+# Every path here counts toward the per-caller limit.
+_METERED_PREFIXES = ("/chat", "/sessions", "/api/complete", "/elevenlabs", "/progress", "/auth/google")
+# POSTs to these paths can spend Anthropic or ElevenLabs credit.
+_AI_PREFIXES = ("/chat", "/sessions", "/api/complete", "/elevenlabs", "/progress")
+
+
+def _client_key(request: Request) -> str:
+    """Address of the caller as seen by the hosting proxy."""
+    if _TRUSTED_PROXY_HOPS > 0:
+        forwarded = ",".join(request.headers.getlist("x-forwarded-for"))
+        hops = [h.strip() for h in forwarded.split(",") if h.strip()]
+        if len(hops) >= _TRUSTED_PROXY_HOPS:
+            return hops[-_TRUSTED_PROXY_HOPS]
+    return (request.client.host if request.client else "") or "unknown"
+
+
+def _evict_idle_buckets(now: float) -> None:
+    """Drop buckets with no requests in the current window, at most once a window."""
+    global _last_bucket_sweep
+    if now - _last_bucket_sweep < _RATE_WINDOW_SECONDS:
+        return
+    _last_bucket_sweep = now
+    cutoff = now - _RATE_WINDOW_SECONDS
+    for key in [k for k, b in _rate_buckets.items() if not b or b[-1] < cutoff]:
+        del _rate_buckets[key]
+
+
+def _rate_limited() -> JSONResponse:
+    return JSONResponse(
+        status_code=429,
+        content={"error": "rate_limit_exceeded", "retry_after_seconds": 60},
+        headers={"Retry-After": "60"},
+    )
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        # Only meter the AI-bearing endpoints. Static/health/auth are unmetered.
+        # Only meter the AI-bearing endpoints and sign-in. Static/health are unmetered.
         path = request.url.path
-        if not path.startswith(("/chat", "/sessions", "/api/complete", "/elevenlabs")):
-            return await call_next(request)
-        client_ip = (request.headers.get("x-forwarded-for", "") or request.client.host or "").split(",")[0].strip()
-        if not client_ip:
+        if not path.startswith(_METERED_PREFIXES):
             return await call_next(request)
         now = time.time()
-        bucket = _rate_buckets[client_ip]
-        cutoff = now - 60.0
+        cutoff = now - _RATE_WINDOW_SECONDS
+        _evict_idle_buckets(now)
+
+        bucket = _rate_buckets.setdefault(_client_key(request), deque())
         while bucket and bucket[0] < cutoff:
             bucket.popleft()
         if len(bucket) >= _RATE_LIMIT_PER_MINUTE:
-            return JSONResponse(
-                status_code=429,
-                content={"error": "rate_limit_exceeded", "retry_after_seconds": 60},
-                headers={"Retry-After": "60"},
-            )
+            return _rate_limited()
+
+        counts_globally = request.method == "POST" and path.startswith(_AI_PREFIXES)
+        if counts_globally:
+            while _global_ai_calls and _global_ai_calls[0] < cutoff:
+                _global_ai_calls.popleft()
+            if len(_global_ai_calls) >= _GLOBAL_AI_CALLS_PER_MINUTE:
+                return _rate_limited()
+            _global_ai_calls.append(now)
+
         bucket.append(now)
         return await call_next(request)
 
@@ -299,12 +351,28 @@ class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1, max_length=8000)
 
 
+class CompleteMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(..., max_length=50_000)
+
+
+# Total characters across all messages in one /api/complete call.
+COMPLETE_MAX_MESSAGE_CHARS = 150_000
+
+
 class CompleteRequest(BaseModel):
-    prompt: str | None = Field(default=None, max_length=200_000)
-    messages: list[dict] | None = None
-    system: str | None = Field(default=None, max_length=200_000)
-    max_tokens: int = Field(default=2048, ge=1, le=8192)
+    prompt: str | None = Field(default=None, max_length=100_000)
+    messages: list[CompleteMessage] | None = Field(default=None, max_length=100)
+    system: str | None = Field(default=None, max_length=50_000)
+    max_tokens: int = Field(default=2048, ge=1, le=5000)
     model: str | None = Field(default=None, max_length=64)
+
+    @model_validator(mode="after")
+    def _limit_total_message_size(self):
+        total = sum(len(m.content) for m in self.messages or [])
+        if total > COMPLETE_MAX_MESSAGE_CHARS:
+            raise ValueError(f"messages may hold at most {COMPLETE_MAX_MESSAGE_CHARS} characters in total")
+        return self
 
 
 # ── Routes ────────────────────────────────────────────────────────────────────
@@ -548,10 +616,12 @@ async def api_complete(req: CompleteRequest):
     if not req.prompt and not req.messages:
         raise HTTPException(status_code=400, detail="Provide either 'prompt' or 'messages'")
 
-    messages = req.messages or [{"role": "user", "content": req.prompt}]
-    for m in messages:
-        if m.get("role") not in ("user", "assistant"):
-            raise HTTPException(status_code=400, detail="Each message needs role=user|assistant")
+    # Roles and plain-text content are already checked by CompleteMessage; only
+    # role and content are forwarded, so callers cannot add other block types.
+    if req.messages:
+        messages = [{"role": m.role, "content": m.content} for m in req.messages]
+    else:
+        messages = [{"role": "user", "content": req.prompt}]
 
     try:
         import asyncio
@@ -560,7 +630,6 @@ async def api_complete(req: CompleteRequest):
         ALLOWED_MODELS = {
             "claude-sonnet-4-6",
             "claude-haiku-4-5-20251001",
-            "claude-opus-4-7",
         }
         chosen_model = req.model if req.model in ALLOWED_MODELS else MODEL
 
@@ -584,7 +653,7 @@ async def api_complete(req: CompleteRequest):
         def _call():
             kwargs = {
                 "model": chosen_model,
-                "max_tokens": max(1, min(req.max_tokens, 8192)),
+                "max_tokens": req.max_tokens,
                 "messages": messages,
             }
             if system_param is not None:
@@ -592,14 +661,16 @@ async def api_complete(req: CompleteRequest):
             resp = engine.client.messages.create(**kwargs)
             return "".join(block.text for block in resp.content if block.type == "text")
 
-        # Haiku is fast; sonnet/opus may take longer. Timeouts reflect that.
+        # Haiku is fast; sonnet may take longer. Timeouts reflect that.
         timeout_s = 60.0 if chosen_model.startswith("claude-haiku") else 150.0
         text = await asyncio.wait_for(asyncio.to_thread(_call), timeout=timeout_s)
         return {"text": text}
     except asyncio.TimeoutError:
         raise HTTPException(status_code=504, detail="Claude request timed out")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        # Keep provider and key details out of the response; they go to the server log.
+        logger.exception("/api/complete failed")
+        raise HTTPException(status_code=500, detail="Claude request failed")
 
 
 GOOGLE_CLIENT_ID = os.environ.get(
@@ -634,8 +705,9 @@ async def auth_google(body: GoogleAuthIn):
     try:
         from google.oauth2 import id_token
         from google.auth.transport import requests as google_requests
-    except Exception as e:
-        raise HTTPException(status_code=503, detail=f"Auth library not available: {e}")
+    except Exception:
+        logger.exception("Google auth library failed to load")
+        raise HTTPException(status_code=503, detail="Sign-in is not available right now")
 
     try:
         info = id_token.verify_oauth2_token(
@@ -645,7 +717,9 @@ async def auth_google(body: GoogleAuthIn):
             clock_skew_in_seconds=10,
         )
     except Exception as e:
-        raise HTTPException(status_code=401, detail=f"Invalid Google token: {e}")
+        # Log the error type only: some messages quote the token itself.
+        logger.info("Rejected Google token (%s)", type(e).__name__)
+        raise HTTPException(status_code=401, detail="Invalid Google token")
 
     if info.get("iss") not in ("accounts.google.com", "https://accounts.google.com"):
         raise HTTPException(status_code=401, detail="Invalid token issuer")
@@ -679,10 +753,26 @@ async def auth_google(body: GoogleAuthIn):
 
 
 # ── ElevenLabs Conversational AI — roleplay voice mode ──────────────────────
-# Signed-URL proxy. Keeps ELEVENLABS_API_KEY server-side and injects a hard
-# 60-second cap + character system prompt per session.
+# Signed-URL proxy. Keeps ELEVENLABS_API_KEY server-side and passes the client
+# a 60-second cap + character system prompt per session. The client applies the
+# cap, so the hard limit must also be set on the agent in the ElevenLabs dashboard.
 
 ELEVENLABS_MAX_DURATION_SEC = 60
+ELEVENLABS_DEFAULT_VOICE_ID = "21m00Tcm4TlvDq8ikWAM"  # Rachel
+ELEVENLABS_DEFAULT_TTS_MODEL = "eleven_turbo_v2_5"
+# Low-cost models only; anything else falls back to the default.
+ELEVENLABS_TTS_MODELS = {"eleven_turbo_v2_5", "eleven_flash_v2_5"}
+_VOICE_ID_RE = re.compile(r"[A-Za-z0-9]{16,32}")
+
+
+def _check_voice_id(voice_id: str | None) -> str | None:
+    """ElevenLabs voice IDs are short letter/digit strings. Reject anything
+    else so a caller cannot steer requests to other ElevenLabs operations."""
+    if not voice_id:
+        return None
+    if not _VOICE_ID_RE.fullmatch(voice_id):
+        raise HTTPException(status_code=400, detail="voice_id is not valid")
+    return voice_id
 
 
 class ElevenLabsRoleplayRequest(BaseModel):
@@ -724,8 +814,9 @@ def _build_character_prompt(scenario: dict, user: dict | None) -> str:
 @app.post("/elevenlabs/signed-url")
 async def elevenlabs_signed_url(req: ElevenLabsRoleplayRequest):
     """Return a signed WebSocket URL + override payload for an ElevenLabs
-    Conversational AI session. Enforces a 60-second cap server-side and
+    Conversational AI session. Passes a 60-second cap to the client and
     injects the roleplay character's system prompt + opening line."""
+    voice_id = _check_voice_id(req.voice_id)
     api_key = os.environ.get("ELEVENLABS_API_KEY")
     agent_id = os.environ.get("ELEVENLABS_AGENT_ID")
     if not api_key or not agent_id:
@@ -741,11 +832,13 @@ async def elevenlabs_signed_url(req: ElevenLabsRoleplayRequest):
             headers={"xi-api-key": api_key},
             timeout=10,
         )
-    except requests.RequestException as e:
-        raise HTTPException(status_code=502, detail=f"ElevenLabs unreachable: {e}")
+    except requests.RequestException:
+        logger.exception("ElevenLabs signed-url request failed")
+        raise HTTPException(status_code=502, detail="Voice service is unavailable")
 
     if resp.status_code != 200:
-        raise HTTPException(status_code=502, detail=f"ElevenLabs error {resp.status_code}: {resp.text[:300]}")
+        logger.error("ElevenLabs signed-url error %s: %s", resp.status_code, resp.text[:300])
+        raise HTTPException(status_code=502, detail="Voice service is unavailable")
 
     signed_url = resp.json().get("signed_url")
     if not signed_url:
@@ -763,8 +856,8 @@ async def elevenlabs_signed_url(req: ElevenLabsRoleplayRequest):
         "language": "en",
     }
     tts_override: dict = {}
-    if req.voice_id:
-        tts_override["voice_id"] = req.voice_id
+    if voice_id:
+        tts_override["voice_id"] = voice_id
 
     overrides: dict = {
         "agent": agent_override,
@@ -795,6 +888,9 @@ async def elevenlabs_tts(req: ElevenLabsTTSRequest):
     Reuses ELEVENLABS_API_KEY. Defaults to Turbo v2.5 (lowest credit cost) and
     Rachel voice (warm, natural). Returns audio/mpeg.
     """
+    voice_id = _check_voice_id(req.voice_id) or ELEVENLABS_DEFAULT_VOICE_ID
+    model_id = req.model_id if req.model_id in ELEVENLABS_TTS_MODELS else ELEVENLABS_DEFAULT_TTS_MODEL
+
     api_key = os.environ.get("ELEVENLABS_API_KEY")
     if not api_key:
         raise HTTPException(
@@ -810,12 +906,10 @@ async def elevenlabs_tts(req: ElevenLabsTTSRequest):
     if len(text) > 1500:
         text = text[:1500]
 
-    voice_id = req.voice_id or "21m00Tcm4TlvDq8ikWAM"  # Rachel
-    model_id = req.model_id or "eleven_turbo_v2_5"
-
     try:
         upstream = requests.post(
-            f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
+            # voice_id is validated above; quoting keeps it a single path segment regardless.
+            f"https://api.elevenlabs.io/v1/text-to-speech/{quote(voice_id, safe='')}",
             headers={
                 "xi-api-key": api_key,
                 "Accept": "audio/mpeg",
@@ -834,14 +928,14 @@ async def elevenlabs_tts(req: ElevenLabsTTSRequest):
             stream=True,
             timeout=30,
         )
-    except requests.RequestException as e:
-        raise HTTPException(status_code=502, detail=f"ElevenLabs upstream error: {e}")
+    except requests.RequestException:
+        logger.exception("ElevenLabs TTS request failed")
+        raise HTTPException(status_code=502, detail="Voice service is unavailable")
 
     if upstream.status_code != 200:
-        raise HTTPException(
-            status_code=upstream.status_code,
-            detail=f"ElevenLabs error: {upstream.text[:300]}",
-        )
+        logger.error("ElevenLabs TTS error %s: %s", upstream.status_code, upstream.text[:300])
+        upstream.close()
+        raise HTTPException(status_code=502, detail="Voice service is unavailable")
 
     def iter_audio():
         for chunk in upstream.iter_content(chunk_size=4096):
