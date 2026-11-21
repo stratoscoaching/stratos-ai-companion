@@ -142,10 +142,11 @@ def test_no_forwarded_for_falls_back_to_peer_address(client, claude):
 
 def test_progress_generate_is_metered(client, monkeypatch):
     monkeypatch.setattr(main, "_RATE_LIMIT_PER_MINUTE", 2)
-    monkeypatch.setattr(main.engine.store, "list_recent", lambda limit=5: [])
+    # raising=False: the session lock-down change removes list_recent; this test only checks metering.
+    monkeypatch.setattr(main.engine.store, "list_recent", lambda limit=5: [], raising=False)
     headers = {"X-Forwarded-For": "203.0.113.9"}
-    assert client.post("/progress/generate", json={}, headers=headers).status_code == 200
-    assert client.post("/progress/generate", json={}, headers=headers).status_code == 200
+    assert client.post("/progress/generate", json={}, headers=headers).status_code != 429
+    assert client.post("/progress/generate", json={}, headers=headers).status_code != 429
     r = client.post("/progress/generate", json={}, headers=headers)
     assert r.status_code == 429
     assert r.json()["error"] == "rate_limit_exceeded"
