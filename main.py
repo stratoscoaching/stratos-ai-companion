@@ -7,6 +7,7 @@ import os
 import re
 import json
 import time
+import logging
 import requests
 from pathlib import Path
 from collections import deque
@@ -16,12 +17,15 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
-from pydantic import BaseModel, Field
+from typing import Literal
+from pydantic import BaseModel, Field, model_validator
 from dotenv import load_dotenv
 
 load_dotenv()
 
 from coaching_engine import CoachingEngine
+
+logger = logging.getLogger(__name__)
 
 # ── App Setup ────────────────────────────────────────────────────────────────
 app = FastAPI(
@@ -317,12 +321,28 @@ class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1, max_length=8000)
 
 
+class CompleteMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(..., max_length=50_000)
+
+
+# Total characters across all messages in one /api/complete call.
+COMPLETE_MAX_MESSAGE_CHARS = 150_000
+
+
 class CompleteRequest(BaseModel):
-    prompt: str | None = Field(default=None, max_length=200_000)
-    messages: list[dict] | None = None
-    system: str | None = Field(default=None, max_length=200_000)
-    max_tokens: int = Field(default=2048, ge=1, le=8192)
+    prompt: str | None = Field(default=None, max_length=100_000)
+    messages: list[CompleteMessage] | None = Field(default=None, max_length=100)
+    system: str | None = Field(default=None, max_length=50_000)
+    max_tokens: int = Field(default=2048, ge=1, le=5000)
     model: str | None = Field(default=None, max_length=64)
+
+    @model_validator(mode="after")
+    def _limit_total_message_size(self):
+        total = sum(len(m.content) for m in self.messages or [])
+        if total > COMPLETE_MAX_MESSAGE_CHARS:
+            raise ValueError(f"messages may hold at most {COMPLETE_MAX_MESSAGE_CHARS} characters in total")
+        return self
 
 
 # ── Routes ────────────────────────────────────────────────────────────────────
@@ -569,10 +589,12 @@ async def api_complete(req: CompleteRequest):
     if not req.prompt and not req.messages:
         raise HTTPException(status_code=400, detail="Provide either 'prompt' or 'messages'")
 
-    messages = req.messages or [{"role": "user", "content": req.prompt}]
-    for m in messages:
-        if m.get("role") not in ("user", "assistant"):
-            raise HTTPException(status_code=400, detail="Each message needs role=user|assistant")
+    # Roles and plain-text content are already checked by CompleteMessage; only
+    # role and content are forwarded, so callers cannot add other block types.
+    if req.messages:
+        messages = [{"role": m.role, "content": m.content} for m in req.messages]
+    else:
+        messages = [{"role": "user", "content": req.prompt}]
 
     try:
         import asyncio
@@ -581,7 +603,6 @@ async def api_complete(req: CompleteRequest):
         ALLOWED_MODELS = {
             "claude-sonnet-4-6",
             "claude-haiku-4-5-20251001",
-            "claude-opus-4-7",
         }
         chosen_model = req.model if req.model in ALLOWED_MODELS else MODEL
 
@@ -605,7 +626,7 @@ async def api_complete(req: CompleteRequest):
         def _call():
             kwargs = {
                 "model": chosen_model,
-                "max_tokens": max(1, min(req.max_tokens, 8192)),
+                "max_tokens": req.max_tokens,
                 "messages": messages,
             }
             if system_param is not None:
@@ -613,14 +634,16 @@ async def api_complete(req: CompleteRequest):
             resp = engine.client.messages.create(**kwargs)
             return "".join(block.text for block in resp.content if block.type == "text")
 
-        # Haiku is fast; sonnet/opus may take longer. Timeouts reflect that.
+        # Haiku is fast; sonnet may take longer. Timeouts reflect that.
         timeout_s = 60.0 if chosen_model.startswith("claude-haiku") else 150.0
         text = await asyncio.wait_for(asyncio.to_thread(_call), timeout=timeout_s)
         return {"text": text}
     except asyncio.TimeoutError:
         raise HTTPException(status_code=504, detail="Claude request timed out")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        # Keep provider and key details out of the response; they go to the server log.
+        logger.exception("/api/complete failed")
+        raise HTTPException(status_code=500, detail="Claude request failed")
 
 
 GOOGLE_CLIENT_ID = os.environ.get(
