@@ -7,10 +7,11 @@ import os
 import re
 import json
 import time
+import logging
 import requests
 from pathlib import Path
 from collections import defaultdict, deque
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Header
 from fastapi.responses import StreamingResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -124,6 +125,29 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Init coaching engine
 engine = CoachingEngine()
+logger = logging.getLogger("stratos.sessions")
+
+
+def _bearer_token(authorization: str | None) -> str | None:
+    """Pull the token out of an "Authorization: Bearer <token>" header."""
+    if not authorization:
+        return None
+    scheme, _, token = authorization.partition(" ")
+    if scheme.lower() != "bearer" or not token.strip():
+        return None
+    return token.strip()
+
+
+def _owned_session_or_404(session_id: str, authorization: str | None):
+    """
+    Return the session only if the caller holds its owner token. A bad ID,
+    a missing or wrong token and an unknown session all get the same 404,
+    so callers cannot tell which sessions exist.
+    """
+    session = engine.store.get_owned(session_id, _bearer_token(authorization))
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    return session
 
 MODEL = "claude-sonnet-4-6"
 
@@ -253,8 +277,14 @@ SCENARIOS = [
 
 
 # ── Request Models ────────────────────────────────────────────────────────────
+class SessionCredential(BaseModel):
+    session_id: str = Field(..., min_length=1, max_length=64)
+    session_token: str = Field(..., min_length=1, max_length=256)
+
+
 class ProgressRequest(BaseModel):
-    session_ids: list[str] = []
+    # Each session must come with its owner token; at most 10 per request.
+    sessions: list[SessionCredential] = Field(default_factory=list, max_length=10)
 
 
 class NewSessionRequest(BaseModel):
@@ -294,7 +324,7 @@ async def new_session(req: NewSessionRequest):
     if req.coach_name not in ("James", "Alexandra"):
         raise HTTPException(status_code=400, detail="coach_name must be 'James' or 'Alexandra'")
 
-    session = engine.get_or_create_session(coach_name=req.coach_name)
+    session, session_token = engine.create_session(coach_name=req.coach_name)
 
     # Configure roleplay mode if requested
     if req.is_roleplay and req.roleplay_character:
@@ -319,6 +349,8 @@ async def new_session(req: NewSessionRequest):
 
     return {
         "session_id": session.session_id,
+        # Owner token: shown only once. Send it back as "Authorization: Bearer <token>".
+        "session_token": session_token,
         "coach_name": session.coach_name,
         "opening_message": opening,
         "is_roleplay": session.is_roleplay,
@@ -327,26 +359,27 @@ async def new_session(req: NewSessionRequest):
 
 
 @app.post("/chat/stream")
-async def chat_stream(req: ChatRequest):
+async def chat_stream(req: ChatRequest, authorization: str | None = Header(default=None)):
     """
     Stream a coaching response via Server-Sent Events.
     Frontend reads: event.data chunks, then [DONE] to close.
+    Requires the session's owner token as a Bearer token.
     """
-    session = engine.store.get(req.session_id)
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
+    session = _owned_session_or_404(req.session_id, authorization)
 
     if not req.message.strip():
         raise HTTPException(status_code=400, detail="Message cannot be empty")
 
     def generate():
         try:
-            for chunk in engine.chat(req.session_id, req.message):
+            for chunk in engine.chat(session, req.message):
                 # SSE format
                 yield f"data: {json.dumps({'text': chunk})}\n\n"
             yield "data: [DONE]\n\n"
-        except Exception as e:
-            yield f"data: {json.dumps({'error': str(e)})}\n\n"
+        except Exception:
+            # Log the detail server-side; never send raw exception text to the browser.
+            logger.exception("Chat stream failed")
+            yield f"data: {json.dumps({'error': 'Something went wrong generating a response.'})}\n\n"
             yield "data: [DONE]\n\n"
 
     return StreamingResponse(
@@ -360,11 +393,9 @@ async def chat_stream(req: ChatRequest):
 
 
 @app.get("/sessions/{session_id}")
-async def get_session(session_id: str):
-    """Get session history."""
-    session = engine.store.get(session_id)
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
+async def get_session(session_id: str, authorization: str | None = Header(default=None)):
+    """Get session history. Requires the session's owner token."""
+    session = _owned_session_or_404(session_id, authorization)
     return {
         "session_id": session.session_id,
         "coach_name": session.coach_name,
@@ -373,28 +404,22 @@ async def get_session(session_id: str):
     }
 
 
-@app.get("/sessions")
-async def list_sessions():
-    """List recent sessions."""
-    return {"sessions": engine.store.list_recent(limit=20)}
-
-
 @app.post("/sessions/{session_id}/evaluate")
-async def evaluate_session(session_id: str):
-    """Generate end-of-session coaching feedback for a roleplay session."""
-    session = engine.store.get(session_id)
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
+async def evaluate_session(session_id: str, authorization: str | None = Header(default=None)):
+    """Generate end-of-session coaching feedback for a roleplay session. Requires the owner token."""
+    session = _owned_session_or_404(session_id, authorization)
     if not session.is_roleplay:
         raise HTTPException(status_code=400, detail="Feedback only available for roleplay sessions")
     if session.turn_count < 2:
         raise HTTPException(status_code=400, detail="Not enough conversation to evaluate")
     try:
         import asyncio
-        feedback = await asyncio.to_thread(engine.generate_feedback, session_id)
+        feedback = await asyncio.to_thread(engine.generate_feedback, session)
         return feedback  # structured dict with score, headline, summary, etc.
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        # Log the detail server-side; return a generic message to the caller.
+        logger.exception("Session evaluation failed")
+        raise HTTPException(status_code=500, detail="Could not generate feedback")
 
 
 @app.get("/scenarios")
@@ -405,12 +430,16 @@ async def get_scenarios():
 
 @app.post("/progress/generate")
 async def generate_progress(req: ProgressRequest):
-    """Analyze last N sessions and generate a progress report using Claude."""
-    if req.session_ids:
-        sessions = [engine.store.get(sid) for sid in req.session_ids if engine.store.get(sid)]
-    else:
-        recent = engine.store.list_recent(limit=5)
-        sessions = [engine.store.get(s["session_id"]) for s in recent if engine.store.get(s["session_id"])]
+    """
+    Generate a progress report using Claude from the caller's own sessions.
+    Only sessions sent with a matching owner token are used; there is no
+    fallback to other sessions on the server.
+    """
+    sessions = []
+    for cred in req.sessions:
+        s = engine.store.get_owned(cred.session_id, cred.session_token)
+        if s and s not in sessions:
+            sessions.append(s)
 
     if not sessions:
         return {"error": "No sessions found", "skills": {}, "leader_score": 0, "growth_plan": ""}
@@ -464,11 +493,9 @@ Return ONLY valid JSON, no other text."""
 
 
 @app.post("/sessions/{session_id}/annotate")
-async def annotate_session(session_id: str):
-    """Generate inline praise/tip annotations for a session transcript."""
-    session = engine.store.get(session_id)
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
+async def annotate_session(session_id: str, authorization: str | None = Header(default=None)):
+    """Generate inline praise/tip annotations for a session transcript. Requires the owner token."""
+    session = _owned_session_or_404(session_id, authorization)
 
     user_messages = [(i, msg["content"]) for i, msg in enumerate(session.messages) if msg["role"] == "user"]
 
