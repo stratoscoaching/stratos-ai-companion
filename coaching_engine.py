@@ -7,6 +7,10 @@ import os
 import uuid
 import json
 import time
+import hmac
+import hashlib
+import logging
+import secrets
 from pathlib import Path
 from typing import Optional, Iterator
 from anthropic import Anthropic
@@ -23,6 +27,36 @@ SESSION_TTL_SECONDS = 3600   # 1 hour session expiry
 # Use SESSIONS_DIR env var if set (Render persistent disk), else local fallback
 SESSIONS_DIR = Path(os.environ.get("SESSIONS_DIR", "sessions"))
 
+logger = logging.getLogger(__name__)
+
+
+def _hash_token(token: str) -> str:
+    """SHA-256 of a session token. Only this hash is ever written to disk."""
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+def session_path(session_id) -> Optional[Path]:
+    """
+    Turn a session ID into its file path, or return None if the ID is not safe.
+
+    Only canonical lowercase UUID strings (the form SessionStore.create issues)
+    are accepted, and the resulting file must sit directly inside SESSIONS_DIR.
+    This stops IDs like "../../x" or "/etc/x" from reaching other files.
+    """
+    if not isinstance(session_id, str):
+        return None
+    try:
+        parsed = uuid.UUID(session_id)
+    except ValueError:
+        return None
+    if str(parsed) != session_id:
+        return None
+    base = SESSIONS_DIR.resolve()
+    path = (base / f"{session_id}.json").resolve()
+    if path.parent != base:
+        return None
+    return path
+
 
 # ── Session Management ───────────────────────────────────────────────────────
 class Session:
@@ -38,6 +72,14 @@ class Session:
         self.is_roleplay: bool = False
         self.roleplay_character: str = ""
         self.roleplay_situation: str = ""
+        # SHA-256 of the owner's session token. Empty means nobody can open it.
+        self.owner_token_hash: str = ""
+
+    def token_matches(self, token: Optional[str]) -> bool:
+        """True only if this session has an owner and the token is theirs."""
+        if not self.owner_token_hash or not token:
+            return False
+        return hmac.compare_digest(_hash_token(token), self.owner_token_hash)
 
     def add_message(self, role: str, content: str):
         self.messages.append({"role": role, "content": content})
@@ -70,6 +112,7 @@ class Session:
             "is_roleplay": self.is_roleplay,
             "roleplay_character": self.roleplay_character,
             "roleplay_situation": self.roleplay_situation,
+            "owner_token_hash": self.owner_token_hash,
         }
 
     @classmethod
@@ -83,6 +126,7 @@ class Session:
         s.is_roleplay = data.get("is_roleplay", False)
         s.roleplay_character = data.get("roleplay_character", "")
         s.roleplay_situation = data.get("roleplay_situation", "")
+        s.owner_token_hash = data.get("owner_token_hash", "")
         # Backfill name from first user message if missing
         if not s.session_name:
             for msg in s.messages:
@@ -101,50 +145,61 @@ class SessionStore:
         self._cache: dict[str, Session] = {}
 
     def get(self, session_id: str) -> Optional[Session]:
+        """
+        Load a session by ID with no ownership check. Internal use only:
+        routes must go through get_owned so the caller proves they own it.
+        """
+        path = session_path(session_id)
+        if path is None:
+            return None
         if session_id in self._cache:
             return self._cache[session_id]
-        path = SESSIONS_DIR / f"{session_id}.json"
-        if path.exists():
+        if not path.exists():
+            return None
+        try:
             data = json.loads(path.read_text())
             session = Session.from_dict(data)
-            self._cache[session_id] = session
-            return session
-        return None
+        except (OSError, ValueError, KeyError, TypeError):
+            logger.warning("Could not load session file %s", path.name)
+            return None
+        # The file must describe the session that was asked for.
+        if session.session_id != session_id:
+            logger.warning("Session file %s holds a different session_id", path.name)
+            return None
+        self._cache[session_id] = session
+        return session
 
-    def create(self, coach_name: str = "James") -> Session:
+    def get_owned(self, session_id: str, token: Optional[str]) -> Optional[Session]:
+        """
+        Load a session only if the caller's token matches its owner hash.
+        Sessions saved before owner tokens existed have no hash and stay closed.
+        """
+        session = self.get(session_id)
+        if session is None or not session.token_matches(token):
+            return None
+        return session
+
+    def create(self, coach_name: str = "James") -> tuple[Session, str]:
+        """
+        Create a session and return it with its owner token. The token is
+        returned only here; the session keeps just its SHA-256 hash.
+        """
         session_id = str(uuid.uuid4())
         session = Session(session_id, coach_name)
+        token = secrets.token_urlsafe(32)
+        session.owner_token_hash = _hash_token(token)
         self._cache[session_id] = session
         self._save(session)
-        return session
+        return session, token
 
     def save(self, session: Session):
         self._save(session)
 
     def _save(self, session: Session):
-        path = SESSIONS_DIR / f"{session.session_id}.json"
+        path = session_path(session.session_id)
+        if path is None:
+            raise ValueError("Refusing to save a session with an invalid session_id")
         path.write_text(json.dumps(session.to_dict(), indent=2))
-
-    def list_recent(self, limit: int = 10) -> list[dict]:
-        sessions = []
-        for path in sorted(SESSIONS_DIR.glob("*.json"), key=lambda p: p.stat().st_mtime, reverse=True)[:limit]:
-            data = json.loads(path.read_text())
-            # Backfill session_name from first user message if not stored
-            session_name = data.get("session_name", "")
-            if not session_name:
-                for msg in data.get("messages", []):
-                    if msg["role"] == "user":
-                        name = msg["content"].strip().replace("\n", " ")
-                        session_name = name[:50] + ("…" if len(name) > 50 else "")
-                        break
-            sessions.append({
-                "session_id": data["session_id"],
-                "coach_name": data.get("coach_name", "James"),
-                "session_name": session_name,
-                "turn_count": data.get("turn_count", 0),
-                "last_active": data.get("last_active", 0),
-            })
-        return sessions
 
 
 # ── Coaching Engine ──────────────────────────────────────────────────────────
@@ -154,22 +209,16 @@ class CoachingEngine:
         self.store = SessionStore()
         self.rag = get_rag_engine()
 
-    def get_or_create_session(self, session_id: Optional[str] = None, coach_name: str = "James") -> Session:
-        if session_id:
-            session = self.store.get(session_id)
-            if session:
-                return session
+    def create_session(self, coach_name: str = "James") -> tuple[Session, str]:
+        """Start a new session. Returns the session and its one-time owner token."""
         return self.store.create(coach_name)
 
-    def chat(self, session_id: str, user_message: str) -> Iterator[str]:
+    def chat(self, session: Session, user_message: str) -> Iterator[str]:
         """
         Stream a coaching response for the given session and user message.
-        Yields text chunks as they arrive from Claude.
+        Yields text chunks as they arrive from Claude. The caller must pass a
+        session it has already checked ownership of (store.get_owned).
         """
-        session = self.store.get(session_id)
-        if not session:
-            raise ValueError(f"Session {session_id} not found")
-
         # Add user message to history
         session.add_message("user", user_message)
 
@@ -228,12 +277,12 @@ class CoachingEngine:
         )
         return response.content[0].text.strip()
 
-    def generate_feedback(self, session_id: str) -> dict:
-        """Generate end-of-session coaching feedback for a completed roleplay."""
+    def generate_feedback(self, session: Session) -> dict:
+        """
+        Generate end-of-session coaching feedback for a completed roleplay.
+        The caller must pass a session it has already checked ownership of.
+        """
         import json, re
-        session = self.store.get(session_id)
-        if not session:
-            raise ValueError(f"Session {session_id} not found")
 
         # Build conversation transcript — label each speaker clearly
         transcript_parts = []
